@@ -30,14 +30,16 @@ export function LandingPage() {
 
         {/* Background Hero Image - Desktop only (right side with gradient) */}
         <div className="absolute inset-0 pointer-events-none select-none overflow-hidden hidden lg:block">
-          <div 
-            className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-[5%]"
+          <div className="absolute inset-0 left-1/2 overflow-hidden">
+            <div 
+              className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-[5%]"
             style={{
-              maskImage: 'linear-gradient(to right, transparent 0%, transparent 5%, rgba(0,0,0,0.02) 8%, rgba(0,0,0,0.05) 12%, rgba(0,0,0,0.1) 16%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.4) 32%, rgba(0,0,0,0.6) 42%, rgba(0,0,0,0.78) 52%, rgba(0,0,0,0.92) 60%, rgba(0,0,0,0.99) 72%, rgba(0,0,0,1) 85%)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 5%, rgba(0,0,0,0.02) 8%, rgba(0,0,0,0.05) 12%, rgba(0,0,0,0.1) 16%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.4) 32%, rgba(0,0,0,0.6) 42%, rgba(0,0,0,0.78) 52%, rgba(0,0,0,0.92) 60%, rgba(0,0,0,0.99) 72%, rgba(0,0,0,1) 85%)',
+              maskImage: 'linear-gradient(to right, transparent 0%, transparent 5%, rgba(0,0,0,0.03) 8%, rgba(0,0,0,0.07) 12%, rgba(0,0,0,0.12) 16%, rgba(0,0,0,0.18) 20%, rgba(0,0,0,0.3) 28%, rgba(0,0,0,0.45) 36%, rgba(0,0,0,0.6) 44%, rgba(0,0,0,0.75) 55%, rgba(0,0,0,0.88) 68%, rgba(0,0,0,0.97) 80%, rgba(0,0,0,1) 90%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 5%, rgba(0,0,0,0.03) 8%, rgba(0,0,0,0.07) 12%, rgba(0,0,0,0.12) 16%, rgba(0,0,0,0.18) 20%, rgba(0,0,0,0.3) 28%, rgba(0,0,0,0.45) 36%, rgba(0,0,0,0.6) 44%, rgba(0,0,0,0.75) 55%, rgba(0,0,0,0.88) 68%, rgba(0,0,0,0.97) 80%, rgba(0,0,0,1) 90%)',
             }}
           >
-            <img src="/hero-bg.jpg" alt="" className="h-[650px] w-auto object-cover rounded-2xl" />
+            <img src="/hero-bg.jpg" alt="" className="h-[650px] w-auto max-w-[50vw] object-cover rounded-2xl" />
+            </div>
           </div>
           
           {/* Subtle gradient overlay for text readability */}
