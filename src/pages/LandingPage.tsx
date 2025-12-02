@@ -11,13 +11,21 @@ export function LandingPage() {
         
         {/* Background Hero Image - Tablet only (full background) */}
         <div className="absolute inset-0 pointer-events-none select-none overflow-hidden hidden md:block lg:hidden">
-          <img 
-            src="/hero-bg.jpg" 
-            alt="" 
-            className="h-full w-full object-cover opacity-[0.45]" 
-          />
+          <div 
+            className="absolute inset-0"
+            style={{
+              maskImage: 'linear-gradient(to right, transparent 0%, transparent 12%, rgba(0,0,0,0.05) 18%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.8) 85%, rgba(0,0,0,0.95) 95%, rgba(0,0,0,1) 100%)',
+              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 12%, rgba(0,0,0,0.05) 18%, rgba(0,0,0,0.1) 25%, rgba(0,0,0,0.2) 35%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.4) 55%, rgba(0,0,0,0.6) 70%, rgba(0,0,0,0.8) 85%, rgba(0,0,0,0.95) 95%, rgba(0,0,0,1) 100%)',
+            }}
+          >
+            <img 
+              src="/hero-bg.jpg" 
+              alt="" 
+              className="h-full w-full object-cover opacity-80" 
+            />
+          </div>
           {/* White overlay for faded effect */}
-          <div className="absolute inset-0 bg-white/75"></div>
+          <div className="absolute inset-0 bg-white/20"></div>
         </div>
 
         {/* Background Hero Image - Desktop only (right side with gradient) */}
