@@ -9,8 +9,19 @@ export function LandingPage() {
       <section className="relative overflow-hidden pt-20 pb-20 md:pt-32 md:pb-32">
         <div className="absolute top-0 left-1/2 -z-10 h-[1000px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl"></div>
         
-        {/* Background Hero Image with Smooth Gradient */}
-        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
+        {/* Background Hero Image - Tablet only (full background) */}
+        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden hidden md:block lg:hidden">
+          <img 
+            src="/hero-bg.jpg" 
+            alt="" 
+            className="h-full w-full object-cover opacity-[0.45]" 
+          />
+          {/* White overlay for faded effect */}
+          <div className="absolute inset-0 bg-white/75"></div>
+        </div>
+
+        {/* Background Hero Image - Desktop only (right side with gradient) */}
+        <div className="absolute inset-0 pointer-events-none select-none overflow-hidden hidden lg:block">
           <div 
             className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-[5%]"
             style={{
@@ -18,7 +29,7 @@ export function LandingPage() {
               WebkitMaskImage: 'linear-gradient(to right, transparent 0%, transparent 5%, rgba(0,0,0,0.02) 8%, rgba(0,0,0,0.05) 12%, rgba(0,0,0,0.1) 16%, rgba(0,0,0,0.15) 20%, rgba(0,0,0,0.4) 32%, rgba(0,0,0,0.6) 42%, rgba(0,0,0,0.78) 52%, rgba(0,0,0,0.92) 60%, rgba(0,0,0,0.99) 72%, rgba(0,0,0,1) 85%)',
             }}
           >
-            <img src="/hero-bg.jpg" alt="" className="h-[500px] w-auto md:h-[650px] object-cover rounded-2xl" />
+            <img src="/hero-bg.jpg" alt="" className="h-[650px] w-auto object-cover rounded-2xl" />
           </div>
           
           {/* Subtle gradient overlay for text readability */}
@@ -26,7 +37,7 @@ export function LandingPage() {
         </div>
 
         <div className="relative z-10 mx-auto max-w-6xl px-4 md:px-6">
-          <div className="max-w-2xl text-left">
+          <div className="max-w-2xl text-center md:text-left">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75"></span>
@@ -45,7 +56,7 @@ export function LandingPage() {
               chrono와 함께 사이드 프로젝트의 성장을 기록해보세요.
             </p>
             
-            <div className="flex flex-col items-start gap-4 sm:flex-row">
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start md:items-start">
               <Link
                 to="/login"
                 className="inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-gray-900 px-8 text-base font-medium text-white transition-all hover:bg-gray-800 hover:shadow-lg"
