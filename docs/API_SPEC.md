@@ -349,7 +349,9 @@ GitHub 관련 에러 코드:
 
 ### `GET /api/projects`
 
-**인증:** 필요
+**인증:** 필요
+
+**정렬:** 최근 커밋 날짜 기준 내림차순
 
 ### Response
 
@@ -371,6 +373,8 @@ GitHub 관련 에러 코드:
 ## 🔹 7.5 프로젝트 상세 조회
 
 ### `GET /api/projects/{projectId}`
+
+**인증:** 필요
 
 ### Response
 

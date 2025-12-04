@@ -260,14 +260,16 @@
 
 ## 11. 기술 스택 (Frontend 기준)
 
-- React 18
-- TypeScript
-- React Router
-- Axios
-- Zustand (전역 상태)
-- React Query (선택적 데이터 fetching)
-- Tailwind CSS
-- Chart.js or Recharts (그래프)
+- **React**: 18.3.1
+- **TypeScript**: ~5.6.2
+- **React Router**: 6.28.0
+- **Vite**: 6.0.1 (빌드 도구)
+- **Tailwind CSS**: 4.0.0-beta.1
+- **상태 관리**: Zustand (예정) / React Query (선택적, 예정)
+- **HTTP 클라이언트**: Axios (예정)
+- **차트 라이브러리**: Chart.js or Recharts (예정)
+- **아이콘**: lucide-react
+- **폰트**: Pretendard (CDN)
 
 ---
 
