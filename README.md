@@ -1,3 +1,29 @@
+# Chrono Frontend
+
+GitHub 커밋 기반 사이드 프로젝트 관리 웹 서비스
+
+## 환경 설정
+
+### 환경 변수
+
+프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 추가하세요:
+
+```env
+# API Base URL (백엔드 서버 URL)
+VITE_API_BASE_URL=http://localhost:8080/api
+```
+
+백엔드 서버가 준비되지 않은 경우, 기본값(`http://localhost:8080/api`)이 사용됩니다.
+
+## 개발 시작
+
+```bash
+npm install
+npm run dev
+```
+
+---
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
