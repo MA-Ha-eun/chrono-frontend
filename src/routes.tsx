@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { LoginPage } from "@/pages/auth/LoginPage";
+import { SignupPage } from "@/pages/auth/SignupPage";
 import { LandingPage } from "@/pages/LandingPage";
 import { DashboardPage } from "@/pages/dashboard/DashboardPage";
 import { ProjectListPage } from "@/pages/projects/ProjectListPage";
@@ -12,6 +13,10 @@ export const router = createBrowserRouter([
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/signup",
+    element: <SignupPage />,
   },
   {
     // Root Layout for both Landing and App
