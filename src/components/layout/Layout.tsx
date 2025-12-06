@@ -7,7 +7,7 @@ export function Layout() {
   const isLanding = location.pathname === "/";
 
   return (
-    <div className={cn("min-h-screen", isLanding ? "bg-white" : "bg-gray-50")}>
+    <div className={cn("min-h-screen", isLanding ? "bg-white" : "bg-zinc-100")}>
       <Navbar />
       {isLanding ? (
         // Landing page takes full width

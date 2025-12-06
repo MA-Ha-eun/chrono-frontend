@@ -45,7 +45,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
+    <div className="flex min-h-screen items-center justify-center bg-zinc-100 p-4">
       <div className="w-full max-w-[400px] space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
           <Link to="/" className="mb-6 flex flex-col items-center gap-3 transition-opacity hover:opacity-80">
@@ -58,7 +58,7 @@ export function LoginPage() {
           </p>
         </div>
 
-        <Card className="p-6 sm:p-8 border-gray-100 shadow-lg shadow-gray-100/50">
+        <Card className="p-6 sm:p-8 border-gray-100 shadow-lg shadow-zinc-100/50">
           <form onSubmit={handleSubmit} className="space-y-6">
             {successMessage && (
               <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">

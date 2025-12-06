@@ -86,7 +86,7 @@ export function LandingPage() {
       </section>
 
       {/* Feature Section */}
-      <section className="bg-gray-50 py-20 md:py-32">
+      <section className="bg-zinc-100 py-20 md:py-32">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
             <FeatureCard 
@@ -119,7 +119,7 @@ export function LandingPage() {
           </p>
           <Link
             to="/signup"
-            className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-lg font-bold text-white transition-all hover:bg-primary-dark hover:shadow-xl hover:shadow-primary/20"
+            className="inline-flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-lg font-bold text-white transition-all hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/20"
           >
             무료로 시작하기
             <ArrowRight className="h-5 w-5" />
@@ -139,7 +139,7 @@ export function LandingPage() {
 
 function FeatureCard({ icon: Icon, title, description }: { icon: any, title: string, description: string }) {
   return (
-    <div className="group rounded-2xl bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md">
+    <div className="group rounded-2xl bg-white p-8 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
       <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
         <Icon className="h-6 w-6" />
       </div>

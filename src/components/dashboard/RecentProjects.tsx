@@ -9,7 +9,7 @@ interface RecentProjectsProps {
 
 export function RecentProjects({ projects }: RecentProjectsProps) {
   return (
-    <div className="rounded-xl bg-white p-6 shadow-uniform">
+    <div className="rounded-xl bg-white p-6 shadow-sm">
       <div className="mb-6 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">최근 프로젝트</h2>
         <Link
