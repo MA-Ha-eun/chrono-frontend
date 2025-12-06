@@ -20,8 +20,16 @@ export function PasswordSection() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError("새 비밀번호는 6자 이상이어야 합니다.");
+    if (newPassword.length < 8) {
+      setError("새 비밀번호는 8자 이상이어야 합니다.");
+      return;
+    }
+
+    const hasLetter = /[a-zA-Z]/.test(newPassword);
+    const hasNumber = /[0-9]/.test(newPassword);
+
+    if (!hasLetter || !hasNumber) {
+      setError("새 비밀번호는 영문과 숫자를 포함해야 합니다.");
       return;
     }
 
@@ -48,7 +56,7 @@ export function PasswordSection() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="mt-[22px] space-y-5">
       {success && (
         <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">
           {success}
@@ -75,7 +83,7 @@ export function PasswordSection() {
           <input
             id="newPassword"
             type="password"
-            placeholder="새 비밀번호 입력 (6자 이상)"
+            placeholder="새 비밀번호 입력 (영문, 숫자 포함 8자 이상)"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             className="flex h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
