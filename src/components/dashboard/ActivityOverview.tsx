@@ -63,11 +63,11 @@ export function ActivityOverview({
           </div>
 
           {/* 연결선 2: 두 번째 노드 중심 → 세 번째 노드 중심 */}
-          <div className="absolute left-[50%] right-[16.67%] top-8 hidden h-2 -translate-y-0.5 bg-gradient-to-r from-primary to-[#8B9BA8] md:block"></div>
+          <div className="absolute left-[50%] right-[16.67%] top-8 hidden h-2 -translate-y-0.5 bg-gradient-to-r from-primary to-primary-dark md:block"></div>
 
           {/* 3. 전체 프로젝트 */}
           <div className="relative z-10 flex flex-1 flex-col items-center gap-3">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#8B9BA8] shadow-lg shadow-[#8B9BA8]/20">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary-dark shadow-lg shadow-primary-dark/20">
               <FolderTree className="h-8 w-8 text-white" />
             </div>
             <div className="flex items-baseline gap-2">
