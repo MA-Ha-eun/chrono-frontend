@@ -120,6 +120,26 @@ export const mockProjects: ProjectListItem[] = [
     targetDate: "2025-11-25",
     startDate: "2025-10-01",
   },
+  {
+    id: 9,
+    title: "웹 게임 프로젝트",
+    status: ProjectStatus.IN_PROGRESS,
+    techStack: "Phaser, TypeScript, WebSocket",
+    lastCommitAt: "2025-12-07T14:20:00Z",
+    totalCommits: 67,
+    targetDate: "2025-12-05", // 목표일 지남 (D+3)
+    startDate: "2025-11-15",
+  },
+  {
+    id: 10,
+    title: "데이터 분석 도구",
+    status: ProjectStatus.IN_PROGRESS,
+    techStack: "Python, Pandas, Jupyter",
+    lastCommitAt: "2025-12-01T09:30:00Z",
+    totalCommits: 124,
+    targetDate: "2025-11-30", // 목표일 지남 (D+8)
+    startDate: "2025-10-10",
+  },
 ];
 
 export const mockProject: Project = {
