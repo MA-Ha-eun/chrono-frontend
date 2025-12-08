@@ -122,6 +122,7 @@ export interface ProjectListItem {
   techStack?: string;
   lastCommitAt?: string;
   totalCommits?: number;
+  targetDate?: string;
 }
 
 // ========== Dashboard ==========
