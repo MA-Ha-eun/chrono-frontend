@@ -26,9 +26,6 @@ export function ProjectListPage() {
       setIsLoading(true);
       const data = await getProjects();
       setProjects(data);
-      if (data.length > 0) {
-        setSelectedProjectId(data[0].id);
-      }
     } catch (err) {
       setError("프로젝트 목록을 불러오는데 실패했습니다.");
       console.error(err);
@@ -112,6 +109,20 @@ export function ProjectListPage() {
 
     return { todayProjects, thisWeekProjects, thisMonthProjects, olderProjects };
   }, [filteredAndSortedProjects, sortBy]);
+
+  // 정렬/필터 변경 시 첫 번째 프로젝트 자동 선택
+  useEffect(() => {
+    if (filteredAndSortedProjects.length > 0) {
+      setSelectedProjectId(filteredAndSortedProjects[0].id);
+    }
+  }, [sortBy, filterStatus]);
+
+  // 프로젝트 목록이 처음 로드될 때 첫 번째 프로젝트 자동 선택
+  useEffect(() => {
+    if (filteredAndSortedProjects.length > 0 && selectedProjectId === null) {
+      setSelectedProjectId(filteredAndSortedProjects[0].id);
+    }
+  }, [filteredAndSortedProjects, selectedProjectId]);
 
   const selectedProject = useMemo(() => {
     return projects.find((p) => p.id === selectedProjectId);
