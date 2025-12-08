@@ -128,6 +128,14 @@ export function ProjectListPage() {
     return projects.find((p) => p.id === selectedProjectId);
   }, [projects, selectedProjectId]);
 
+  const projectCounts = useMemo(() => {
+    return {
+      all: projects.length,
+      inProgress: projects.filter((p) => p.status === ProjectStatus.IN_PROGRESS).length,
+      completed: projects.filter((p) => p.status === ProjectStatus.COMPLETED).length,
+    };
+  }, [projects]);
+
   const getStatusLabel = (status: ProjectStatus) => {
     return status === ProjectStatus.IN_PROGRESS ? "진행 중" : "완료";
   };
@@ -244,7 +252,7 @@ export function ProjectListPage() {
                       : "text-gray-900 hover:bg-zinc-50"
                   }`}
                 >
-                  전체 {projects.length}
+                  전체 {projectCounts.all}
                 </button>
                 <button
                   onClick={() => setFilterStatus("in_progress")}
@@ -254,7 +262,7 @@ export function ProjectListPage() {
                       : "text-gray-900 hover:bg-zinc-50"
                   }`}
                 >
-                  진행 중 {projects.filter((p) => p.status === ProjectStatus.IN_PROGRESS).length}
+                  진행 중 {projectCounts.inProgress}
                 </button>
                 <button
                   onClick={() => setFilterStatus("completed")}
@@ -264,7 +272,7 @@ export function ProjectListPage() {
                       : "text-gray-900 hover:bg-zinc-50"
                   }`}
                 >
-                  완료 {projects.filter((p) => p.status === ProjectStatus.COMPLETED).length}
+                  완료 {projectCounts.completed}
                 </button>
               </div>
 
