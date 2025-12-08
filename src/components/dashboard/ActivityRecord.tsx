@@ -58,12 +58,12 @@ export function ActivityRecord({ totalWeekCommits, totalCommitsThisMonth, inProg
           <div className="mt-1 text-sm text-gray-500">프로젝트</div>
           <div className="mt-4 flex items-center justify-center gap-4">
             <div className="flex items-baseline gap-2">
-              <span className="text-xs text-gray-500">진행 중</span>
+              <span className="text-xs font-medium text-gray-500">진행 중</span>
               <strong className="text-xl font-bold text-gray-900">{inProgressCount}</strong>
             </div>
             <div className="h-3 w-px bg-gray-200" />
             <div className="flex items-baseline gap-2">
-              <span className="text-xs text-gray-500">완료</span>
+              <span className="text-xs font-medium text-gray-500">완료</span>
               <strong className="text-xl font-bold text-gray-900">{completedCount}</strong>
             </div>
           </div>
@@ -86,7 +86,7 @@ export function ActivityRecord({ totalWeekCommits, totalCommitsThisMonth, inProg
           {/* 추세 비교 */}
           <div className="flex items-center justify-center gap-1.5 pt-1">
             <TrendIcon className={`h-3.5 w-3.5 ${trendInfo.color}`} />
-            <span className={`text-xs ${trendInfo.color}`}>{trendInfo.text}</span>
+            <span className={`text-xs font-medium ${trendInfo.color}`}>{trendInfo.text}</span>
           </div>
         </div>
       </div>

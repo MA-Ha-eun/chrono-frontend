@@ -130,7 +130,7 @@ export function ActivityOverview({
             </div>
             <div className="flex items-center gap-2">
               <Sparkle className="h-4 w-4 text-accent" />
-              <span className="text-sm text-gray-500">{dayLabels[mostActiveDayIndex]}요일에 가장 활발했어요</span>
+              <span className="text-xs font-medium text-gray-500">{dayLabels[mostActiveDayIndex]}요일에 가장 활발했어요</span>
             </div>
           </div>
         </div>
