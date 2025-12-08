@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { GitCommit, Calendar, Loader2, ArrowRight, Target } from "lucide-react";
 import { getProjects } from "@/lib/api/project";
@@ -374,96 +374,113 @@ function TimelineGroup({
   if (projects.length === 0) return null;
 
   return (
-    <div className="relative mb-8 last:mb-0">
+    <div className="mb-8 last:mb-0">
       {/* Group Title */}
-      <div className="mb-4 flex items-center gap-3">
-        <div className="h-3 w-3 rounded-full bg-primary"></div>
-        <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-        <div className="h-px flex-1 bg-gray-200"></div>
+      <div className="mb-4 grid grid-cols-[24px_1fr] items-center gap-x-4">
+        <div className="flex justify-center">
+          <div className="h-3 w-3 rounded-full bg-primary"></div>
+        </div>
+        <div className="flex items-center gap-3">
+          <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+          <div className="h-px flex-1 bg-gray-200"></div>
+        </div>
       </div>
 
-      {/* Timeline Line */}
-      <div className="absolute left-[5px] top-12 bottom-0 w-0.5 bg-gray-200"></div>
-
-      {/* Project Items */}
-      <div className="space-y-2 pl-8">
+      {/* Project Items - Grid로 타임라인과 카드 정렬 */}
+      <div className="grid grid-cols-[24px_1fr] gap-x-4 gap-y-2 items-stretch">
         {projects.map((project, index) => {
           const daysAgo = getDaysSinceLastCommit(project);
           const isSelected = project.id === selectedId;
           const dday = getDday(project.targetDate);
           const ddayInfo = getDdayLabel(dday);
           const rank = index + 1;
+          const isFirst = index === 0;
+          const isLast = index === projects.length - 1;
 
           return (
-            <button
-              key={project.id}
-              onClick={() => onSelect(project.id)}
-              className={`relative w-full rounded-lg border p-3 text-left transition-all ${
-                isSelected
-                  ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-gray-200 bg-white hover:border-primary/50 hover:bg-gray-50"
-              }`}
-            >
-              {/* Timeline Dot or Rank */}
-              {showRank ? (
-                <div
-                  className={`absolute -left-8 top-1/2 flex h-5 w-5 -translate-y-1/2 items-center justify-center rounded-full text-[10px] font-bold ${
-                    rank === 1
-                      ? "bg-amber-400 text-white"
-                      : rank === 2
-                      ? "bg-gray-300 text-white"
-                      : rank === 3
-                      ? "bg-amber-600 text-white"
-                      : isSelected
-                      ? "bg-primary text-white"
-                      : "bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  {rank}
-                </div>
-              ) : (
-                <div
-                  className={`absolute -left-8 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full ${
-                    isSelected ? "bg-primary" : "bg-gray-300"
+            <React.Fragment key={project.id}>
+              {/* Timeline Cell */}
+              <div className="relative flex justify-center">
+                {/* 세로 선 - 첫/마지막 카드 고려 */}
+                <div 
+                  className={`absolute left-1/2 -translate-x-1/2 w-0.5 bg-gray-200 ${
+                    isFirst && isLast ? 'top-4 bottom-4' : isFirst ? 'top-1/2 -bottom-1' : isLast ? '-top-1 bottom-1/2' : '-top-1 -bottom-1'
                   }`}
                 ></div>
-              )}
-
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium text-gray-900 truncate">{project.title}</h4>
-                  <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
-                    {project.totalCommits !== undefined && (
-                      <span className="flex items-center gap-1">
-                        <GitCommit className="h-3 w-3" />
-                        <span className={showRank ? "font-semibold text-gray-900" : ""}>{project.totalCommits}</span>
-                        <span>커밋</span>
-                      </span>
-                    )}
-                    <span>·</span>
-                    <span>{getTimeLabel(daysAgo)}</span>
-                    {ddayInfo && (
-                      <>
-                        <span>·</span>
-                        <span
-                          className={`font-medium ${
-                            ddayInfo.isOverdue
-                              ? "text-red-600"
-                              : ddayInfo.isUrgent
-                              ? "text-amber-600"
-                              : "text-gray-600"
-                          }`}
-                        >
-                          {ddayInfo.label}
-                          {ddayInfo.isOverdue && " ⚠️"}
-                          {ddayInfo.isUrgent && !ddayInfo.isOverdue && " 🔥"}
-                        </span>
-                      </>
-                    )}
-                  </div>
+                
+                {/* 동그라미 또는 순위 - 카드 중앙에 위치 */}
+                <div className="absolute inset-0 z-10 grid place-items-center">
+                  {showRank ? (
+                    <div
+                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
+                        rank === 1
+                          ? "bg-amber-400 text-white"
+                          : rank === 2
+                          ? "bg-gray-300 text-white"
+                          : rank === 3
+                          ? "bg-amber-600 text-white"
+                          : isSelected
+                          ? "bg-primary text-white"
+                          : "bg-gray-200 text-gray-600"
+                      }`}
+                    >
+                      {rank}
+                    </div>
+                  ) : (
+                    <div
+                      className={`h-2 w-2 rounded-full ${
+                        isSelected ? "bg-primary" : "bg-gray-300"
+                      }`}
+                    ></div>
+                  )}
                 </div>
               </div>
-            </button>
+
+              {/* Card Cell */}
+              <button
+                onClick={() => onSelect(project.id)}
+                className={`min-h-[80px] rounded-lg border p-4 text-left transition-all ${
+                  isSelected
+                    ? "border-primary bg-primary/5 shadow-sm"
+                    : "border-gray-200 bg-white hover:border-primary/50 hover:bg-gray-50"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-gray-900 truncate">{project.title}</h4>
+                    <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                      {project.totalCommits !== undefined && (
+                        <span className="flex items-center gap-1">
+                          <GitCommit className="h-3 w-3" />
+                          <span className={showRank ? "font-semibold text-gray-900" : ""}>{project.totalCommits}</span>
+                          <span>커밋</span>
+                        </span>
+                      )}
+                      <span>·</span>
+                      <span>{getTimeLabel(daysAgo)}</span>
+                      {ddayInfo && (
+                        <>
+                          <span>·</span>
+                          <span
+                            className={`font-medium ${
+                              ddayInfo.isOverdue
+                                ? "text-red-600"
+                                : ddayInfo.isUrgent
+                                ? "text-amber-600"
+                                : "text-gray-600"
+                            }`}
+                          >
+                            {ddayInfo.label}
+                            {ddayInfo.isOverdue && " ⚠️"}
+                            {ddayInfo.isUrgent && !ddayInfo.isOverdue && " 🔥"}
+                          </span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </button>
+            </React.Fragment>
           );
         })}
       </div>
