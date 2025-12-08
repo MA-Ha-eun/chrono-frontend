@@ -457,7 +457,7 @@ function TimelineGroup({
                     </div>
                   ) : (
                     <div
-                      className={`h-2 w-2 rounded-full ${
+                      className={`h-2 w-2 rounded-full transition-colors duration-200 ease-in-out ${
                         isSelected ? "bg-primary" : "bg-gray-300"
                       }`}
                     ></div>
@@ -468,7 +468,7 @@ function TimelineGroup({
               {/* Card Cell */}
               <button
                 onClick={() => onSelect(project.id)}
-                className={`min-h-[80px] rounded-lg border p-4 text-left transition-all ${
+                className={`min-h-[80px] rounded-lg border p-4 text-left transition-all duration-200 ease-in-out ${
                   isSelected
                     ? "border-primary bg-primary/5 shadow-sm"
                     : "border-gray-200 bg-white hover:border-primary/50 hover:bg-gray-50"
