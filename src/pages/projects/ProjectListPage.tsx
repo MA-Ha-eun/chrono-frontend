@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { GitCommit, Calendar, Loader2, ArrowRight, Target, ChevronDown, CircleAlert, Flame, Clock } from "lucide-react";
+import { GitCommit, Loader2, ChevronDown } from "lucide-react";
 import { getProjects } from "@/lib/api/project";
 import { ProjectListItem, ProjectStatus } from "@/types/api";
-import { Badge } from "@/components/common/Badge";
-import { getDaysSinceLastCommit } from "@/utils/dashboard";
+import { TimelineSection } from "@/components/projects/TimelineSection";
+import { ProjectPreview } from "@/components/projects/ProjectPreview";
 
 type FilterStatus = "all" | "in_progress" | "completed";
 type SortOption = "recent" | "commits" | "created";
@@ -287,7 +287,7 @@ export function ProjectListPage() {
             <div className="relative">
               {/* Timeline Groups */}
               {sortBy === "commits" ? (
-                <TimelineGroup
+                <TimelineSection
                   title="전체"
                   projects={groupedProjects.todayProjects}
                   selectedId={selectedProjectId}
@@ -301,7 +301,7 @@ export function ProjectListPage() {
                 />
               ) : (
                 <>
-                  <TimelineGroup
+                  <TimelineSection
                     title={sortBy === "recent" ? "오늘 활동" : "오늘"}
                     projects={groupedProjects.todayProjects}
                     selectedId={selectedProjectId}
@@ -312,7 +312,7 @@ export function ProjectListPage() {
                     getStatusLabel={getStatusLabel}
                     getStatusVariant={getStatusVariant}
                   />
-                  <TimelineGroup
+                  <TimelineSection
                     title={sortBy === "recent" ? "이번 주 활동" : "이번 주"}
                     projects={groupedProjects.thisWeekProjects}
                     selectedId={selectedProjectId}
@@ -323,7 +323,7 @@ export function ProjectListPage() {
                     getStatusLabel={getStatusLabel}
                     getStatusVariant={getStatusVariant}
                   />
-                  <TimelineGroup
+                  <TimelineSection
                     title={sortBy === "recent" ? "이번 달 활동" : "이번 달"}
                     projects={groupedProjects.thisMonthProjects}
                     selectedId={selectedProjectId}
@@ -334,7 +334,7 @@ export function ProjectListPage() {
                     getStatusLabel={getStatusLabel}
                     getStatusVariant={getStatusVariant}
                   />
-                  <TimelineGroup
+                  <TimelineSection
                     title={sortBy === "recent" ? "이전 활동" : "이전"}
                     projects={groupedProjects.olderProjects}
                     selectedId={selectedProjectId}
@@ -371,287 +371,6 @@ export function ProjectListPage() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-// Timeline Group Component
-function TimelineGroup({
-  title,
-  projects,
-  selectedId,
-  onSelect,
-  getTimeLabel,
-  getDday,
-  getDdayLabel,
-  getStatusLabel,
-  getStatusVariant,
-  showRank = false,
-}: {
-  title: string;
-  projects: ProjectListItem[];
-  selectedId: number | null;
-  onSelect: (id: number) => void;
-  getTimeLabel: (daysAgo: number | null) => string;
-  getDday: (targetDate?: string) => number | null;
-  getDdayLabel: (dday: number | null) => { label: string; isUrgent?: boolean; isOverdue?: boolean } | null;
-  getStatusLabel: (status: ProjectStatus) => string;
-  getStatusVariant: (status: ProjectStatus) => "primary" | "accent";
-  showRank?: boolean;
-}) {
-  if (projects.length === 0) return null;
-
-  return (
-    <div className="mb-8 last:mb-0">
-      {/* Group Title - 커밋 많은 순일 때는 숨김 */}
-      {!showRank && (
-        <div className="mb-4 grid grid-cols-[24px_1fr] items-center gap-x-4">
-          <div className="flex justify-center">
-            <div className="h-3 w-3 rounded-full bg-primary"></div>
-          </div>
-          <div className="flex items-center">
-            <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
-          </div>
-        </div>
-      )}
-
-      {/* Project Items - Grid로 타임라인과 카드 정렬 */}
-      <div className="grid grid-cols-[24px_1fr] gap-x-4 gap-y-2 items-stretch">
-        {projects.map((project, index) => {
-          const daysAgo = getDaysSinceLastCommit(project);
-          const isSelected = project.id === selectedId;
-          const dday = project.status !== ProjectStatus.COMPLETED ? getDday(project.targetDate) : null;
-          const ddayInfo = dday !== null ? getDdayLabel(dday) : null;
-          const rank = index + 1;
-          const isFirst = index === 0;
-          const isLast = index === projects.length - 1;
-
-          return (
-            <React.Fragment key={project.id}>
-              {/* Timeline Cell */}
-              <div className="relative flex justify-center">
-                {/* 세로 선 - 첫/마지막 카드 고려 */}
-                <div 
-                  className={`absolute left-1/2 -translate-x-1/2 w-0.5 bg-gray-200 ${
-                    isFirst && isLast ? 'top-4 bottom-4' : isFirst ? 'top-1/2 -bottom-1' : isLast ? '-top-1 bottom-1/2' : '-top-1 -bottom-1'
-                  }`}
-                ></div>
-                
-                {/* 동그라미 또는 순위 - 카드 중앙에 위치 */}
-                <div className="absolute inset-0 z-10 grid place-items-center">
-                  {showRank ? (
-                    <div
-                      className={`flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold ${
-                        rank === 1
-                          ? "bg-amber-400 text-white"
-                          : rank === 2
-                          ? "bg-gray-300 text-white"
-                          : rank === 3
-                          ? "bg-amber-600 text-white"
-                          : isSelected
-                          ? "bg-primary text-white"
-                          : "bg-gray-200 text-gray-600"
-                      }`}
-                    >
-                      {rank}
-                    </div>
-                  ) : (
-                    <div
-                      className={`h-2 w-2 rounded-full transition-colors duration-200 ease-in-out ${
-                        isSelected ? "bg-primary" : "bg-gray-300"
-                      }`}
-                    ></div>
-                  )}
-                </div>
-              </div>
-
-              {/* Card Cell */}
-              <button
-                onClick={() => onSelect(project.id)}
-                className={`min-h-[80px] rounded-lg border p-4 text-left transition-all duration-200 ease-in-out ${
-                  isSelected
-                    ? "border-primary bg-primary/5 shadow-sm"
-                    : "border-gray-200 bg-white hover:border-primary/50 hover:bg-gray-50"
-                }`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate">{project.title}</h4>
-                    <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                      {project.totalCommits !== undefined && (
-                        <span className="flex items-center gap-1">
-                          <GitCommit className="h-3 w-3" />
-                          <span className={showRank ? "font-semibold text-gray-900" : ""}>{project.totalCommits}</span>
-                          <span>커밋</span>
-                        </span>
-                      )}
-                      <span>·</span>
-                      <span>{getTimeLabel(daysAgo)}</span>
-                      {ddayInfo && project.status !== ProjectStatus.COMPLETED && (
-                        <>
-                          <span>·</span>
-                          <span
-                            className={`flex items-center gap-1 font-medium ${
-                              ddayInfo.isOverdue
-                                ? "text-gray-300"
-                                : ddayInfo.isUrgent
-                                ? "text-accent"
-                                : "text-gray-700"
-                            }`}
-                          >
-                            {ddayInfo.label}
-                            {ddayInfo.isOverdue && (
-                              <CircleAlert className="h-3.5 w-3.5" />
-                            )}
-                            {ddayInfo.isUrgent && !ddayInfo.isOverdue && (
-                              <Flame className="h-3.5 w-3.5" />
-                            )}
-                          </span>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                  <Badge variant={getStatusVariant(project.status)} className="shrink-0 text-xs">
-                    {getStatusLabel(project.status)}
-                  </Badge>
-                </div>
-              </button>
-            </React.Fragment>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// Project Preview Component
-function ProjectPreview({
-  project,
-  getStatusLabel,
-  getStatusVariant,
-  getTimeLabel,
-  getDday,
-  getDdayLabel,
-}: {
-  project: ProjectListItem;
-  getStatusLabel: (status: ProjectStatus) => string;
-  getStatusVariant: (status: ProjectStatus) => "primary" | "accent";
-  getTimeLabel: (daysAgo: number | null) => string;
-  getDday: (targetDate?: string) => number | null;
-  getDdayLabel: (dday: number | null) => { label: string; isUrgent?: boolean; isOverdue?: boolean } | null;
-}) {
-  const daysAgo = getDaysSinceLastCommit(project);
-  const techStackArray = project.techStack
-    ? project.techStack.split(",").map((s) => s.trim())
-    : [];
-  const dday = project.status !== ProjectStatus.COMPLETED ? getDday(project.targetDate) : null;
-  const ddayInfo = dday !== null ? getDdayLabel(dday) : null;
-
-  return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h2 className="text-lg font-semibold text-gray-900">{project.title}</h2>
-      </div>
-
-      {/* Tech Stack */}
-      {techStackArray.length > 0 && (
-        <div>
-          <h3 className="mb-2 text-xs font-medium text-gray-500">기술 스택</h3>
-          <div className="flex flex-wrap items-center">
-            {techStackArray.map((tech, idx) => (
-              <React.Fragment key={idx}>
-                {idx > 0 && (
-                  <div className="mx-2 h-4 border-l border-gray-100"></div>
-                )}
-                <span className="rounded-md p-4 text-xs font-medium text-gray-700">
-                  {tech}
-                </span>
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Stats */}
-      <div className="space-y-3">
-        {project.totalCommits !== undefined && (
-          <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <GitCommit className="h-4 w-4 text-primary" />
-              <span>총 커밋</span>
-            </div>
-            <span className="text-base font-medium text-gray-900">{project.totalCommits}</span>
-          </div>
-        )}
-
-        {daysAgo !== null && (
-          <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Calendar className="h-4 w-4 text-primary" />
-              <span>최근 활동</span>
-            </div>
-            <span className="text-base font-medium text-gray-900">{getTimeLabel(daysAgo)}</span>
-          </div>
-        )}
-
-        {project.targetDate && (
-          <div
-            className={`flex items-center justify-between rounded-lg p-4 ${
-              project.status === ProjectStatus.COMPLETED
-                ? "bg-zinc-50"
-                : ddayInfo?.isOverdue
-                ? "bg-accent-50"
-                : "bg-zinc-50"
-            }`}
-          >
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Target className="h-4 w-4 text-primary" />
-              <span>목표</span>
-            </div>
-            <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-2">
-                {ddayInfo && project.status !== ProjectStatus.COMPLETED && (
-                  <div
-                    className={`flex items-center gap-1 text-sm font-medium ${
-                      ddayInfo.isOverdue
-                        ? "text-gray-300"
-                        : ddayInfo.isUrgent
-                        ? "text-accent"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    {ddayInfo.label}
-                    {ddayInfo.isOverdue && (
-                      <CircleAlert className="h-3.5 w-3.5" />
-                    )}
-                    {ddayInfo.isUrgent && !ddayInfo.isOverdue && (
-                      <Flame className="h-3.5 w-3.5" />
-                    )}
-                  </div>
-                )}
-                <Badge variant={getStatusVariant(project.status)}>{getStatusLabel(project.status)}</Badge>
-              </div>
-              <div className="text-xs text-gray-500">
-                {new Date(project.targetDate).toLocaleDateString("ko-KR", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Action Button */}
-      <Link
-        to={`/projects/${project.id}`}
-        className="flex h-10 items-center justify-center gap-2 rounded-lg bg-primary text-sm font-medium text-white transition-colors hover:bg-primary-dark"
-      >
-        상세보기
-        <ArrowRight className="h-4 w-4" />
-      </Link>
     </div>
   );
 }
