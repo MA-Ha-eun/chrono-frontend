@@ -123,6 +123,7 @@ export interface ProjectListItem {
   lastCommitAt?: string;
   totalCommits?: number;
   targetDate?: string;
+  startDate?: string;
 }
 
 // ========== Dashboard ==========
