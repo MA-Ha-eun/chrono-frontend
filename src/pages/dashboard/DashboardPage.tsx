@@ -45,10 +45,39 @@ export function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">대시보드</h1>
           <p className="mt-1 text-sm text-gray-500">당신의 프로젝트 활동을 한눈에 확인하세요.</p>
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 animate-pulse rounded-xl bg-gray-50"></div>
-          ))}
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* ActivityOverview 스켈레톤 */}
+          <div className="lg:col-span-2">
+            <div className="h-96 animate-pulse rounded-xl bg-white p-6 shadow-sm">
+              <div className="space-y-4">
+                <div className="h-6 w-48 rounded bg-gray-200"></div>
+                <div className="h-64 rounded-lg bg-gray-100"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* ActivityRecord 스켈레톤 */}
+          <div>
+            <div className="h-96 animate-pulse rounded-xl bg-white p-6 shadow-sm">
+              <div className="space-y-4">
+                <div className="h-6 w-20 rounded bg-gray-200"></div>
+                <div className="h-64 rounded-lg bg-gray-100"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* RecentProjects 스켈레톤 */}
+        <div className="h-64 animate-pulse rounded-xl bg-white p-6 shadow-sm">
+          <div className="space-y-3">
+            <div className="h-6 w-24 rounded bg-gray-200"></div>
+            <div className="space-y-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-20 rounded-lg bg-gray-100"></div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );
