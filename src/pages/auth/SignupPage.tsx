@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
-import { signup } from "@/lib/api/auth";
+import { signup, sendEmailVerification, verifyEmailCode } from "@/lib/api/auth";
 import { isApiError } from "@/lib/api/client";
 
 export function SignupPage() {
@@ -11,14 +11,73 @@ export function SignupPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
+  const [emailVerified, setEmailVerified] = useState(false);
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [nickname, setNickname] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSendVerificationCode = async () => {
+    if (!email.trim()) {
+      setError("이메일을 입력해주세요.");
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+    setIsSendingCode(true);
+
+    try {
+      await sendEmailVerification({ email: email.trim() });
+      setSuccess("인증코드가 발송되었습니다. 이메일을 확인해주세요.");
+    } catch (err) {
+      if (isApiError(err)) {
+        setError(err.message || "인증코드 발송에 실패했습니다.");
+      } else {
+        setError("인증코드 발송 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsSendingCode(false);
+    }
+  };
+
+  const handleVerifyCode = async () => {
+    if (!verificationCode.trim()) {
+      setError("인증코드를 입력해주세요.");
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+    setIsVerifyingCode(true);
+
+    try {
+      await verifyEmailCode({ email: email.trim(), code: verificationCode.trim() });
+      setEmailVerified(true);
+      setSuccess("이메일 인증이 완료되었습니다.");
+    } catch (err) {
+      if (isApiError(err)) {
+        setError(err.message || "인증코드 확인에 실패했습니다.");
+      } else {
+        setError("인증코드 확인 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+
+    if (!emailVerified) {
+      setError("이메일 인증을 완료해주세요.");
+      return;
+    }
 
     if (password !== passwordConfirm) {
       setError("비밀번호가 일치하지 않습니다.");
@@ -67,53 +126,125 @@ export function SignupPage() {
                 {error}
               </div>
             )}
+            {success && (
+              <div className="rounded-lg bg-green-50 p-3 text-sm text-green-600">
+                {success}
+              </div>
+            )}
+
             <div className="space-y-4">
-              <Input
-                id="email"
-                type="email"
-                label="이메일"
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                autoComplete="email"
-              />
-              <Input
-                id="password"
-                type="password"
-                label="비밀번호"
-                placeholder="8자 이상 입력하세요"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="new-password"
-              />
-              <Input
-                id="passwordConfirm"
-                type="password"
-                label="비밀번호 확인"
-                placeholder="비밀번호를 다시 입력하세요"
-                value={passwordConfirm}
-                onChange={(e) => setPasswordConfirm(e.target.value)}
-                required
-                autoComplete="new-password"
-              />
-              <Input
-                id="nickname"
-                type="text"
-                label="닉네임"
-                placeholder="닉네임을 입력하세요"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                required
-                autoComplete="nickname"
-              />
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    이메일
+                  </label>
+                  <div className="flex">
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="email@example.com"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        setEmailVerified(false);
+                        setVerificationCode("");
+                      }}
+                      disabled={emailVerified}
+                      required
+                      autoComplete="email"
+                      className="flex-1 rounded-r-none border-r-0"
+                      label=""
+                    />
+                    <Button
+                      type="button"
+                      onClick={handleSendVerificationCode}
+                      disabled={emailVerified || isSendingCode}
+                      isLoading={isSendingCode}
+                      className="h-10 rounded-l-none whitespace-nowrap px-4"
+                    >
+                      {emailVerified ? "인증완료" : "인증하기"}
+                    </Button>
+                  </div>
+                </div>
+
+                {!emailVerified && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      인증코드
+                    </label>
+                    <div className="flex">
+                      <Input
+                        id="verificationCode"
+                        type="text"
+                        placeholder="인증코드를 입력하세요"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        maxLength={8}
+                        className="flex-1 rounded-r-none border-r-0"
+                        label=""
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleVerifyCode}
+                        disabled={!verificationCode.trim() || isVerifyingCode}
+                        isLoading={isVerifyingCode}
+                        className="h-10 rounded-l-none whitespace-nowrap px-4"
+                      >
+                        인증확인
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
+                {emailVerified && (
+                  <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700 flex items-center gap-1.5">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    이메일 인증이 완료되었습니다.
+                  </div>
+                )}
+              </div>
+
+              <div className={emailVerified ? "space-y-4" : "space-y-4 opacity-50 pointer-events-none"}>
+                <Input
+                  id="password"
+                  type="password"
+                  label="비밀번호"
+                  placeholder="8자 이상 입력하세요"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                />
+                <Input
+                  id="passwordConfirm"
+                  type="password"
+                  label="비밀번호 확인"
+                  placeholder="비밀번호를 다시 입력하세요"
+                  value={passwordConfirm}
+                  onChange={(e) => setPasswordConfirm(e.target.value)}
+                  required
+                  autoComplete="new-password"
+                />
+                <Input
+                  id="nickname"
+                  type="text"
+                  label="닉네임"
+                  placeholder="닉네임을 입력하세요"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  required
+                  autoComplete="nickname"
+                />
+              </div>
             </div>
 
             <Button
               type="submit"
               className="w-full h-11 text-base"
               isLoading={isLoading}
+              disabled={!emailVerified}
             >
               회원가입
             </Button>
