@@ -172,74 +172,28 @@ export function ProjectListPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">프로젝트</h1>
-            <p className="mt-1 text-sm text-gray-500">관리 중인 사이드 프로젝트 목록입니다.</p>
-          </div>
-          <div className="h-10 w-24 animate-pulse rounded-lg bg-gray-200"></div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">프로젝트</h1>
+          <p className="mt-1 text-sm text-gray-500">관리 중인 사이드 프로젝트 목록입니다.</p>
         </div>
 
-        {/* Timeline + Preview Layout */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           {/* Timeline List 스켈레톤 */}
           <div className="lg:col-span-2">
-            <div className="animate-pulse rounded-xl bg-white p-6 shadow-sm">
-              {/* Filters & Sort 스켈레톤 */}
-              <div className="mb-6 flex items-center gap-2 sm:justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-[38px] w-16 rounded-full bg-gray-200"></div>
-                  <div className="h-[38px] w-20 rounded-full bg-gray-200"></div>
-                  <div className="h-[38px] w-16 rounded-full bg-gray-200"></div>
-                </div>
-                <div className="h-[38px] w-32 rounded-lg bg-gray-200"></div>
-              </div>
-
-              {/* Timeline Content 스켈레톤 */}
-              <div className="space-y-8">
-                {/* Timeline Section 스켈레톤 */}
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="h-3 w-3 rounded-full bg-gray-200"></div>
-                      <div className="h-4 w-24 rounded bg-gray-200"></div>
-                    </div>
-                    <div className="grid grid-cols-[24px_1fr] gap-x-4 gap-y-2">
-                      {[1, 2].map((j) => (
-                        <React.Fragment key={j}>
-                          <div className="flex justify-center">
-                            <div className="h-2 w-2 rounded-full bg-gray-200"></div>
-                          </div>
-                          <div className="h-20 rounded-lg border border-gray-200 bg-gray-50"></div>
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+            <div className="h-96 animate-pulse rounded-xl bg-white p-6 shadow-sm">
+              <div className="space-y-4">
+                <div className="h-6 w-48 rounded bg-gray-200"></div>
+                <div className="h-64 rounded-lg bg-gray-100"></div>
               </div>
             </div>
           </div>
 
           {/* Preview Panel 스켈레톤 */}
-          <div className="lg:col-span-1">
-            <div className="animate-pulse rounded-xl bg-white p-6 shadow-sm lg:sticky lg:top-6">
-              <div className="space-y-6">
-                <div className="h-7 w-32 rounded bg-gray-200"></div>
-                <div className="space-y-3">
-                  <div className="h-4 w-20 rounded bg-gray-200"></div>
-                  <div className="flex gap-2">
-                    <div className="h-6 w-16 rounded-md bg-gray-200"></div>
-                    <div className="h-4 w-px bg-gray-200"></div>
-                    <div className="h-6 w-20 rounded-md bg-gray-200"></div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-16 rounded-lg bg-gray-100"></div>
-                  ))}
-                </div>
-                <div className="h-10 w-full rounded-lg bg-gray-200"></div>
+          <div>
+            <div className="h-96 animate-pulse rounded-xl bg-white p-6 shadow-sm">
+              <div className="space-y-4">
+                <div className="h-6 w-20 rounded bg-gray-200"></div>
+                <div className="h-64 rounded-lg bg-gray-100"></div>
               </div>
             </div>
           </div>
