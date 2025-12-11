@@ -1,8 +1,9 @@
 # 📘 PRD – Chrono (MVP)
 
-**버전:** v1.0
+**버전:** v1.1
 
 **작성일:** 2025-12-02
+**수정일:** 2025-12-12
 
 ---
 
@@ -125,6 +126,8 @@
 ### 6.2 SHOULD (여유 시 구현)
 
 - 프로필 수정 (닉네임/소개 변경)
+- 비밀번호 변경
+- 회원탈퇴
 - 대시보드 API 캐싱
 - GitHub API 실패에 따른 세부 UX 처리
 - 프로젝트 상세 페이지의 시각적 구성 강화
@@ -138,7 +141,22 @@
 - GitHub 잔디 히트맵
 - 1일 1커밋 스트릭/뱃지
 - README/포트폴리오 자동 생성
-- GitHub OAuth (private repo 지원)
+- GitHub OAuth (OAuth 방식의 private repo 지원)
+
+### 6.4 GitHub 연동 전략
+
+#### MVP 버전 (현재)
+- **일반 로그인 + GitHub username 방식**
+- GitHub public 데이터만으로 대시보드 구성
+- UI/문구로 명확하게 안내:
+  - "본인의 GitHub username만 입력해 주세요."
+  - "현재 버전에서는 public 데이터만 분석합니다."
+
+#### 향후 계획
+- **PAT(Personal Access Token) 입력 옵션 추가**
+- "원하면 프라이빗 repo까지 포함한 분석 제공"
+- PAT 방식으로 private repository 접근 지원
+- 기본적으로 PAT 연동을 권장하는 방향으로 진행
 
 ---
 
@@ -147,17 +165,22 @@
 ### 7.1 Auth
 
 - 이메일/비밀번호 기반 간단 로그인
-- 로그인 시 JWT 발급
-- 보호 라우트: `/dashboard`, `/projects/**`, `/settings`
+- 회원가입 전 이메일 인증코드 발송 및 확인
+- 로그인 시 JWT 발급 (Access Token + Refresh Token)
+- Refresh Token으로 Access Token 재발급
+- 로그아웃 (서버 측 Refresh Token 삭제)
+- 보호 라우트: `/dashboard`, `/projects/**`, `/settings`
 
 ---
 
 ### 7.2 GitHub 연동
 
+- GitHub username 유효성 검증 (실시간)
 - GitHub username 설정 후 repo 자동 조회
 - `/api/github/repos`로 public repo 리스트 가져옴
 - 프로젝트 생성 시 repo 선택
 - GitHub API 호출 실패 시 명확한 에러 메시지 제공
+- (향후) PAT 연동으로 private repo 접근 지원
 
 ---
 
@@ -279,7 +302,7 @@
 - GitHub 잔디 히트맵
 - 포트폴리오/README 자동 생성
 - 기술 스택별 시간/경험치 통계
-- Private repo를 위한 GitHub OAuth
+- Private repo를 위한 PAT 연동 (기본 연동 후 PAT 입력 옵션 제공)
 
 ---
 
