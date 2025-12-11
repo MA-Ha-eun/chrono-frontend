@@ -65,12 +65,18 @@ export interface UpdateProfileRequest {
 }
 
 // ========== GitHub ==========
+// 백엔드 GithubRepoDto에 맞춘 타입
 export interface GitHubRepo {
-  name: string;
+  repoId: number;
+  repoName: string;
   fullName: string;
   description: string | null;
+  isPrivate: boolean;
   htmlUrl: string;
-  private: boolean;
+  language: string | null;
+  stargazersCount: number;
+  forksCount: number;
+  updatedAt: string;
 }
 
 export interface CommitStats {
