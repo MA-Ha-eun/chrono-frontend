@@ -5,7 +5,7 @@
 버전: v1.1
 
 작성일: 2025-12-02  
-수정일: 2025-12-XX
+수정일: 2025-12-12
 
 기반 문서: PRD.md, FRS.md
 
@@ -130,9 +130,59 @@ GitHub 관련 에러 코드:
 }
 ```
 
+**비고**: Refresh Token은 HttpOnly Cookie로 전송됨
+
 ---
 
-## 🔹 4.3 이메일 인증코드 발송
+## 🔹 4.3 Refresh Token으로 Access Token 재발급
+
+### `POST /api/auth/refresh`
+
+**인증:** 불필요 (Refresh Token 쿠키 필요)
+
+### Request
+
+쿠키에 `refreshToken` 포함 (HttpOnly Cookie)
+
+### Response 200
+
+```json
+"eyJhbGciOiJIUzIOTgsImV4cCI6MTc2NDkyNjY~~~~~~~"
+```
+
+Access Token 문자열 반환
+
+### Error
+
+- Refresh Token 없음 → 401 UNAUTHORIZED
+- Refresh Token 유효하지 않음 → 401 UNAUTHORIZED
+- Refresh Token 불일치 → 401 UNAUTHORIZED
+
+---
+
+## 🔹 4.4 로그아웃
+
+### `POST /api/auth/logout`
+
+**인증:** 필요
+
+### Request
+
+본문 없음 (인증 토큰만 필요)
+
+### Response 200
+
+```json
+{
+  "message": "로그아웃 성공"
+}
+```
+
+**비고**: 서버 측 Refresh Token 삭제 및 쿠키 제거
+
+---
+
+## 🔹 4.5 이메일 인증코드 발송
 
 ### `POST /api/auth/email/send`
 
@@ -152,7 +202,7 @@ GitHub 관련 에러 코드:
 
 ---
 
-## 🔹 4.4 이메일 인증코드 확인
+## 🔹 4.6 이메일 인증코드 확인
 
 ### `POST /api/auth/email/verify`
 
