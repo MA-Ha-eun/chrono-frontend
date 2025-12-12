@@ -1,9 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { RootRedirect } from "@/components/auth/RootRedirect";
 import { LoginPage } from "@/pages/auth/LoginPage";
 import { SignupPage } from "@/pages/auth/SignupPage";
-import { LandingPage } from "@/pages/LandingPage";
 import { DashboardPage } from "@/pages/dashboard/DashboardPage";
 import { SettingsPage } from "@/pages/SettingsPage";
 import { ProjectListPage } from "@/pages/projects/ProjectListPage";
@@ -20,11 +20,10 @@ export const router = createBrowserRouter([
     element: <SignupPage />,
   },
   {
-    // Root Layout for both Landing and App
     path: "/",
     element: <Layout />,
     children: [
-      { index: true, element: <LandingPage /> },
+      { index: true, element: <RootRedirect /> },
       {
         path: "dashboard",
         element: (
