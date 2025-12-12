@@ -20,13 +20,7 @@ npm run dev
 ```env
 # API Base URL (백엔드 서버 URL)
 VITE_API_BASE_URL=http://localhost:8080/api
-
-# 개발 환경 전용 옵션
-# VITE_USE_MOCK=true # 모킹 데이터 사용 (백엔드 개발 전)
-# VITE_BYPASS_AUTH=true # 인증 우회 (개발 편의용)
 ```
 
 **참고:**
-- `VITE_API_BASE_URL`: 백엔드 개발 전 기본값(`http://localhost:8080/api`) 사용
-- `VITE_USE_MOCK`: 개발 환경에서만 동작, 백 개발 전 모킹 데이터로 프론트 개발 진행
-- `VITE_BYPASS_AUTH`: 개발 환경에서만 동작, 인증 없이 보호된 라우트 접근
+- `VITE_API_BASE_URL`: 백엔드 서버 URL (기본값: `http://localhost:8080/api`)

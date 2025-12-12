@@ -12,7 +12,6 @@ interface AuthState {
   logout: () => Promise<void>;
   setUser: (user: User) => void;
   setToken: (token: string) => void;
-  setMockAuth: (user: User, token?: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -55,14 +54,6 @@ export const useAuthStore = create<AuthState>()(
 
       setToken: (token: string) => {
         set({ accessToken: token, isAuthenticated: true });
-      },
-
-      setMockAuth: (user: User, token: string = "mock-token") => {
-        set({
-          user,
-          accessToken: token,
-          isAuthenticated: true,
-        });
       },
     }),
     {

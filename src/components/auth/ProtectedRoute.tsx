@@ -10,9 +10,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isAuthenticated, accessToken } = useAuthStore();
   const location = useLocation();
 
-  const isDevMode = import.meta.env.DEV;
-  const bypassAuth = isDevMode && import.meta.env.VITE_BYPASS_AUTH === "true";
-
   useEffect(() => {
     if (!accessToken) return;
     
@@ -22,10 +19,6 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
       useAuthStore.getState().logout();
     }
   }, [accessToken]);
-
-  if (bypassAuth) {
-    return <>{children}</>;
-  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
