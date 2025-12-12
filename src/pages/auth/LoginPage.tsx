@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
+import { Footer } from "@/components/layout/Footer";
 import { useAuthStore } from "@/stores/authStore";
 import { isApiError } from "@/lib/api/client";
 import { useToastStore } from "@/stores/toastStore";
@@ -37,8 +38,9 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-100 p-4">
-      <div className="w-full max-w-[400px] space-y-8">
+    <div className="flex min-h-screen flex-col bg-zinc-100">
+      <div className="flex flex-1 items-center justify-center p-4">
+        <div className="w-full max-w-[400px] space-y-8">
         <div className="flex flex-col items-center justify-center text-center">
           <Link to="/" className="mb-6 flex flex-col items-center gap-3 transition-opacity hover:opacity-80">
             <span className="text-5xl font-extrabold tracking-[-0.015em] text-gray-900">
@@ -115,7 +117,9 @@ export function LoginPage() {
             </div>
           </div>
         </Card>
+        </div>
       </div>
+      <Footer />
     </div>
   );
 }

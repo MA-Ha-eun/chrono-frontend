@@ -5,11 +5,9 @@ import logo from "@/assets/logo.svg";
 export function LandingPage() {
   return (
     <>
-      {/* Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-20 md:pt-32 md:pb-32">
         <div className="absolute top-0 left-1/2 -z-10 h-[1000px] w-[1000px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/5 blur-3xl"></div>
         
-        {/* Background Hero Image - Tablet only (full background) */}
         <div className="absolute inset-0 pointer-events-none select-none overflow-hidden hidden md:block lg:hidden">
           <div 
             className="absolute inset-0"
@@ -24,11 +22,9 @@ export function LandingPage() {
               className="h-full w-full object-cover opacity-80" 
             />
           </div>
-          {/* White overlay for faded effect */}
           <div className="absolute inset-0 bg-white/20"></div>
         </div>
 
-        {/* Background Hero Image - Desktop only (right side with gradient) */}
         <div className="absolute inset-0 pointer-events-none select-none overflow-hidden hidden lg:block">
           <div className="absolute inset-0 left-1/2 overflow-hidden">
             <div 
@@ -42,7 +38,6 @@ export function LandingPage() {
             </div>
           </div>
           
-          {/* Subtle gradient overlay for text readability */}
           <div className="absolute top-0 right-0 bottom-0 w-1/2 bg-gradient-to-l from-transparent via-white/10 to-white/25 pointer-events-none"></div>
         </div>
 
@@ -85,7 +80,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* Feature Section */}
       <section className="bg-zinc-100 py-20 md:py-32">
         <div className="mx-auto max-w-6xl px-4 md:px-6">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-3">
@@ -108,7 +102,6 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="py-20 md:py-32">
         <div className="mx-auto max-w-4xl px-4 text-center md:px-6">
           <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
@@ -126,13 +119,6 @@ export function LandingPage() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t border-gray-100 bg-white py-8">
-        <div className="mx-auto max-w-6xl px-4 text-center text-sm text-gray-500 md:px-6">
-          © 2025 chrono. All rights reserved.
-        </div>
-      </footer>
     </>
   );
 }
