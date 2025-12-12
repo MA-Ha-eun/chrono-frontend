@@ -10,7 +10,7 @@ export function Navbar() {
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const logout = useAuthStore((state) => state.logout);
-  const isLanding = location.pathname === "/";
+  const isLanding = location.pathname === "/" || location.pathname === "/landing";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => {
@@ -35,7 +35,7 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-xs">
       <div className="mx-auto grid h-16 max-w-6xl grid-cols-3 items-center px-4 md:px-6">
-        <Link to={isAuthenticated ? "/dashboard" : "/"} className="flex items-center gap-2" onClick={closeMobileMenu}>
+        <Link to={isAuthenticated ? "/dashboard" : "/landing"} className="flex items-center gap-2" onClick={closeMobileMenu}>
           <span className="text-2xl md:text-3xl font-extrabold tracking-[-0.015em] text-gray-900">
             chrono<span className="text-primary text-3xl md:text-4xl leading-none">.</span>
           </span>

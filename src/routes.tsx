@@ -18,7 +18,7 @@ function RootRedirect() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <LandingPage />;
+  return <Navigate to="/landing" replace />;
 }
 
 export const router = createBrowserRouter([
@@ -35,6 +35,10 @@ export const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <RootRedirect /> },
+      {
+        path: "landing",
+        element: <LandingPage />,
+      },
       {
         path: "dashboard",
         element: (

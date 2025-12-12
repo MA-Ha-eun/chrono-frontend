@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 export function Layout() {
   const location = useLocation();
-  const isLanding = location.pathname === "/";
+  const isLanding = location.pathname === "/" || location.pathname === "/landing";
 
   return (
     <div className={cn("min-h-screen", isLanding ? "bg-white" : "bg-zinc-100")}>
