@@ -9,7 +9,7 @@ interface AuthState {
   accessToken: string | null;
   isAuthenticated: boolean;
   login: (credentials: LoginRequest) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   setUser: (user: User) => void;
   setToken: (token: string) => void;
   setMockAuth: (user: User, token?: string) => void;
@@ -35,13 +35,18 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      logout: () => {
-        set({
-          user: null,
-          accessToken: null,
-          isAuthenticated: false,
-        });
-        logoutApi();
+      logout: async () => {
+        try {
+          await logoutApi();
+        } catch (error) {
+          console.error("Logout API failed:", error);
+        } finally {
+          set({
+            user: null,
+            accessToken: null,
+            isAuthenticated: false,
+          });
+        }
       },
 
       setUser: (user: User) => {
