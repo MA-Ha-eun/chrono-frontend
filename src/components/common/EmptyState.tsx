@@ -34,7 +34,7 @@ export interface EmptyStateProps {
    */
   className?: string;
   /**
-   * 아이콘 배경색 (기본: "bg-gray-100")
+   * 아이콘 배경색 (기본: "bg-zinc-50")
    */
   iconBg?: string;
   /**
@@ -57,7 +57,7 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
       onAction,
       actionLink,
       className,
-      iconBg = "bg-gray-100",
+      iconBg = "bg-zinc-50",
       iconColor = "text-gray-400",
       ...props
     },
@@ -70,7 +70,7 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
         {actionLink ? (
           <Link
             to={actionLink}
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
           >
             {actionLabel}
           </Link>
@@ -96,7 +96,7 @@ export const EmptyState = React.forwardRef<HTMLDivElement, EmptyStateProps>(
             <Icon className={cn(iconSize, iconColor)} />
           </div>
         )}
-        <h3 className="mt-4 text-lg font-semibold text-gray-900">{title}</h3>
+        <h2 className="mt-4 text-xl font-semibold text-gray-900">{title}</h2>
         {description && (
           <p className="mt-2 text-sm text-gray-500">{description}</p>
         )}
