@@ -4,6 +4,7 @@ import { ActivityOverview } from "@/components/dashboard/ActivityOverview";
 import { ActivityRecord } from "@/components/dashboard/ActivityRecord";
 import { RecentProjects } from "@/components/dashboard/RecentProjects";
 import { SkeletonCard, SkeletonCardContent, Skeleton } from "@/components/common/Skeleton";
+import { ErrorState } from "@/components/common/ErrorState";
 import { ProjectStatus } from "@/types/api";
 
 export function DashboardPage() {
@@ -119,9 +120,12 @@ export function DashboardPage() {
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">대시보드</h1>
           <p className="mt-1 text-sm text-gray-500">당신의 프로젝트 활동을 한눈에 확인하세요.</p>
         </div>
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
-          <p className="text-sm text-red-600">{error || "데이터를 불러올 수 없습니다."}</p>
-        </div>
+        <ErrorState
+          title={error || "데이터를 불러올 수 없습니다"}
+          description="잠시 후 다시 시도해주세요."
+          actionLabel="다시 시도"
+          onAction={() => window.location.reload()}
+        />
       </div>
     );
   }
