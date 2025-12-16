@@ -509,88 +509,123 @@ Query Parameter: `username` (String)
 
 ### `POST /api/projects`
 
-**인증:** 필요
+**인증:** 필요
+
+**비고:** 현재 백엔드 작업 진행 중. 최종 스펙은 백엔드 작업 완료 후 확정 예정.
 
 ### Request
 
 ```json
 {
-  "title": "Project Tracker",
-  "description": "사이드 프로젝트 관리 도구",
-  "targetDate": "2025-12-31",
-  "techStack": "React, Spring, MySQL",
-  "repoName": "project-tracker"
-}
-```
-
-### Response 201
-
-```json
-{
-  "id": 10,
-  "title": "Project Tracker",
-  "description": "사이드 프로젝트 관리 도구",
-  "startDate": "2025-11-20",
-  "targetDate": "2025-12-31",
-  "techStack": "React, Spring, MySQL",
-  "status": "IN_PROGRESS",
-  "repoOwner": "jimin-dev",
+  "owner": "jimin-dev",
   "repoName": "project-tracker",
-  "github": {
-    "totalCommits": 87,
-    "lastCommitAt": "2025-11-20T10:22:31Z"
-  }
+  "repoUrl": "https://github.com/jimin-dev/project-tracker",
+  "title": "Project Tracker",
+  "description": "사이드 프로젝트 관리 도구",
+  "techStack": ["React", "Spring", "MySQL"],
+  "startDate": "2025-12-01",
+  "targetDate": "2025-12-31"
 }
 ```
 
-### Error
+**필수 필드:**
+- `owner`: GitHub username
+- `repoName`: Repository 이름
+- `repoUrl`: Repository URL
 
-- GitHub Repo 조회 실패 → GITHUB_REPO_NOT_FOUND
-- GitHub username 미설정 → GITHUB_USERNAME_NOT_SET
-
----
-
-## 🔹 7.2 프로젝트 수정
-
-### `PUT /api/projects/{projectId}`
-
-**인증:** 필요
-
-### Request
-
-```json
-{
-  "title": "수정된 제목",
-  "description": "업데이트 설명",
-  "targetDate": "2026-01-01",
-  "techStack": "React, Spring"
-}
-```
+**선택 필드:**
+- `title`, `description`, `techStack`, `startDate`, `targetDate`
 
 ### Response 200
 
 ```json
 {
-  "id": 10,
-  "title": "수정된 제목",
-  "description": "업데이트 설명",
-  "targetDate": "2026-01-01",
-  "techStack": "React, Spring",
-  "status": "IN_PROGRESS"
+  "projectId": 10
 }
 ```
 
----
+### Error
 
-## 🔹 7.3 프로젝트 삭제
-
-### `DELETE /api/projects/{projectId}`
-
-**Response 204** (내용 없음)
+- 중복 등록 → 400 Bad Request (이미 등록된 프로젝트)
+- GitHub Repo 조회 실패 → 400 Bad Request
+- Private repo인데 PAT 미설정 → 400 Bad Request (PAT 등록 필요)
 
 ---
 
-## 🔹 7.4 프로젝트 목록 조회
+## 🔹 7.2 프로젝트 메타데이터 수정
+
+### `PUT /api/projects/{projectId}/meta`
+
+**인증:** 필요
+
+### Request
+
+```json
+{
+  "title": "수정된 제목",
+  "description": "업데이트 설명",
+  "techStack": ["React", "Spring"],
+  "startDate": "2025-12-01",
+  "targetDate": "2026-01-01"
+}
+```
+
+**비고:** 모든 필드는 선택사항. 수정할 필드만 포함하면 됨.
+
+### Response 200
+
+내용 없음 (204 No Content)
+
+---
+
+## 🔹 7.3 프로젝트 상태 변경
+
+### `PATCH /api/projects/{projectId}/status`
+
+**인증:** 필요
+
+### Request
+
+```json
+{
+  "status": "COMPLETED"
+}
+```
+
+**상태값:** `IN_PROGRESS` 또는 `COMPLETED`
+
+### Response 200
+
+내용 없음 (204 No Content)
+
+---
+
+## 🔹 7.4 프로젝트 삭제 (소프트 삭제)
+
+### `PATCH /api/projects/{projectId}/active`
+
+**인증:** 필요
+
+### Request
+
+```json
+{
+  "active": false
+}
+```
+
+**비고:** 
+- `active: false` → 프로젝트 비활성화 (소프트 삭제)
+- `active: true` → 프로젝트 활성화 (복구)
+- 비활성화된 프로젝트는 목록 조회에서 제외됨
+
+### Response 200
+
+내용 없음 (204 No Content)
+
+---
+
+## 🔹 7.5 프로젝트 목록 조회
 
 ### `GET /api/projects`
 
@@ -598,48 +633,68 @@ Query Parameter: `username` (String)
 
 **정렬:** 최근 커밋 날짜 기준 내림차순
 
-### Response
+**비고:** 활성화된 프로젝트(`active: true`)만 조회됨
+
+### Response 200
 
 ```json
 [
   {
-    "id": 10,
+    "projectId": 10,
+    "owner": "jimin-dev",
+    "repoName": "project-tracker",
+    "repoUrl": "https://github.com/jimin-dev/project-tracker",
+    "active": true,
+    "createdAt": "2025-12-13T19:38:57.93523",
     "title": "Project Tracker",
     "status": "IN_PROGRESS",
-    "techStack": "React, Spring",
-    "lastCommitAt": "2025-11-20T10:22:31Z",
-    "totalCommits": 87
+    "techStack": ["React", "Spring"],
+    "totalCommits": 87,
+    "lastCommitAt": "2025-11-20T10:22:31",
+    "startDate": "2025-11-20",
+    "targetDate": "2025-12-31"
   }
 ]
 ```
 
+**비고:**
+- `active: false`인 프로젝트는 목록에 포함되지 않음
+- `techStack`은 문자열 배열 (null 가능)
+- `title`, `description`, `startDate`, `targetDate`는 null 가능 (메타데이터 미입력 시)
+
 ---
 
-## 🔹 7.5 프로젝트 상세 조회
+## 🔹 7.6 프로젝트 상세 조회
 
 ### `GET /api/projects/{projectId}`
 
 **인증:** 필요
 
-### Response
+### Response 200
 
 ```json
 {
-  "id": 10,
+  "projectId": 10,
+  "owner": "jimin-dev",
+  "repoName": "project-tracker",
+  "repoUrl": "https://github.com/jimin-dev/project-tracker",
   "title": "Project Tracker",
-  "description": "...",
+  "description": "사이드 프로젝트 관리 도구",
+  "techStack": ["React", "Spring", "MySQL"],
   "startDate": "2025-11-20",
   "targetDate": "2025-12-31",
-  "techStack": "React, Spring, MySQL",
   "status": "IN_PROGRESS",
-  "repoName": "project-tracker",
-  "repoOwner": "jimin-dev",
-  "github": {
-    "totalCommits": 87,
-    "lastCommitAt": "2025-11-20T10:22:31Z"
-  }
+  "active": true,
+  "createdAt": "2025-12-13T19:38:57.93523",
+  "totalCommit": 87,
+  "lastCommitAt": "2025-11-20T10:22:31"
 }
 ```
+
+**비고:**
+- `active: false`인 프로젝트는 조회 불가 (404 에러)
+- `techStack`은 문자열 배열
+- `totalCommit` (단수형) 주의
 
 ---
 
