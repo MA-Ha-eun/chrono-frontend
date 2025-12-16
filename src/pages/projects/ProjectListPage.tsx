@@ -1,12 +1,13 @@
 import { useState, useEffect, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { GitCommit, ChevronDown } from "lucide-react";
+import { GitCommitVertical, ChevronDown } from "lucide-react";
 import { getProjects } from "@/lib/api/project";
 import { ProjectListItem, ProjectStatus } from "@/types/api";
 import { TimelineSection } from "@/components/projects/TimelineSection";
 import { ProjectPreview } from "@/components/projects/ProjectPreview";
 import { SkeletonCard, SkeletonCardContent } from "@/components/common/Skeleton";
 import { EmptyState } from "@/components/common/EmptyState";
+import { ErrorState } from "@/components/common/ErrorState";
 
 type FilterStatus = "all" | "in_progress" | "completed";
 type SortOption = "recent" | "commits" | "created";
@@ -174,14 +175,12 @@ export function ProjectListPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* Timeline List 스켈레톤 */}
           <div className="lg:col-span-2">
             <SkeletonCard>
               <SkeletonCardContent titleWidth="w-48" />
             </SkeletonCard>
           </div>
 
-          {/* Preview Panel 스켈레톤 */}
           <div>
             <SkeletonCard>
               <SkeletonCardContent titleWidth="w-20" />
@@ -199,7 +198,12 @@ export function ProjectListPage() {
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">프로젝트</h1>
           <p className="mt-1 text-sm text-gray-500">관리 중인 사이드 프로젝트 목록입니다.</p>
         </div>
-        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-600">{error}</div>
+        <ErrorState
+          title={error}
+          description="잠시 후 다시 시도해주세요."
+          actionLabel="다시 시도"
+          onAction={loadProjects}
+        />
       </div>
     );
   }
@@ -212,10 +216,10 @@ export function ProjectListPage() {
           <p className="mt-1 text-sm text-gray-500">관리 중인 사이드 프로젝트 목록입니다.</p>
         </div>
         <EmptyState
-          icon={GitCommit}
+          icon={GitCommitVertical}
           title="프로젝트가 없습니다"
           description="첫 프로젝트를 만들어보세요!"
-          actionLabel="+ 새 프로젝트 만들기"
+          actionLabel="+ 새 프로젝트"
           actionLink="/projects/new"
         />
       </div>
@@ -252,7 +256,7 @@ export function ProjectListPage() {
                   className={`flex cursor-pointer items-center justify-center rounded-full px-2.5 py-2 text-xs font-medium transition-colors whitespace-nowrap sm:px-3.5 sm:py-2.5 ${
                     filterStatus === "all"
                       ? "bg-zinc-50 text-gray-900"
-                      : "text-gray-900 hover:bg-zinc-50"
+                      : "text-gray-700 hover:bg-zinc-50"
                   }`}
                 >
                   전체 {projectCounts.all}
@@ -262,7 +266,7 @@ export function ProjectListPage() {
                   className={`flex cursor-pointer items-center justify-center rounded-full px-2.5 py-2 text-xs font-medium transition-colors whitespace-nowrap sm:px-3.5 sm:py-2.5 ${
                     filterStatus === "in_progress"
                       ? "bg-primary-50 text-primary"
-                      : "text-gray-900 hover:bg-zinc-50"
+                      : "text-gray-700 hover:bg-zinc-50"
                   }`}
                 >
                   진행 중 {projectCounts.inProgress}
@@ -272,7 +276,7 @@ export function ProjectListPage() {
                   className={`flex cursor-pointer items-center justify-center rounded-full px-2.5 py-2 text-xs font-medium transition-colors whitespace-nowrap sm:px-3.5 sm:py-2.5 ${
                     filterStatus === "completed"
                       ? "bg-accent-50 text-accent"
-                      : "text-gray-900 hover:bg-zinc-50"
+                      : "text-gray-700 hover:bg-zinc-50"
                   }`}
                 >
                   완료 {projectCounts.completed}
@@ -284,7 +288,7 @@ export function ProjectListPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="h-[38px] w-auto min-w-[100px] appearance-none rounded-lg border border-gray-300 bg-white pl-2.5 pr-7 text-xs text-gray-700 transition-colors hover:border-gray-400 focus:border-primary focus:outline-none sm:min-w-[120px] sm:pl-3 sm:pr-8"
+                  className="h-[38px] w-auto min-w-[100px] appearance-none rounded-lg border border-gray-200 bg-white pl-2.5 pr-7 text-xs text-gray-700 transition-colors hover:border-gray-300 focus:border-primary focus:outline-none sm:min-w-[120px] sm:pl-3 sm:pr-8"
                 >
                   <option value="created">최근생성순</option>
                   <option value="recent">최근커밋순</option>

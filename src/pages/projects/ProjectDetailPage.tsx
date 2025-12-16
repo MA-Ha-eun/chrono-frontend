@@ -7,6 +7,7 @@ import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
 import { useToastStore } from "@/stores/toastStore";
 import { SkeletonCard, SkeletonCardContent, SkeletonText, Skeleton } from "@/components/common/Skeleton";
+import { ErrorState } from "@/components/common/ErrorState";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -92,7 +93,6 @@ export function ProjectDetailPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* 프로젝트 정보 스켈레톤 */}
           <div className="lg:col-span-2">
             <SkeletonCard>
               <div className="space-y-4">
@@ -103,7 +103,6 @@ export function ProjectDetailPage() {
             </SkeletonCard>
           </div>
 
-          {/* GitHub 통계 스켈레톤 */}
           <div>
             <SkeletonCard>
               <SkeletonCardContent titleWidth="w-24" />
@@ -121,16 +120,12 @@ export function ProjectDetailPage() {
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">프로젝트 상세</h1>
           <p className="mt-1 text-sm text-gray-500">프로젝트 정보를 확인할 수 없습니다.</p>
         </div>
-        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
-          <p className="text-sm text-red-600">{error || "프로젝트를 찾을 수 없습니다."}</p>
-          <Button
-            variant="outline"
-            className="mt-4"
-            onClick={() => navigate("/projects")}
-          >
-            프로젝트 목록으로 돌아가기
-          </Button>
-        </div>
+        <ErrorState
+          title={error || "프로젝트를 찾을 수 없습니다"}
+          description="프로젝트가 삭제되었거나 접근 권한이 없을 수 있습니다."
+          actionLabel="프로젝트 목록으로 돌아가기"
+          actionLink="/projects"
+        />
       </div>
     );
   }
@@ -155,7 +150,6 @@ export function ProjectDetailPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
           <Button
@@ -191,19 +185,15 @@ export function ProjectDetailPage() {
         </div>
       </div>
 
-      {/* Main Content - 2 Column Layout */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Left Column - Project Info & Commit Activity */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Project Info Card */}
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <div className="space-y-6">
-              {/* Title & Status */}
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <h2 className="text-xl font-bold text-gray-900">{project.title}</h2>
                   {project.description && (
-                    <p className="mt-2 text-sm text-gray-600">{project.description}</p>
+                    <p className="mt-2 text-sm text-gray-500">{project.description}</p>
                   )}
                 </div>
                 <Badge variant={getStatusVariant(project.status)}>
@@ -211,7 +201,6 @@ export function ProjectDetailPage() {
                 </Badge>
               </div>
 
-              {/* Tech Stack */}
               {techStackArray.length > 0 && (
                 <div>
                   <h3 className="mb-2 text-xs font-medium text-gray-500">기술 스택</h3>
@@ -228,7 +217,6 @@ export function ProjectDetailPage() {
                 </div>
               )}
 
-              {/* Project Dates */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {project.startDate && (
                   <div className="flex items-center gap-3 rounded-lg bg-zinc-50 p-4">
@@ -294,7 +282,6 @@ export function ProjectDetailPage() {
             </div>
           </div>
 
-          {/* Commit Activity Card */}
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <h2 className="mb-4 text-lg font-semibold text-gray-900">커밋 활동</h2>
             <div className="flex items-center justify-center rounded-lg bg-zinc-50 py-12">
@@ -306,7 +293,6 @@ export function ProjectDetailPage() {
           </div>
         </div>
 
-        {/* Right Column - GitHub Stats */}
         <div className="space-y-6">
           <div className="rounded-xl bg-white p-6 shadow-sm">
             <div className="mb-6">
@@ -315,7 +301,6 @@ export function ProjectDetailPage() {
             </div>
 
             <div className="space-y-4">
-              {/* Repo Link */}
               <div>
                 <h3 className="mb-2 text-xs font-medium text-gray-500">저장소</h3>
                 <a
@@ -332,10 +317,9 @@ export function ProjectDetailPage() {
                 </a>
               </div>
 
-              {/* Total Commits */}
               {(project.totalCommits !== undefined || project.github?.totalCommits !== undefined) && (
                 <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
                     <GitCommitVertical className="h-4 w-4 text-primary" />
                     <span>총 커밋</span>
                   </div>
@@ -345,10 +329,9 @@ export function ProjectDetailPage() {
                 </div>
               )}
 
-              {/* Last Commit */}
               {daysAgo !== null && (
                 <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Calendar className="h-4 w-4 text-primary" />
                     <span>최근 활동</span>
                   </div>
@@ -356,7 +339,6 @@ export function ProjectDetailPage() {
                 </div>
               )}
 
-              {/* Last Commit Date */}
               {(project.lastCommitAt || project.github?.lastCommitAt) && (
                 <div className="rounded-lg bg-zinc-50 p-4">
                   <p className="text-xs font-medium text-gray-500 mb-1">마지막 커밋</p>
