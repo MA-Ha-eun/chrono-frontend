@@ -98,15 +98,15 @@ export function TimelineSection({
               {/* Card Cell */}
               <button
                 onClick={() => onSelect(project.id)}
-                className={`min-h-[80px] rounded-lg border p-4 text-left transition-all duration-200 ease-in-out ${
+                className={`min-h-[80px] rounded-lg border p-4 text-left transition-all duration-200 ease-in-out cursor-pointer ${
                   isSelected
-                    ? "border-primary bg-primary/5 shadow-sm"
-                    : "border-gray-200 bg-white hover:border-primary/50 hover:bg-gray-50"
+                    ? "border-primary shadow-sm shadow-primary/20 hover:bg-primary/5"
+                    : "border-gray-200 bg-white hover:bg-gray-50"
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-gray-900 truncate">{project.title}</h4>
+                    <h4 className={`font-medium truncate ${isSelected ? "text-primary" : "text-gray-900"}`}>{project.title}</h4>
                     <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
                       {project.totalCommits !== undefined && (
                         <span>
