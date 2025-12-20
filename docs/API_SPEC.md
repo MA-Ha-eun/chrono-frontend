@@ -2,10 +2,10 @@
 
 **Chrono – API 명세서**
 
-버전: v1.1
+버전: v1.2
 
 작성일: 2025-12-02  
-수정일: 2025-12-12
+수정일: 2025-12-19
 
 기반 문서: PRD.md, FRS.md
 
@@ -41,7 +41,25 @@
 
 ---
 
-# 3. 에러 응답 공통 구조
+# 3. 공통 응답 구조
+
+## ✔ 성공 응답 구조
+
+모든 API 성공 응답은 `SuccessResponseDto`로 감싸져 있습니다:
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": { ... }
+}
+```
+
+**프론트엔드 처리:**
+- `response.data.data`로 실제 데이터 접근 필요
+- 또는 axios interceptor에서 자동 처리 가능
+
+## ✔ 에러 응답 공통 구조
 
 ```json
 {
@@ -89,13 +107,13 @@ GitHub 관련 에러 코드:
 }
 ```
 
-### Response 201
+### Response 200
 
 ```json
 {
-  "id": 1,
-  "email": "user@example.com",
-  "nickname": "jimin"
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
 }
 ```
 
@@ -120,8 +138,13 @@ GitHub 관련 에러 코드:
 
 ```json
 {
-  "accessToken": "eyJhbGciOiJIUzI...",
-  "nickname": "jimin"
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI...",
+    "refreshTokenCookie": "...",
+    "nickname": "jimin"
+  }
 }
 ```
 
@@ -142,7 +165,11 @@ GitHub 관련 에러 코드:
 ### Response 200
 
 ```json
-"eyJhbGciOiJIUzIOTgsImV4cCI6MTc2NDkyNjY~~~~~~~"
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": "eyJhbGciOiJIUzIOTgsImV4cCI6MTc2NDkyNjY~~~~~~~"
+}
 ```
 
 Access Token 문자열 반환
@@ -169,7 +196,9 @@ Access Token 문자열 반환
 
 ```json
 {
-  "message": "로그아웃 성공"
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
 }
 ```
 
@@ -193,7 +222,13 @@ Access Token 문자열 반환
 
 ### Response 200
 
-이메일 인증코드 발송 완료
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
+}
+```
 
 ---
 
@@ -214,7 +249,13 @@ Access Token 문자열 반환
 
 ### Response 200
 
-인증코드 확인 완료
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": true
+}
+```
 
 **비고:** 회원가입 전 이메일 인증이 완료되어야 함
 
@@ -228,17 +269,23 @@ Access Token 문자열 반환
 
 **인증:** 필요
 
-### Response
+### Response 200
 
 ```json
 {
-  "id": 1,
-  "email": "user@example.com",
-  "nickname": "jimin",
-  "bio": "hi!",
-  "githubUsername": "jimin-dev"
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "id": 1,
+    "email": "user@example.com",
+    "nickname": "jimin",
+    "bio": "hi!",
+    "githubUsername": "jimin-dev"
+  }
 }
 ```
+
+**비고:** ⚠️ 백엔드 추가 예정
 
 ---
 
@@ -260,9 +307,15 @@ Access Token 문자열 반환
 
 ```json
 {
-  "githubUsername": "jimin-dev"
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "githubUsername": "jimin-dev"
+  }
 }
 ```
+
+**비고:** ⚠️ 현재는 `POST /api/github/connect-basic` 사용 가능
 
 ### Error
 
@@ -290,19 +343,25 @@ Access Token 문자열 반환
 
 ```json
 {
-  "id": 1,
-  "email": "user@example.com",
-  "nickname": "새 닉네임",
-  "bio": "한줄 소개",
-  "githubUsername": "jimin-dev"
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "id": 1,
+    "email": "user@example.com",
+    "nickname": "새 닉네임",
+    "bio": "한줄 소개",
+    "githubUsername": "jimin-dev"
+  }
 }
 ```
+
+**비고:** ⚠️ 백엔드 추가 예정
 
 ---
 
 ## 🔹 5.4 비밀번호 변경
 
-### `PUT /api/users/me/password`
+### `PATCH /api/users/me/password`
 
 **인증:** 필요
 
@@ -311,7 +370,8 @@ Access Token 문자열 반환
 ```json
 {
   "currentPassword": "현재비밀번호",
-  "newPassword": "새비밀번호123!"
+  "newPassword": "새비밀번호123!",
+  "newPasswordConfirm": "새비밀번호123!"
 }
 ```
 
@@ -321,7 +381,9 @@ Access Token 문자열 반환
 
 ```json
 {
-  "message": "비밀번호가 변경되었습니다."
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
 }
 ```
 
@@ -334,7 +396,7 @@ Access Token 문자열 반환
 
 ## 🔹 5.5 회원탈퇴
 
-### `DELETE /api/users/me`
+### `DELETE /api/auth`
 
 **인증:** 필요
 
@@ -342,9 +404,15 @@ Access Token 문자열 반환
 
 본문 없음 (인증 토큰만 필요)
 
-### Response 204
+### Response 200
 
-내용 없음
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
+}
+```
 
 **비고:** 회원 탈퇴 시 관련 프로젝트 및 커밋 데이터 처리 필요
 
@@ -360,18 +428,27 @@ Access Token 문자열 반환
 
 **전제:** githubUsername 존재해야 함
 
-### Response
+### Response 200
 
 ```json
-[
-  {
-    "name": "project-tracker",
-    "fullName": "jimin-dev/project-tracker",
-    "description": "사이드 프로젝트 관리 앱",
-    "htmlUrl": "https://github.com/jimin-dev/project-tracker",
-    "private": false
-  }
-]
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": [
+    {
+      "repoId": 1059981952,
+      "repoName": "bid-N-buy-backend",
+      "fullName": "bid-N-buy/bid-N-buy-backend",
+      "description": "[Bid&Buy] 중고거래에 실시간 경매를 더한 새로운 거래 서비스",
+      "htmlUrl": "https://github.com/bid-N-buy/bid-N-buy-backend",
+      "language": "Java",
+      "stargazersCount": 0,
+      "forksCount": 2,
+      "updatedAt": "2025-12-09T08:40:29Z",
+      "private": false
+    }
+  ]
+}
 ```
 
 ### Error
@@ -397,20 +474,28 @@ Query Parameter: `username` (String)
 **성공 시:**
 ```json
 {
-  "valid": true,
-  "username": "simuneu",
-  "avatarUrl": "https://github.com/simuneu.png",
-  "message": "존재하는 GitHub 사용자입니다."
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "valid": true,
+    "username": "simuneu",
+    "avatarUrl": "https://github.com/simuneu.png",
+    "message": "존재하는 GitHub 사용자입니다."
+  }
 }
 ```
 
 **실패 시:**
 ```json
 {
-  "valid": false,
-  "username": "simuneuffff",
-  "avatarUrl": null,
-  "message": "존재하지 않는 GitHub 사용자입니다."
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "valid": false,
+    "username": "simuneuffff",
+    "avatarUrl": null,
+    "message": "존재하지 않는 GitHub 사용자입니다."
+  }
 }
 ```
 
@@ -436,11 +521,15 @@ Query Parameter: `username` (String)
 
 ```json
 {
-  "connected": true,
-  "type": "BASIC",
-  "username": "simuneu",
-  "avatarUrl": "https://avatars.githubusercontent.com/u/191446770?v=4",
-  "message": "기본 연동이 완료되었습니다."
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "connected": true,
+    "type": "BASIC",
+    "username": "simuneu",
+    "avatarUrl": "https://avatars.githubusercontent.com/u/191446770?v=4",
+    "message": "기본 연동이 완료되었습니다."
+  }
 }
 ```
 
@@ -469,9 +558,13 @@ Query Parameter: `username` (String)
 
 ```json
 {
-  "connected": true,
-  "type": "FULL",
-  "message": "github full연동 완료"
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "connected": true,
+    "type": "FULL",
+    "message": "github full연동 완료"
+  }
 }
 ```
 
@@ -540,7 +633,9 @@ Query Parameter: `username` (String)
 
 ```json
 {
-  "projectId": 10
+  "success": true,
+  "message": "SUCCESS",
+  "data": 5
 }
 ```
 
@@ -574,7 +669,13 @@ Query Parameter: `username` (String)
 
 ### Response 200
 
-내용 없음 (204 No Content)
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
+}
+```
 
 ---
 
@@ -596,7 +697,13 @@ Query Parameter: `username` (String)
 
 ### Response 200
 
-내용 없음 (204 No Content)
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
+}
+```
 
 ---
 
@@ -621,7 +728,13 @@ Query Parameter: `username` (String)
 
 ### Response 200
 
-내용 없음 (204 No Content)
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
+}
+```
 
 ---
 
@@ -638,29 +751,51 @@ Query Parameter: `username` (String)
 ### Response 200
 
 ```json
-[
-  {
-    "projectId": 10,
-    "owner": "jimin-dev",
-    "repoName": "project-tracker",
-    "repoUrl": "https://github.com/jimin-dev/project-tracker",
-    "active": true,
-    "createdAt": "2025-12-13T19:38:57.93523",
-    "title": "Project Tracker",
-    "status": "IN_PROGRESS",
-    "techStack": ["React", "Spring"],
-    "totalCommits": 87,
-    "lastCommitAt": "2025-11-20T10:22:31",
-    "startDate": "2025-11-20",
-    "targetDate": "2025-12-31"
-  }
-]
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": [
+    {
+      "projectId": 5,
+      "owner": "simuneu",
+      "repoName": "budgie_backend",
+      "repoUrl": "https://github.com/simuneu/budgie_backend",
+      "active": true,
+      "createdAt": "2025-12-18T22:05:55.046094",
+      "title": null,
+      "status": "IN_PROGRESS",
+      "techStack": [],
+      "totalCommits": 0,
+      "lastCommitAt": null,
+      "startDate": null,
+      "targetDate": null,
+      "progressRate": 0
+    },
+    {
+      "projectId": 6,
+      "owner": "simuneu",
+      "repoName": "java-pr",
+      "repoUrl": "https://github.com/simuneu/java-pr",
+      "active": true,
+      "createdAt": "2025-12-18T22:06:35.643923",
+      "title": "프로젝트",
+      "status": "IN_PROGRESS",
+      "techStack": ["Spring Boot", "Java"],
+      "totalCommits": 0,
+      "lastCommitAt": null,
+      "startDate": "2025-12-01",
+      "targetDate": "2025-12-31",
+      "progressRate": 56
+    }
+  ]
+}
 ```
 
 **비고:**
 - `active: false`인 프로젝트는 목록에 포함되지 않음
-- `techStack`은 문자열 배열 (null 가능)
-- `title`, `description`, `startDate`, `targetDate`는 null 가능 (메타데이터 미입력 시)
+- `techStack`은 문자열 배열
+- `title`, `startDate`, `targetDate`는 null 가능 (메타데이터 미입력 시)
+- `progressRate`: 진행률 (0-100)
 
 ---
 
@@ -674,20 +809,24 @@ Query Parameter: `username` (String)
 
 ```json
 {
-  "projectId": 10,
-  "owner": "jimin-dev",
-  "repoName": "project-tracker",
-  "repoUrl": "https://github.com/jimin-dev/project-tracker",
-  "title": "Project Tracker",
-  "description": "사이드 프로젝트 관리 도구",
-  "techStack": ["React", "Spring", "MySQL"],
-  "startDate": "2025-11-20",
-  "targetDate": "2025-12-31",
-  "status": "IN_PROGRESS",
-  "active": true,
-  "createdAt": "2025-12-13T19:38:57.93523",
-  "totalCommit": 87,
-  "lastCommitAt": "2025-11-20T10:22:31"
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "projectId": 6,
+    "owner": "simuneu",
+    "repoName": "java-pr",
+    "repoUrl": "https://github.com/simuneu/java-pr",
+    "title": "프로젝트",
+    "description": "프로젝트트 설명",
+    "techStack": ["Spring Boot", "Java"],
+    "startDate": "2025-12-01",
+    "targetDate": "2025-12-31",
+    "status": "IN_PROGRESS",
+    "active": true,
+    "createdAt": "2025-12-18T22:06:35.643923",
+    "totalCommit": 0,
+    "lastCommitAt": null
+  }
 }
 ```
 
@@ -710,10 +849,13 @@ Query Parameter: `username` (String)
 
 ```json
 {
-  "message": "커밋 동기화 완료",
-  "savedCount": 12
+  "success": true,
+  "message": "SUCCESS",
+  "data": 28
 }
 ```
+
+**비고:** 저장된 커밋 수 반환
 
 **비고:** 프로젝트 상세 페이지에서 수동 커밋 동기화 버튼으로 활용 가능
 
@@ -729,11 +871,15 @@ Query Parameter: `username` (String)
 
 ```json
 {
-  "projectId": 2,
-  "totalCommits": 12,
-  "latestCommitDate": "2025-07-20T12:16:35",
-  "commitsThisWeek": 0,
-  "mostActiveDay": "Sunday"
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "projectId": 6,
+    "totalCommits": 28,
+    "latestCommitDate": "2025-10-19T09:51:17",
+    "commitsThisWeek": 0,
+    "mostActiveDay": "Wednesday"
+  }
 }
 ```
 
@@ -749,41 +895,47 @@ Query Parameter: `username` (String)
 
 **인증:** 필요
 
-### Response
+### Response 200
 
 ```json
 {
-  "summary": {
-    "inProgressCount": 3,
-    "completedCount": 2,
-    "totalCommitsThisMonth": 108
-  },
-  "weeklyCommits": [
-    {
-      "dayOfWeek": "MON",
-      "date": "2025-11-17",
-      "count": 3
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "summary": {
+      "inProgressCount": 3,
+      "completedCount": 2,
+      "totalCommitsThisMonth": 108
     },
-    {
-      "dayOfWeek": "TUE",
-      "date": "2025-11-18",
-      "count": 5
-    }
-  ],
-  "weekInfo": {
-    "startDate": "2025-11-17",
-    "endDate": "2025-11-23"
-  },
-  "recentProjects": [
-    {
-      "id": 10,
-      "title": "Project Tracker",
-      "lastCommitAt": "2025-11-20T10:22:31Z",
-      "totalCommits": 87
-    }
-  ]
+    "weeklyCommits": [
+      {
+        "dayOfWeek": "MON",
+        "date": "2025-11-17",
+        "count": 3
+      },
+      {
+        "dayOfWeek": "TUE",
+        "date": "2025-11-18",
+        "count": 5
+      }
+    ],
+    "weekInfo": {
+      "startDate": "2025-11-17",
+      "endDate": "2025-11-23"
+    },
+    "recentProjects": [
+      {
+        "id": 10,
+        "title": "Project Tracker",
+        "lastCommitAt": "2025-11-20T10:22:31Z",
+        "totalCommits": 87
+      }
+    ]
+  }
 }
 ```
+
+**비고:** ⚠️ 백엔드 추가 예정
 
 ---
 
@@ -807,6 +959,20 @@ status ∈ {
 | Repo 리스트        | GitHub username 기반                        |
 | Rate Limit 발생 시 | 캐시된 데이터 유지                          |
 | Private Repo       | MVP에서는 지원 ❌ (추후 PAT 기반 확장 가능) |
+
+---
+
+---
+
+# 12. 주의사항
+
+1. **응답 구조**: 모든 API는 `SuccessResponseDto`로 감싸져 있으므로 `response.data.data`로 접근 필요
+2. **프로젝트 상세**: `totalCommit` (단수형) 사용 주의
+3. **프로젝트 삭제**: `DELETE` 대신 `PATCH /api/projects/{projectId}/active` 사용 (`active: false`)
+4. **techStack**: 백엔드에서는 `string[]` 배열로 전송
+5. **날짜 형식**: `LocalDate`는 `"YYYY-MM-DD"`, `LocalDateTime`은 ISO 8601 형식
+6. **비밀번호 변경**: `PUT`이 아닌 `PATCH /api/users/me/password` 사용
+7. **회원 탈퇴**: `DELETE /api/users/me`가 아닌 `DELETE /api/auth` 사용
 
 ---
 
