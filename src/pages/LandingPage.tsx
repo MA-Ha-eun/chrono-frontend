@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Github, BarChart3, Layers, ArrowRight } from "lucide-react";
-import logo from "@/assets/logo.svg";
 
 export function LandingPage() {
   return (
