@@ -82,19 +82,9 @@ export function ProjectDetailPage() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
-  useEffect(() => {
-    if (!id) {
-      setError("프로젝트 ID가 없습니다.");
-      setIsLoading(false);
-      return;
-    }
-
-    loadProject();
-    loadCommitSummary();
-    loadCommitHistory();
-  }, [id]);
-
   const loadProject = async () => {
+    if (!id) return;
+    
     try {
       setIsLoading(true);
       setError(null);
@@ -135,6 +125,18 @@ export function ProjectDetailPage() {
       setIsLoadingHistory(false);
     }
   };
+
+  useEffect(() => {
+    if (!id) {
+      setError("프로젝트 ID가 없습니다.");
+      setIsLoading(false);
+      return;
+    }
+
+    loadProject();
+    loadCommitSummary();
+    loadCommitHistory();
+  }, [id]);
 
   const handleSyncCommits = async () => {
     if (!id || !project) return;
