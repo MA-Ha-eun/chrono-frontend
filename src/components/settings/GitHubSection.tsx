@@ -6,7 +6,7 @@ import { updateGithubUsername } from "@/lib/api/user";
 import { connectGitHubPat, disconnectGitHubPat } from "@/lib/api/github";
 import { isApiError } from "@/lib/api/client";
 import { useToastStore } from "@/stores/toastStore";
-import { Github, ExternalLink, HelpCircle } from "lucide-react";
+import { Github, ExternalLink, HelpCircle, ShieldCheck } from "lucide-react";
 
 interface GitHubSectionProps {
   initialUsername: string;
@@ -71,16 +71,23 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
     setIsPatLoading(true);
 
     try {
-      const response = await connectGitHubPat({
+      await connectGitHubPat({
         username: patUsername.trim(),
         pat: patToken.trim(),
       });
       onUpdate(patUsername.trim());
-      setPatSuccess(response.message || "PAT 연동이 완료되었습니다.");
+      setPatSuccess("Private repository 분석이 활성화되었습니다.");
       setPatToken("");
     } catch (err) {
       if (isApiError(err)) {
-        setPatError(err.message || "PAT 연동에 실패했습니다.");
+        const errorMessage = err.message || "PAT 연동에 실패했습니다.";
+        if (errorMessage.includes("401") || errorMessage.includes("Unauthorized") || errorMessage.includes("인증")) {
+          setPatError("이 토큰에는 private repository 접근 권한이 없습니다. `repo` 권한이 필요합니다.");
+        } else if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
+          setPatError("GitHub 사용자를 찾을 수 없습니다. 올바른 username을 입력해주세요.");
+        } else {
+          setPatError(errorMessage);
+        }
       } else {
         setPatError("PAT 연동 중 오류가 발생했습니다.");
       }
@@ -137,19 +144,24 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
           </div>
         )}
 
-        <Input
-          id="githubUsername"
-          type="text"
-          label="GitHub Username"
-          placeholder="예: octocat"
-          value={githubUsername}
-          onChange={(e) => setGithubUsername(e.target.value)}
-          required
-          helperText="프로젝트 생성을 위해 반드시 설정해야 합니다."
-        />
+        <div className="space-y-1.5">
+          <label htmlFor="githubUsername" className="block text-sm font-medium text-gray-700">
+            GitHub Username
+          </label>
+          <p className="text-xs text-gray-500">프로젝트를 만들 때 필요해요.</p>
+          <Input
+            id="githubUsername"
+            type="text"
+            placeholder="예: octocat"
+            value={githubUsername}
+            onChange={(e) => setGithubUsername(e.target.value)}
+            required
+            label=""
+          />
+        </div>
 
         <Button type="submit" isLoading={isLoading} className="-mt-2 w-full md:w-auto">
-          GitHub 연동 저장
+          GitHub 연동
         </Button>
       </form>
 
@@ -198,25 +210,11 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
           <Input
             id="patToken"
             type="password"
-            label="Personal Access Token"
+            label="Personal Access Token(PAT)"
             placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
             value={patToken}
             onChange={(e) => setPatToken(e.target.value)}
             required
-            helperText={
-              <span className="flex items-center gap-1">
-                <span>PAT 생성 가이드:</span>
-                <a
-                  href="https://github.com/settings/tokens?type=beta"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-primary hover:text-primary-dark underline"
-                >
-                  GitHub Settings
-                  <ExternalLink className="h-3 w-3" />
-                </a>
-              </span>
-            }
           />
 
           <div className="flex items-center gap-2">
@@ -233,6 +231,27 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
             >
               PAT 해제
             </Button>
+          </div>
+
+          <div className="space-y-1 pt-1">
+            <div className="flex items-start gap-1">
+              <ShieldCheck className="h-3.5 w-3.5 text-gray-400 shrink-0 mt-0.5" />
+              <p className="text-xs text-gray-500">
+                PAT은 암호화되어 저장되며, 언제든지 삭제할 수 있습니다.
+              </p>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="text-xs text-gray-500">PAT 생성 가이드:</span>
+              <a
+                href="https://github.com/settings/tokens?type=beta"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-dark underline"
+              >
+                GitHub Settings
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </div>
           </div>
         </form>
       </div>
