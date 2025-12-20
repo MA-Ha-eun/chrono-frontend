@@ -1,14 +1,71 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit, Trash2, ExternalLink, GitCommitVertical, Calendar, Target, CircleAlert, Flame, Github } from "lucide-react";
+import { ArrowLeft, Edit, Trash2, ExternalLink, GitCommitVertical, Calendar, Target, CircleAlert, Flame, Github, RefreshCw } from "lucide-react";
 import { getProject, deleteProject } from "@/lib/api/project";
+import { syncCommits, getCommitSummary, getCommitHistory } from "@/lib/api/commit";
 import { isApiError } from "@/lib/api/client";
-import { Project, ProjectStatus } from "@/types/api";
+import { Project, ProjectStatus, CommitSummary, CommitHistoryCount } from "@/types/api";
 import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
 import { useToastStore } from "@/stores/toastStore";
 import { SkeletonCard, SkeletonCardContent, SkeletonText, Skeleton } from "@/components/common/Skeleton";
 import { ErrorState } from "@/components/common/ErrorState";
+import { getCommitIntensity } from "@/utils/dashboard";
+
+function CommitHistoryChart({ history }: { history: CommitHistoryCount[] }) {
+  const maxCount = Math.max(...history.map((h) => h.count), 1);
+  const sortedHistory = [...history].sort((a, b) => 
+    new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}/${day}`;
+  };
+
+  const displayHistory = sortedHistory.slice(-14);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-end justify-between gap-1">
+        {displayHistory.map((item) => {
+          const height = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+          const intensity = getCommitIntensity(item.count);
+          return (
+            <div
+              key={item.date}
+              className="group flex flex-1 flex-col items-center gap-2"
+            >
+              <div className="relative flex w-full items-end" style={{ height: "80px" }}>
+                {item.count > 0 && (
+                  <span
+                    className="absolute left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap"
+                    style={{
+                      bottom: `calc(${Math.max(height, item.count > 0 ? 12 : 4)}% + 4px)`,
+                    }}
+                  >
+                    {item.count}
+                  </span>
+                )}
+                <div
+                  className={`w-full rounded-t-lg ${intensity.bg} transition-all hover:opacity-80`}
+                  style={{
+                    height: `${Math.max(height, item.count > 0 ? 12 : 4)}%`,
+                    minHeight: item.count > 0 ? "20px" : "4px",
+                  }}
+                  title={`${formatDate(item.date)}: ${item.count} commits`}
+                />
+              </div>
+              <span className="text-xs text-gray-500">{formatDate(item.date)}</span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -18,6 +75,11 @@ export function ProjectDetailPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [commitSummary, setCommitSummary] = useState<CommitSummary | null>(null);
+  const [commitHistory, setCommitHistory] = useState<CommitHistoryCount[]>([]);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [isLoadingSummary, setIsLoadingSummary] = useState(false);
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -27,6 +89,8 @@ export function ProjectDetailPage() {
     }
 
     loadProject();
+    loadCommitSummary();
+    loadCommitHistory();
   }, [id]);
 
   const loadProject = async () => {
@@ -40,6 +104,55 @@ export function ProjectDetailPage() {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadCommitSummary = async () => {
+    if (!id) return;
+    
+    try {
+      setIsLoadingSummary(true);
+      const summary = await getCommitSummary(Number(id));
+      setCommitSummary(summary);
+    } catch (err) {
+      console.error("커밋 통계를 불러오는데 실패했습니다:", err);
+    } finally {
+      setIsLoadingSummary(false);
+    }
+  };
+
+  const loadCommitHistory = async () => {
+    if (!id) return;
+    
+    try {
+      setIsLoadingHistory(true);
+      const history = await getCommitHistory(Number(id));
+      setCommitHistory(history);
+    } catch (err) {
+      console.error("커밋 히스토리를 불러오는데 실패했습니다:", err);
+    } finally {
+      setIsLoadingHistory(false);
+    }
+  };
+
+  const handleSyncCommits = async () => {
+    if (!id || !project) return;
+    
+    try {
+      setIsSyncing(true);
+      const count = await syncCommits(Number(id));
+      showToast(`${count}개의 커밋이 동기화되었습니다.`, "success");
+      await loadProject();
+      await loadCommitSummary();
+      await loadCommitHistory();
+    } catch (err) {
+      if (isApiError(err)) {
+        showToast(err.message || "커밋 동기화에 실패했습니다.", "error");
+      } else {
+        showToast("커밋 동기화 중 오류가 발생했습니다.", "error");
+      }
+    } finally {
+      setIsSyncing(false);
     }
   };
 
@@ -293,13 +406,80 @@ export function ProjectDetailPage() {
           </div>
 
           <div className="rounded-xl bg-white p-6 shadow-sm">
-            <h2 className="mb-4 text-lg font-semibold text-gray-900">커밋 활동</h2>
-            <div className="flex items-center justify-center rounded-lg bg-zinc-50 py-12">
-              <div className="text-center">
-                <GitCommitVertical className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                <p className="text-sm text-gray-500">커밋 그래프는 곧 추가될 예정입니다.</p>
-              </div>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900">커밋 활동</h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSyncCommits}
+                disabled={isSyncing}
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? "animate-spin" : ""}`} />
+                {isSyncing ? "동기화 중..." : "동기화"}
+              </Button>
             </div>
+            
+            {isLoadingSummary ? (
+              <div className="flex items-center justify-center rounded-lg bg-zinc-50 py-12">
+                <div className="text-center">
+                  <div className="h-8 w-8 mx-auto mb-3 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+                  <p className="text-sm text-gray-500">커밋 통계를 불러오는 중...</p>
+                </div>
+              </div>
+            ) : commitSummary ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-lg bg-zinc-50 p-4">
+                    <p className="text-xs font-medium text-gray-500 mb-1">총 커밋</p>
+                    <p className="text-2xl font-bold text-gray-900">{commitSummary.totalCommits}</p>
+                  </div>
+                  <div className="rounded-lg bg-zinc-50 p-4">
+                    <p className="text-xs font-medium text-gray-500 mb-1">이번 주 커밋</p>
+                    <p className="text-2xl font-bold text-gray-900">{commitSummary.commitsThisWeek}</p>
+                  </div>
+                </div>
+                {commitSummary.mostActiveDay && (
+                  <div className="rounded-lg bg-zinc-50 p-4">
+                    <p className="text-xs font-medium text-gray-500 mb-1">가장 활발한 요일</p>
+                    <p className="text-base font-semibold text-gray-900">{commitSummary.mostActiveDay}</p>
+                  </div>
+                )}
+                {commitSummary.latestCommitDate && (
+                  <div className="rounded-lg bg-zinc-50 p-4">
+                    <p className="text-xs font-medium text-gray-500 mb-1">최근 커밋</p>
+                    <p className="text-sm text-gray-700">
+                      {new Date(commitSummary.latestCommitDate).toLocaleDateString("ko-KR", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                )}
+
+                {commitHistory.length > 0 && (
+                  <div className="border-t border-gray-100 pt-6">
+                    <h3 className="mb-4 text-sm font-semibold text-gray-900">커밋 히스토리</h3>
+                    {isLoadingHistory ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                      </div>
+                    ) : (
+                      <CommitHistoryChart history={commitHistory} />
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center rounded-lg bg-zinc-50 py-12">
+                <div className="text-center">
+                  <GitCommitVertical className="h-12 w-12 mx-auto text-gray-400 mb-3" />
+                  <p className="text-sm text-gray-500">커밋 통계를 불러올 수 없습니다.</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
