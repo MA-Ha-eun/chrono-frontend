@@ -2,9 +2,9 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Edit, Trash2, ExternalLink, GitCommitVertical, Calendar, Target, CircleAlert, Flame, Github, RefreshCw, ChevronDown } from "lucide-react";
 import { getProject, deleteProject, updateProjectStatus } from "@/lib/api/project";
-import { syncCommits, getCommitSummary, getCommitHistory } from "@/lib/api/commit";
+import { syncCommits, getCommitSummary, getCommitHistory, getAllCommits } from "@/lib/api/commit";
 import { isApiError } from "@/lib/api/client";
-import { Project, ProjectStatus, CommitSummary, CommitHistoryCount } from "@/types/api";
+import { Project, ProjectStatus, CommitSummary, CommitHistoryCount, Commit } from "@/types/api";
 import { Badge } from "@/components/common/Badge";
 import { Button } from "@/components/common/Button";
 import { useToastStore } from "@/stores/toastStore";
@@ -77,9 +77,11 @@ export function ProjectDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [commitSummary, setCommitSummary] = useState<CommitSummary | null>(null);
   const [commitHistory, setCommitHistory] = useState<CommitHistoryCount[]>([]);
+  const [commits, setCommits] = useState<Commit[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isLoadingCommits, setIsLoadingCommits] = useState(false);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const loadProject = async () => {
@@ -126,6 +128,20 @@ export function ProjectDetailPage() {
     }
   };
 
+  const loadCommits = async () => {
+    if (!id) return;
+    
+    try {
+      setIsLoadingCommits(true);
+      const commitsData = await getAllCommits(Number(id));
+      setCommits(commitsData);
+    } catch (err) {
+      console.error("커밋 목록을 불러오는데 실패했습니다:", err);
+    } finally {
+      setIsLoadingCommits(false);
+    }
+  };
+
   useEffect(() => {
     if (!id) {
       setError("프로젝트 ID가 없습니다.");
@@ -136,6 +152,7 @@ export function ProjectDetailPage() {
     loadProject();
     loadCommitSummary();
     loadCommitHistory();
+    loadCommits();
   }, [id]);
 
   const handleSyncCommits = async () => {
@@ -148,6 +165,7 @@ export function ProjectDetailPage() {
       await loadProject();
       await loadCommitSummary();
       await loadCommitHistory();
+      await loadCommits();
     } catch (err) {
       if (isApiError(err)) {
         showToast(err.message || "커밋 동기화에 실패했습니다.", "error");
@@ -504,6 +522,53 @@ export function ProjectDetailPage() {
                       </div>
                     ) : (
                       <CommitHistoryChart history={commitHistory} />
+                    )}
+                  </div>
+                )}
+
+                {commits.length > 0 && (
+                  <div className="border-t border-gray-100 pt-6">
+                    <h3 className="mb-4 text-sm font-semibold text-gray-900">최근 커밋</h3>
+                    {isLoadingCommits ? (
+                      <div className="flex items-center justify-center py-8">
+                        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {commits.slice(0, 10).map((commit) => (
+                          <div
+                            key={commit.sha}
+                            className="flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-4 transition-colors hover:bg-gray-50"
+                          >
+                            <div className="mt-0.5 shrink-0">
+                              <GitCommitVertical className="h-4 w-4 text-gray-400" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-gray-900 line-clamp-2">
+                                {commit.message}
+                              </p>
+                              <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
+                                <span>{commit.authorName}</span>
+                                <span>•</span>
+                                <span>
+                                  {new Date(commit.commitDate).toLocaleDateString("ko-KR", {
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                  })}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                        {commits.length > 10 && (
+                          <p className="text-xs text-gray-500 text-center pt-2">
+                            총 {commits.length}개의 커밋 중 최근 10개만 표시됩니다.
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}
