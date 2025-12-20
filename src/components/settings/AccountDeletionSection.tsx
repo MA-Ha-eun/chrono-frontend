@@ -1,10 +1,39 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/common/Button";
 import { Card } from "@/components/common/Card";
 import { AlertTriangle } from "lucide-react";
+import { deleteAccount } from "@/lib/api/auth";
+import { isApiError } from "@/lib/api/client";
+import { useAuthStore } from "@/stores/authStore";
+import { useToastStore } from "@/stores/toastStore";
 
 export function AccountDeletionSection() {
-  const handleDeleteAccount = () => {
-    // TODO: 회원탈퇴 확인 모달 표시
+  const navigate = useNavigate();
+  const logout = useAuthStore((state) => state.logout);
+  const showToast = useToastStore((state) => state.showToast);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (!window.confirm("정말로 회원 탈퇴를 하시겠습니까?\n\n탈퇴 후에는 프로젝트 기록 및 데이터를 복구할 수 없습니다.")) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteAccount();
+      showToast("회원 탈퇴가 완료되었습니다.", "success");
+      await logout();
+      navigate("/");
+    } catch (err) {
+      if (isApiError(err)) {
+        showToast(err.message || "회원 탈퇴에 실패했습니다.", "error");
+      } else {
+        showToast("회원 탈퇴 중 오류가 발생했습니다.", "error");
+      }
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -22,6 +51,8 @@ export function AccountDeletionSection() {
           variant="outline"
           size="sm"
           onClick={handleDeleteAccount}
+          disabled={isDeleting}
+          isLoading={isDeleting}
           className="shrink-0 border-accent-dark text-accent-dark"
         >
           탈퇴하기
