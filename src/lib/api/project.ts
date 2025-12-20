@@ -188,7 +188,7 @@ export async function updateProjectStatus(
 
 export async function deleteProject(id: number): Promise<void> {
   if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
-    return mockApi.project.deleteProject(id);
+    return mockApi.project.deleteProject();
   }
   
   await apiClient.patch(`/projects/${id}/active`, { active: false });

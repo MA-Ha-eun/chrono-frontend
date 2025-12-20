@@ -80,7 +80,7 @@ export const mockApi = {
       await delay(300);
       return { ...mockProject, id, ...data };
     },
-    deleteProject: async (id: number): Promise<void> => {
+    deleteProject: async (): Promise<void> => {
       await delay(300);
     },
   },

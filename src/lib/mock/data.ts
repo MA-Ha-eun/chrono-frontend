@@ -17,25 +17,40 @@ export const mockUser: User = {
 
 export const mockRepos: GitHubRepo[] = [
   {
-    name: "chrono",
+    repoId: 1,
+    repoName: "chrono",
     fullName: "testuser/chrono",
     description: "GitHub 커밋 기반 프로젝트 관리 서비스",
     htmlUrl: "https://github.com/testuser/chrono",
-    private: false,
+    isPrivate: false,
+    language: "TypeScript",
+    stargazersCount: 10,
+    forksCount: 2,
+    updatedAt: "2025-12-08T10:30:00Z",
   },
   {
-    name: "portfolio",
+    repoId: 2,
+    repoName: "portfolio",
     fullName: "testuser/portfolio",
     description: "개인 포트폴리오 웹사이트",
     htmlUrl: "https://github.com/testuser/portfolio",
-    private: false,
+    isPrivate: false,
+    language: "JavaScript",
+    stargazersCount: 5,
+    forksCount: 1,
+    updatedAt: "2025-12-06T15:20:00Z",
   },
   {
-    name: "blog",
+    repoId: 3,
+    repoName: "blog",
     fullName: "testuser/blog",
     description: "기술 블로그",
     htmlUrl: "https://github.com/testuser/blog",
-    private: false,
+    isPrivate: false,
+    language: "Markdown",
+    stargazersCount: 3,
+    forksCount: 0,
+    updatedAt: "2025-12-05T09:15:00Z",
   },
 ];
 
@@ -127,7 +142,7 @@ export const mockProjects: ProjectListItem[] = [
     techStack: "Phaser, TypeScript, WebSocket",
     lastCommitAt: "2025-12-07T14:20:00Z",
     totalCommits: 67,
-    targetDate: "2025-12-05", // 목표일 지남 (D+3)
+    targetDate: "2025-12-05",
     startDate: "2025-11-15",
   },
   {
@@ -137,7 +152,7 @@ export const mockProjects: ProjectListItem[] = [
     techStack: "Python, Pandas, Jupyter",
     lastCommitAt: "2025-12-01T09:30:00Z",
     totalCommits: 124,
-    targetDate: "2025-11-30", // 목표일 지남 (D+8)
+    targetDate: "2025-11-30",
     startDate: "2025-10-10",
   },
 ];
