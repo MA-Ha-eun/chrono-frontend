@@ -36,6 +36,12 @@ apiClient.interceptors.request.use(
 );
 apiClient.interceptors.response.use(
   (response) => {
+    if (response.data && typeof response.data === "object" && "success" in response.data && "data" in response.data) {
+      return {
+        ...response,
+        data: response.data.data,
+      };
+    }
     return response;
   },
   async (error: AxiosError<ApiError>) => {
@@ -68,8 +74,8 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshResponse = await refreshClient.post<string>("/auth/refresh");
-        const newAccessToken = refreshResponse.data;
+        const refreshResponse = await refreshClient.post<{ success: boolean; message: string; data: string }>("/auth/refresh");
+        const newAccessToken = refreshResponse.data?.data || refreshResponse.data;
         useAuthStore.getState().setToken(newAccessToken);
 
         refreshSubscribers.forEach((callback) => callback(newAccessToken));
