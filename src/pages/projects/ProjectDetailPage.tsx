@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Edit, Trash2, ExternalLink, GitCommitVertical, Calendar, Target, CircleAlert, Flame, Github, RefreshCw } from "lucide-react";
-import { getProject, deleteProject } from "@/lib/api/project";
+import { ArrowLeft, Edit, Trash2, ExternalLink, GitCommitVertical, Calendar, Target, CircleAlert, Flame, Github, RefreshCw, ChevronDown } from "lucide-react";
+import { getProject, deleteProject, updateProjectStatus } from "@/lib/api/project";
 import { syncCommits, getCommitSummary, getCommitHistory } from "@/lib/api/commit";
 import { isApiError } from "@/lib/api/client";
 import { Project, ProjectStatus, CommitSummary, CommitHistoryCount } from "@/types/api";
@@ -80,6 +80,7 @@ export function ProjectDetailPage() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   useEffect(() => {
     if (!id) {
@@ -153,6 +154,25 @@ export function ProjectDetailPage() {
       }
     } finally {
       setIsSyncing(false);
+    }
+  };
+
+  const handleStatusChange = async (newStatus: ProjectStatus) => {
+    if (!project || project.status === newStatus) return;
+    
+    try {
+      setIsUpdatingStatus(true);
+      await updateProjectStatus(project.id, newStatus);
+      showToast(`프로젝트 상태가 "${getStatusLabel(newStatus)}"로 변경되었습니다.`, "success");
+      await loadProject();
+    } catch (err) {
+      if (isApiError(err)) {
+        showToast(err.message || "프로젝트 상태 변경에 실패했습니다.", "error");
+      } else {
+        showToast("프로젝트 상태 변경 중 오류가 발생했습니다.", "error");
+      }
+    } finally {
+      setIsUpdatingStatus(false);
     }
   };
 
@@ -319,9 +339,23 @@ export function ProjectDetailPage() {
                     <p className="mt-2 text-sm text-gray-500">{project.description}</p>
                   )}
                 </div>
-                <Badge variant={getStatusVariant(project.status)}>
-                  {getStatusLabel(project.status)}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge variant={getStatusVariant(project.status)}>
+                    {getStatusLabel(project.status)}
+                  </Badge>
+                  <div className="relative">
+                    <select
+                      value={project.status}
+                      onChange={(e) => handleStatusChange(e.target.value as ProjectStatus)}
+                      disabled={isUpdatingStatus}
+                      className="h-[38px] w-auto min-w-[90px] appearance-none rounded-lg border border-gray-200 bg-white pl-2.5 pr-7 text-xs text-gray-700 transition-colors hover:border-gray-300 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value={ProjectStatus.IN_PROGRESS}>진행 중</option>
+                      <option value={ProjectStatus.COMPLETED}>완료</option>
+                    </select>
+                    <ChevronDown className="pointer-events-none absolute right-1.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-400" />
+                  </div>
+                </div>
               </div>
 
               {techStackArray.length > 0 && (
