@@ -180,8 +180,7 @@ export interface DashboardSummary {
 }
 
 export interface WeeklyCommit {
-  dayOfWeek: string;
-  date: string;
+  dayOfWeek: number;
   count: number;
 }
 

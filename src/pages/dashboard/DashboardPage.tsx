@@ -18,7 +18,14 @@ export function DashboardPage() {
     mostActiveDayIndex,
     streakDays,
   } = useMemo(() => {
-    const counts = weeklyCommits.map((d) => d.count ?? 0);
+    // 월요일부터 일요일 순서 (MySQL DAYOFWEEK: 2=월, 3=화, ..., 1=일)
+    const dayOrder = [2, 3, 4, 5, 6, 7, 1];
+    const countsByDay = new Map<number, number>();
+    weeklyCommits.forEach((commit) => {
+      countsByDay.set(commit.dayOfWeek, commit.count ?? 0);
+    });
+
+    const counts = dayOrder.map((dayOfWeek) => countsByDay.get(dayOfWeek) ?? 0);
     const max = counts.length > 0 ? Math.max(...counts) : 1;
     const total = counts.reduce((s, v) => s + v, 0);
 
@@ -83,14 +90,12 @@ export function DashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {/* ActivityOverview 스켈레톤 */}
           <div className="lg:col-span-2">
             <SkeletonCard>
               <SkeletonCardContent titleWidth="w-48" />
             </SkeletonCard>
           </div>
 
-          {/* ActivityRecord 스켈레톤 */}
           <div>
             <SkeletonCard>
               <SkeletonCardContent titleWidth="w-20" />
@@ -98,7 +103,6 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* RecentProjects 스켈레톤 */}
         <SkeletonCard height="h-64">
           <div className="space-y-3">
             <Skeleton width="w-24" height="h-6" />

@@ -2,7 +2,7 @@ import { GitCommitHorizontal, Sparkle, PlayCircle, CircleCheckBig, FolderTree } 
 import { getCommitIntensity } from "@/utils/dashboard";
 
 interface ActivityOverviewProps {
-  weeklyCommits: { date: string; count?: number }[];
+  weeklyCommits: { dayOfWeek: number; count?: number }[];
   weekInfo: { startDate: string; endDate: string };
   streakDays: number;
   totalWeekCommits: number;
@@ -34,10 +34,8 @@ export function ActivityOverview({
 }: ActivityOverviewProps) {
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm">
-      {/* 요약 카드 */}
       <div className="relative mb-[30px] rounded-lg bg-zinc-50 py-8 px-2">
         <div className="relative flex items-center justify-between">
-          {/* 1. 진행중 */}
           <div className="relative z-10 flex flex-1 flex-col items-center gap-3">
             <div className="flex h-15 w-15 items-center justify-center rounded-full bg-primary-light shadow-lg shadow-primary-light/20">
               <PlayCircle className="h-8 w-8 text-white" />
@@ -48,10 +46,8 @@ export function ActivityOverview({
             </div>
           </div>
 
-          {/* 연결선 1: 첫 번째 노드 중심 → 두 번째 노드 중심 */}
           <div className="absolute left-[16.67%] right-[50%] top-[30px] hidden h-2 -translate-y-1/2 bg-gradient-to-r from-primary-light to-primary md:block"></div>
 
-          {/* 2. 완료 */}
           <div className="relative z-10 flex flex-1 flex-col items-center gap-3">
             <div className="flex h-15 w-15 items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/20">
               <CircleCheckBig className="h-8 w-8 text-white" />
@@ -62,10 +58,8 @@ export function ActivityOverview({
             </div>
           </div>
 
-          {/* 연결선 2: 두 번째 노드 중심 → 세 번째 노드 중심 */}
           <div className="absolute left-[50%] right-[16.67%] top-[30px] hidden h-2 -translate-y-1/2 bg-gradient-to-r from-primary to-primary-dark md:block"></div>
 
-          {/* 3. 전체 프로젝트 */}
           <div className="relative z-10 flex flex-1 flex-col items-center gap-3">
             <div className="flex h-15 w-15 items-center justify-center rounded-full bg-primary-dark shadow-lg shadow-primary-dark/20">
               <FolderTree className="h-8 w-8 text-white" />
@@ -78,7 +72,6 @@ export function ActivityOverview({
         </div>
       </div>
 
-      {/* 커밋 기록 */}
       <div>
         <div className="mb-8">
           <h2 className="text-lg font-semibold text-gray-900">최근 일주일간 {totalWeekCommits}번 커밋했어요</h2>
@@ -89,35 +82,39 @@ export function ActivityOverview({
 
         <div className="space-y-4">
           <div className="flex items-end justify-between gap-2">
-            {weeklyCommits.map((commit, index) => {
-              const height = maxCommits > 0 ? (commit.count ?? 0) / maxCommits * 100 : 0;
-              const intensity = getCommitIntensity(commit.count ?? 0);
+            {[2, 3, 4, 5, 6, 7, 1].map((dayOfWeek) => {
+              const commit = weeklyCommits.find((c) => c.dayOfWeek === dayOfWeek);
+              const count = commit?.count ?? 0;
+              // MySQL DAYOFWEEK(1=일, 2=월, ...) → dayLabels 인덱스(0=월, 6=일)
+              const dayIndex = (dayOfWeek - 2 + 7) % 7;
+              const height = maxCommits > 0 ? count / maxCommits * 100 : 0;
+              const intensity = getCommitIntensity(count);
               return (
                 <div
-                  key={commit.date}
+                  key={dayOfWeek}
                   className="group flex flex-1 flex-col items-center gap-2"
                 >
                   <div className="relative flex w-full items-end" style={{ height: "80px" }}>
-                    {(commit.count ?? 0) > 0 && (
+                    {count > 0 && (
                       <span
                         className="absolute left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 transition-opacity group-hover:opacity-100"
                         style={{
-                          bottom: `calc(${Math.max(height, (commit.count ?? 0) > 0 ? 12 : 4)}% + 4px)`,
+                          bottom: `calc(${Math.max(height, count > 0 ? 12 : 4)}% + 4px)`,
                         }}
                       >
-                        {commit.count}
+                        {count}
                       </span>
                     )}
                     <div
                       className={`w-full rounded-t-lg ${intensity.bg} transition-all hover:opacity-80`}
                       style={{
-                        height: `${Math.max(height, (commit.count ?? 0) > 0 ? 12 : 4)}%`,
-                        minHeight: (commit.count ?? 0) > 0 ? "20px" : "4px",
+                        height: `${Math.max(height, count > 0 ? 12 : 4)}%`,
+                        minHeight: count > 0 ? "20px" : "4px",
                       }}
-                      title={`${dayLabels[index]}: ${commit.count ?? 0} commits`}
+                      title={`${dayLabels[dayIndex]}: ${count} commits`}
                     ></div>
                   </div>
-                  <span className="text-xs text-gray-500">{dayLabels[index]}</span>
+                  <span className="text-xs text-gray-500">{dayLabels[dayIndex]}</span>
                 </div>
               );
             })}
