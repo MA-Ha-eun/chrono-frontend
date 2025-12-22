@@ -186,7 +186,7 @@ export function ProjectDetailPage() {
     
     try {
       setIsUpdatingStatus(true);
-      await updateProjectStatus(project.id, newStatus);
+      await updateProjectStatus(project.projectId, newStatus);
       showToast(`프로젝트 상태가 "${getStatusLabel(newStatus)}"로 변경되었습니다.`, "success");
       await loadProject();
     } catch (err) {
@@ -214,7 +214,7 @@ export function ProjectDetailPage() {
     if (!project) return;
     
     try {
-      await updateProject(project.id, data);
+      await updateProject(project.projectId, data);
       await loadProject();
       showToast("프로젝트가 수정되었습니다.", "success");
     } catch (err) {
@@ -234,7 +234,7 @@ export function ProjectDetailPage() {
     if (!project) return;
     
     try {
-      await deleteProject(project.id);
+      await deleteProject(project.projectId);
       showToast("프로젝트가 삭제되었습니다.", "success");
       navigate("/projects");
     } catch (err) {

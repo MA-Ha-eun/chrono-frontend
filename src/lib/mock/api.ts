@@ -50,7 +50,7 @@ export const mockApi = {
     createProject: async (data: CreateProjectRequest): Promise<Project> => {
       await delay(500);
       return {
-        id: Math.floor(Math.random() * 1000),
+        projectId: Math.floor(Math.random() * 1000),
         title: data.title,
         description: data.description,
         startDate: new Date().toISOString().split("T")[0],
@@ -71,14 +71,14 @@ export const mockApi = {
     },
     getProject: async (id: number): Promise<Project> => {
       await delay(300);
-      return { ...mockProject, id };
+      return { ...mockProject, projectId: id };
     },
     updateProject: async (
       id: number,
       data: UpdateProjectRequest
     ): Promise<Project> => {
       await delay(300);
-      return { ...mockProject, id, ...data };
+      return { ...mockProject, projectId: id, ...data };
     },
     deleteProject: async (): Promise<void> => {
       await delay(300);

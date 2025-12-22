@@ -14,7 +14,7 @@ export async function createProject(
 ): Promise<{ projectId: number }> {
   if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
     const mockProject = await mockApi.project.createProject(data);
-    return { projectId: mockProject.id };
+    return { projectId: mockProject.projectId };
   }
   
   try {
@@ -45,7 +45,7 @@ export async function createProject(
     if (import.meta.env.DEV) {
       console.warn("프로젝트 생성 API 호출 실패, mock 데이터 사용:", error);
       const mockProject = await mockApi.project.createProject(data);
-      return { projectId: mockProject.id };
+      return { projectId: mockProject.projectId };
     }
     throw error;
   }
@@ -122,7 +122,7 @@ export async function getProject(id: number): Promise<Project> {
     const p = response.data;
     
     return {
-      id: p.projectId,
+      projectId: p.projectId,
       title: p.title || p.repoName,
       description: p.description || undefined,
       startDate: p.startDate || p.createdAt,

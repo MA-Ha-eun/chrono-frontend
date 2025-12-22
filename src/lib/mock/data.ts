@@ -157,7 +157,7 @@ export const mockProjects: ProjectListItem[] = [
 ];
 
 export const mockProject: Project = {
-  id: 1,
+  projectId: 1,
   title: "Chrono - 프로젝트 관리 서비스",
   description: "GitHub 커밋을 기반으로 사이드 프로젝트를 관리하는 서비스입니다.",
   startDate: "2025-11-01",

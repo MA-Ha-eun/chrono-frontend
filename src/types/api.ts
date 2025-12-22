@@ -131,7 +131,7 @@ export enum ProjectStatus {
 }
 
 export interface Project {
-  id: number;
+  projectId: number;
   title: string;
   description?: string;
   startDate: string;
