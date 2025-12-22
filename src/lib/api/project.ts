@@ -160,8 +160,8 @@ export async function updateProject(
       title: data.title,
       description: data.description,
       techStack: techStackArray,
-      startDate: undefined,
-      targetDate: data.targetDate,
+      startDate: data.startDate || undefined,
+      targetDate: data.targetDate || undefined,
     });
     
     return getProject(id);

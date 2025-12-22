@@ -208,6 +208,7 @@ export function ProjectDetailPage() {
     title: string;
     description?: string;
     techStack?: string;
+    startDate?: string;
     targetDate?: string;
   }) => {
     if (!project) return;

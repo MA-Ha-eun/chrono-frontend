@@ -156,6 +156,7 @@ export interface CreateProjectRequest {
 export interface UpdateProjectRequest {
   title?: string;
   description?: string;
+  startDate?: string;
   targetDate?: string;
   techStack?: string;
   status?: ProjectStatus;
