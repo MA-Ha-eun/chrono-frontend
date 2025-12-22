@@ -47,7 +47,7 @@ export interface LoginResponse {
 }
 
 export interface User {
-  id: number;
+  userId: number;
   email: string;
   nickname: string;
   githubUsername?: string;

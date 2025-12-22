@@ -20,7 +20,7 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
   return {
     accessToken: response.data.accessToken,
     user: {
-      id: 0,
+      userId: 0,
       email: data.email,
       nickname: response.data.nickname,
       githubUsername: undefined,

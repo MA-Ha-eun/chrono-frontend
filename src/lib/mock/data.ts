@@ -8,7 +8,7 @@ import {
 } from "@/types/api";
 
 export const mockUser: User = {
-  id: 1,
+  userId: 1,
   email: "developer@example.com",
   nickname: "개발자",
   githubUsername: "testuser",
