@@ -7,6 +7,7 @@ import {
   UpdatePasswordRequest,
 } from "@/types/api";
 import { mockApi } from "@/lib/mock/api";
+import { connectGitHubBasic } from "./github";
 
 export async function getMe(): Promise<User> {
   if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
@@ -31,7 +32,17 @@ export async function updateGithubUsername(
   if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
     return mockApi.user.updateGithubUsername(data);
   }
-  throw new Error("백엔드에 GitHub username 설정 API가 없습니다.");
+  
+  try {
+    const response = await connectGitHubBasic({ username: data.githubUsername });
+    return { githubUsername: response.username };
+  } catch (error) {
+    if (import.meta.env.DEV) {
+      console.warn("GitHub username 설정 API 호출 실패, mock 데이터 사용:", error);
+      return mockApi.user.updateGithubUsername(data);
+    }
+    throw error;
+  }
 }
 
 export async function updateProfile(
