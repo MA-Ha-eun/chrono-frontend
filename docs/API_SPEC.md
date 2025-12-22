@@ -5,7 +5,7 @@
 버전: v1.2
 
 작성일: 2025-12-02  
-수정일: 2025-12-19
+수정일: 2025-12-20
 
 기반 문서: PRD.md, FRS.md
 
@@ -276,15 +276,13 @@ Access Token 문자열 반환
   "success": true,
   "message": "SUCCESS",
   "data": {
-    "id": 1,
+    "userId": 1,
     "email": "user@example.com",
     "nickname": "jimin",
     "githubUsername": "jimin-dev"
   }
 }
 ```
-
-**비고:** ⚠️ 백엔드 추가 예정
 
 ---
 
@@ -323,7 +321,7 @@ Access Token 문자열 반환
 
 ---
 
-## 🔹 (SHOULD) 5.3 프로필 수정
+## 🔹 5.3 프로필 수정
 
 ### `PUT /api/users/me`
 
@@ -344,7 +342,7 @@ Access Token 문자열 반환
   "success": true,
   "message": "SUCCESS",
   "data": {
-    "id": 1,
+    "userId": 1,
     "email": "user@example.com",
     "nickname": "새 닉네임",
     "githubUsername": "jimin-dev"
@@ -352,7 +350,7 @@ Access Token 문자열 반환
 }
 ```
 
-**비고:** ⚠️ 백엔드 추가 예정
+**비고:** 응답 필드명은 `id`가 아닌 `userId` 사용
 
 ---
 
@@ -578,6 +576,34 @@ Query Parameter: `username` (String)
 
 ---
 
+## 🔹 6.6 PAT 연동 해제
+
+### `DELETE /api/github/pat`
+
+**인증:** 필요
+
+### Request
+
+본문 없음 (인증 토큰만 필요)
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "connected": true,
+    "type": "BASIC",
+    "message": "PAT연동 해제"
+  }
+}
+```
+
+**비고:** PAT 해제 후 기본 연동(BASIC) 상태로 변경됨
+
+---
+
 ## 🔹 6.5 Repo 커밋 데이터 조회 (내부 호출)
 
 ### 사용처: 프로젝트 생성 시 자동 호출
@@ -600,8 +626,6 @@ Query Parameter: `username` (String)
 ### `POST /api/projects`
 
 **인증:** 필요
-
-**비고:** 현재 백엔드 작업 진행 중. 최종 스펙은 백엔드 작업 완료 후 확정 예정.
 
 ### Request
 
@@ -852,9 +876,7 @@ Query Parameter: `username` (String)
 }
 ```
 
-**비고:** 저장된 커밋 수 반환
-
-**비고:** 프로젝트 상세 페이지에서 수동 커밋 동기화 버튼으로 활용 가능
+**비고:** 저장된 커밋 수 반환. 프로젝트 상세 페이지에서 수동 커밋 동기화 버튼으로 활용 가능
 
 ---
 
@@ -884,9 +906,150 @@ Query Parameter: `username` (String)
 
 ---
 
+## 🔹 8.3 커밋 수 조회
+
+### `GET /api/projects/{projectId}/commits/count`
+
+**인증:** 필요
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": 28
+}
+```
+
+**비고:** 프로젝트의 전체 커밋 수 반환
+
+---
+
+## 🔹 8.4 최근 커밋 날짜 조회
+
+### `GET /api/projects/{projectId}/commits/latest`
+
+**인증:** 필요
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": "2025-10-19T09:51:17"
+}
+```
+
+**비고:** 가장 최근 커밋의 날짜 반환 (ISO 8601 형식)
+
+---
+
+## 🔹 8.5 주간 커밋 통계
+
+### `GET /api/projects/{projectId}/commits/weekly`
+
+**인증:** 필요
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": [
+    {
+      "dayOfWeek": 2,
+      "count": 2
+    },
+    {
+      "dayOfWeek": 3,
+      "count": 2
+    },
+    {
+      "dayOfWeek": 4,
+      "count": 1
+    }
+  ]
+}
+```
+
+**비고:** `dayOfWeek`는 요일을 나타냄 (1=월요일, 7=일요일). 주간 커밋 통계 반환
+
+---
+
+## 🔹 8.6 커밋 히스토리
+
+### `GET /api/projects/{projectId}/commits/history`
+
+**인증:** 필요
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": [
+    {
+      "date": "2025-11-24",
+      "count": 8
+    },
+    {
+      "date": "2025-11-25",
+      "count": 2
+    },
+    {
+      "date": "2025-11-27",
+      "count": 3
+    }
+  ]
+}
+```
+
+**비고:** 날짜별 커밋 수 집계 반환
+
+---
+
+## 🔹 8.7 커밋 전체 조회
+
+### `GET /api/projects/{projectId}/commits`
+
+**인증:** 필요
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": [
+    {
+      "sha": "f40e9c6f84e3191ab6e902a14b6fd7705ed3bc8a",
+      "message": "fix:refresh설정 수정",
+      "authorName": "simuneu",
+      "authorEmail": "worksimu@gmail.com",
+      "commitDate": "2025-12-17T13:27:11"
+    },
+    {
+      "sha": "a1740bd609d32af1868e3264d5b2470681ce08fd",
+      "message": "fix:요일별 소비 패턴 계산 기준 통일 및 undefined 오류 수정",
+      "authorName": "simuneu",
+      "authorEmail": "worksimu@gmail.com",
+      "commitDate": "2025-12-16T15:50:07"
+    }
+  ]
+}
+```
+
+**비고:** 최근 30개 커밋만 반환 (필요 시 전체 조회로 확장 가능). 프로젝트 상세 페이지에서 최근 커밋 목록 표시에 활용 가능
+
+---
+
 # 9. Dashboard API
 
-## 🔹 8.1 대시보드 전체 데이터 조회
+## 🔹 9.1 대시보드 전체 데이터 조회
 
 ### `GET /api/dashboard`
 
@@ -906,14 +1069,16 @@ Query Parameter: `username` (String)
     },
     "weeklyCommits": [
       {
-        "dayOfWeek": "MON",
-        "date": "2025-11-17",
-        "count": 3
+        "dayOfWeek": 2,
+        "count": 2
       },
       {
-        "dayOfWeek": "TUE",
-        "date": "2025-11-18",
-        "count": 5
+        "dayOfWeek": 3,
+        "count": 2
+      },
+      {
+        "dayOfWeek": 4,
+        "count": 1
       }
     ],
     "weekInfo": {
@@ -922,17 +1087,23 @@ Query Parameter: `username` (String)
     },
     "recentProjects": [
       {
-        "id": 10,
-        "title": "Project Tracker",
-        "lastCommitAt": "2025-11-20T10:22:31Z",
-        "totalCommits": 87
+        "projectId": 5,
+        "totalCommits": 30,
+        "latestCommitDate": "2025-12-17T13:27:11",
+        "commitsThisWeek": 5,
+        "mostActiveDay": "Wednesday"
+      },
+      {
+        "projectId": 6,
+        "totalCommits": 28,
+        "latestCommitDate": "2025-10-19T09:51:17",
+        "commitsThisWeek": 0,
+        "mostActiveDay": "Sunday"
       }
     ]
   }
 }
 ```
-
-**비고:** ⚠️ 백엔드 추가 예정
 
 ---
 
@@ -943,7 +1114,6 @@ status ∈ {
   "IN_PROGRESS",  // 진행 중
   "COMPLETED"     // 완료
 }
-
 ```
 
 ---
@@ -955,9 +1125,7 @@ status ∈ {
 | 커밋 수집          | 프로젝트 생성 시 동기 호출                  |
 | Repo 리스트        | GitHub username 기반                        |
 | Rate Limit 발생 시 | 캐시된 데이터 유지                          |
-| Private Repo       | MVP에서는 지원 ❌ (추후 PAT 기반 확장 가능) |
-
----
+| Private Repo       | PAT 기반 접근 지원                          |
 
 ---
 
