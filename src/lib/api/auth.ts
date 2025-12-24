@@ -1,5 +1,5 @@
 import { apiClient, refreshClient } from "./client";
-import { LoginRequest, LoginResponse, SignupRequest, EmailVerificationSendRequest, EmailVerificationVerifyRequest } from "@/types/api";
+import { LoginRequest, LoginResponse, SignupRequest, EmailVerificationSendRequest, EmailVerificationVerifyRequest, PasswordResetRequest, PasswordResetConfirmRequest } from "@/types/api";
 
 export async function sendEmailVerification(data: EmailVerificationSendRequest): Promise<void> {
   await apiClient.post("/auth/email/send", data);
@@ -42,5 +42,13 @@ export async function logout(): Promise<void> {
 
 export async function deleteAccount(): Promise<void> {
   await apiClient.delete("/auth");
+}
+
+export async function requestPasswordReset(data: PasswordResetRequest): Promise<void> {
+  await apiClient.post("/auth/password/reset-request", data);
+}
+
+export async function resetPassword(data: PasswordResetConfirmRequest): Promise<void> {
+  await apiClient.post("/auth/password/reset", data);
 }
 
