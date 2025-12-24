@@ -43,7 +43,7 @@ export function AccountDeletionSection() {
     <Card className="border-0 p-6 shadow-sm">
       <h2 className="mb-4 text-lg font-semibold text-gray-900">회원 탈퇴</h2>
 
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p className="flex items-start gap-1 text-sm text-accent-dark">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent-dark" />
           <span>
@@ -56,7 +56,7 @@ export function AccountDeletionSection() {
           onClick={handleDeleteAccountClick}
           disabled={isDeleting}
           isLoading={isDeleting}
-          className="shrink-0"
+          className="shrink-0 w-full md:w-auto"
         >
           탈퇴하기
         </Button>
