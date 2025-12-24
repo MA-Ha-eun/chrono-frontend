@@ -41,7 +41,7 @@ export function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">설정</h1>
+        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">계정설정</h1>
         <p className="mt-1 text-sm text-gray-500">계정 정보와 GitHub 연동을 관리하세요.</p>
       </div>
 
@@ -52,8 +52,8 @@ export function SettingsPage() {
           <div className="mb-6 flex items-center gap-5">
             <User className="h-10 w-10 text-primary" />
             <div>
-              <h2 className="text-lg font-semibold text-gray-900">내 정보 관리</h2>
-              <p className="text-sm text-gray-500">이메일, 비밀번호, 닉네임을 관리합니다.</p>
+              <h2 className="text-lg font-semibold text-gray-900">계정 정보</h2>
+              <p className="text-sm text-gray-500">이메일, 닉네임, 비밀번호를 관리합니다.</p>
             </div>
           </div>
 
