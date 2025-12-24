@@ -43,6 +43,11 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
   const githubUsernameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const patUsernameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  useEffect(() => {
+    setGithubUsername(initialUsername);
+    setPatUsername(initialUsername);
+  }, [initialUsername]);
+
   const validateUsername = useCallback(async (username: string, setValidation: (state: ValidationState) => void) => {
     if (!username.trim()) {
       setValidation({ status: 'idle', message: null });
@@ -134,11 +139,17 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
       return;
     }
 
+    if (githubUsername.trim() === initialUsername) {
+      showToast("변경된 내용이 없습니다.", "info");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const updated = await updateGithubUsername({ githubUsername: githubUsername.trim() });
       onUpdate(updated.githubUsername);
+      setGithubUsernameValidation({ status: 'idle', message: null });
       showToast("GitHub Username이 업데이트되었습니다.", "success");
     } catch (err) {
       if (isApiError(err)) {
@@ -171,6 +182,7 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
         pat: patToken.trim(),
       });
       onUpdate(patUsername.trim());
+      setPatUsernameValidation({ status: 'idle', message: null });
       showToast("Private repository 분석이 활성화되었습니다.", "success");
       setPatToken("");
     } catch (err) {
