@@ -166,7 +166,7 @@ export function ForgotPasswordPage() {
 
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full -mt-2"
                   isLoading={isSendingCode}
                 >
                   인증코드 발송
@@ -267,7 +267,7 @@ export function ForgotPasswordPage() {
 
                 <Button
                   type="submit"
-                  className="w-full"
+                  className="w-full -mt-2"
                   isLoading={isResetting}
                 >
                   비밀번호 재설정

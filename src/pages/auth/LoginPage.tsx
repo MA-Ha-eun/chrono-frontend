@@ -79,7 +79,7 @@ export function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full -mt-2"
               isLoading={isLoading}
             >
               로그인

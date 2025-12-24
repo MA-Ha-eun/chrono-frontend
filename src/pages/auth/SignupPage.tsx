@@ -353,7 +353,7 @@ export function SignupPage() {
 
             <Button
               type="submit"
-              className="w-full"
+              className="w-full -mt-2"
               isLoading={isLoading}
               disabled={!emailVerified}
             >
