@@ -102,12 +102,15 @@ export function PasswordSection() {
             onChange={(e) => {
               const value = e.target.value;
               setNewPassword(value);
-              if (value && !validatePassword(value).valid) {
-                setPasswordMessage(validatePassword(value).message || "비밀번호 조건을 만족하지 않습니다.");
-              } else {
+              
+              const passwordValidation = validatePassword(value);
+              if (value && !passwordValidation.valid) {
+                setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
+              } else if (value && confirmPassword && value !== confirmPassword) {
+                setPasswordMessage("비밀번호가 일치하지 않습니다.");
+              } else if (value && confirmPassword && value === confirmPassword) {
                 setPasswordMessage(null);
-              }
-              if (confirmPassword && value !== confirmPassword) {
+              } else {
                 setPasswordMessage(null);
               }
             }}
@@ -121,8 +124,18 @@ export function PasswordSection() {
             onChange={(e) => {
               const value = e.target.value;
               setConfirmPassword(value);
-              if (value && newPassword && value !== newPassword) {
-                setPasswordMessage("비밀번호가 일치하지 않습니다.");
+              
+              if (value && newPassword) {
+                if (value !== newPassword) {
+                  setPasswordMessage("비밀번호가 일치하지 않습니다.");
+                } else {
+                  const passwordValidation = validatePassword(newPassword);
+                  if (!passwordValidation.valid) {
+                    setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
+                  } else {
+                    setPasswordMessage(null);
+                  }
+                }
               } else {
                 setPasswordMessage(null);
               }
