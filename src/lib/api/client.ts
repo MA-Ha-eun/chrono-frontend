@@ -107,9 +107,47 @@ apiClient.interceptors.response.use(
       return Promise.reject(error.response.data);
     }
 
+    // 백엔드에서 에러 메시지가 없을 경우 status code별 기본 메시지 제공
+    const statusCode = error.response?.status;
+    let message = "요청 처리 중 오류가 발생했습니다.";
+    let code = ErrorCode.SERVER_ERROR;
+
+    if (statusCode) {
+      switch (statusCode) {
+        case 400:
+          message = "잘못된 요청입니다.";
+          code = ErrorCode.VALIDATION_ERROR;
+          break;
+        case 401:
+          message = "인증이 필요합니다.";
+          code = ErrorCode.UNAUTHORIZED;
+          break;
+        case 403:
+          message = "요청을 처리할 수 없습니다.";
+          code = ErrorCode.FORBIDDEN;
+          break;
+        case 404:
+          message = "요청한 리소스를 찾을 수 없습니다.";
+          code = ErrorCode.NOT_FOUND;
+          break;
+        case 500:
+        case 502:
+        case 503:
+          message = "서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+          code = ErrorCode.SERVER_ERROR;
+          break;
+        default:
+          message = `요청 처리 중 오류가 발생했습니다. (${statusCode})`;
+      }
+    } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      message = "요청 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.";
+    } else if (error.message?.includes('Network Error') || !error.response) {
+      message = "네트워크 연결을 확인해주세요.";
+    }
+
     return Promise.reject({
-      message: error.message || "네트워크 오류가 발생했습니다.",
-      code: ErrorCode.SERVER_ERROR,
+      message,
+      code,
     } as ApiError);
   }
 );
