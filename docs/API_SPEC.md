@@ -5,7 +5,7 @@
 버전: v1.2
 
 작성일: 2025-12-02  
-수정일: 2025-12-23
+수정일: 2025-12-25
 
 기반 문서: PRD.md, FRS.md
 
@@ -258,6 +258,74 @@ Access Token 문자열 반환
 ```
 
 **비고:** 회원가입 전 이메일 인증이 완료되어야 함
+
+---
+
+## 🔹 4.7 비밀번호 재설정 요청 (코드 발송)
+
+### `POST /api/auth/password/reset-request`
+
+**인증:** 불필요
+
+### Request
+
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
+}
+```
+
+**비고:** 이메일로 비밀번호 재설정 인증 코드가 발송됨
+
+### Error
+
+- 존재하지 않는 이메일 → 400 `"존재하지 않는 이메일"`
+
+---
+
+## 🔹 4.8 비밀번호 재설정 (코드 확인 및 비밀번호 변경)
+
+### `POST /api/auth/password/reset`
+
+**인증:** 불필요
+
+### Request
+
+```json
+{
+  "email": "user@example.com",
+  "code": "CPL3DFWL",
+  "newPassword": "abcd123!"
+}
+```
+
+**조건:** 새 비밀번호는 영문, 숫자, 특수문자 포함 8자 이상
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
+}
+```
+
+### Error
+
+- 존재하지 않는 이메일 → 400 `"존재하지 않는 이메일"`
+- 인증 코드 오류 → 400 `"인증 코드가 올바르지 않습니다."`
+- 새 비밀번호 조건 불만족 → 400 VALIDATION_ERROR
 
 ---
 
