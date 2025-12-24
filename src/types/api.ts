@@ -71,6 +71,16 @@ export interface UpdatePasswordRequest {
   newPasswordConfirm: string;
 }
 
+export interface PasswordResetRequest {
+  email: string;
+}
+
+export interface PasswordResetConfirmRequest {
+  email: string;
+  code: string;
+  newPassword: string;
+}
+
 export interface GitHubUsernameValidation {
   valid: boolean;
   username: string;
