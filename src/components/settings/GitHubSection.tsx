@@ -72,7 +72,7 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
         const errorMessage = result.message || '존재하지 않는 GitHub Username';
         setValidation({
           status: 'invalid',
-          message: errorMessage.includes('사용자') || errorMessage.includes('사용자를 찾을 수 없습니다')
+          message: errorMessage.includes('사용자') || errorMessage.includes('사용자를 찾을 수 없습니다') || errorMessage.includes('존재하지 않는')
             ? '존재하지 않는 GitHub Username'
             : errorMessage,
         });
@@ -281,7 +281,7 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
             }}
             required
             label=""
-            error={undefined}
+            error={githubUsernameValidation.status === 'invalid' ? '' : undefined}
           />
         </div>
 
@@ -352,7 +352,7 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
               }}
               required
               label=""
-              error={undefined}
+              error={patUsernameValidation.status === 'invalid' ? '' : undefined}
             />
           </div>
 
