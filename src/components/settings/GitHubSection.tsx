@@ -40,8 +40,8 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false);
 
-  const githubUsernameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const patUsernameTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const githubUsernameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const patUsernameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     setGithubUsername(initialUsername);
