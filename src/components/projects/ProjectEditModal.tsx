@@ -1,10 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
+import { Badge } from "@/components/common/Badge";
 import { Project } from "@/types/api";
 import { useToastStore } from "@/stores/toastStore";
 import { isApiError } from "@/lib/api/client";
+import { cn } from "@/lib/utils";
+import { POPULAR_TECH_STACKS } from "@/lib/constants/techStacks";
 
 export interface ProjectEditModalProps {
   isOpen: boolean;
@@ -14,7 +17,6 @@ export interface ProjectEditModalProps {
     title: string;
     description?: string;
     techStack?: string;
-    startDate?: string;
     targetDate?: string;
   }) => Promise<void>;
 }
@@ -30,7 +32,6 @@ export function ProjectEditModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [techStack, setTechStack] = useState("");
-  const [startDate, setStartDate] = useState("");
   const [targetDate, setTargetDate] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [titleMessage, setTitleMessage] = useState<string | null>(null);
@@ -54,12 +55,20 @@ export function ProjectEditModal({
     };
   }, [isOpen, isLoading, onClose]);
 
+  const getTodayString = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const today = getTodayString();
+
   useEffect(() => {
     if (isOpen && project) {
       setTitle(project.title || "");
       setDescription(project.description || "");
       setTechStack(project.techStack || "");
-      setStartDate(project.startDate || "");
       setTargetDate(project.targetDate || "");
       setTitleMessage(null);
       setDescriptionMessage(null);
@@ -83,6 +92,116 @@ export function ProjectEditModal({
     return { valid: true };
   };
 
+  const [techStackInput, setTechStackInput] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
+  const techStackInputRef = useRef<HTMLDivElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+
+  const techStackArray = useMemo(() => {
+    if (!techStack.trim()) return [];
+    return techStack
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }, [techStack]);
+
+  const suggestions = useMemo(() => {
+    if (!techStackInput.trim() || !showSuggestions) return [];
+    const inputLower = techStackInput.toLowerCase();
+    const currentItems = techStackArray.map((s) => s.toLowerCase());
+    return POPULAR_TECH_STACKS.filter(
+      (tech) =>
+        tech.toLowerCase().includes(inputLower) &&
+        !currentItems.includes(tech.toLowerCase())
+    ).slice(0, 8);
+  }, [techStackInput, techStackArray, showSuggestions]);
+
+  const addTechToStack = (tech: string) => {
+    if (!tech.trim()) return;
+    const trimmedTech = tech.trim();
+    if (!techStackArray.map((s) => s.toLowerCase()).includes(trimmedTech.toLowerCase())) {
+      const newArray = [...techStackArray, trimmedTech];
+      setTechStack(newArray.join(", "));
+    }
+    setTechStackInput("");
+    setShowSuggestions(false);
+    setSelectedIndex(-1);
+  };
+
+  const handleRemoveTech = (indexToRemove: number) => {
+    const newArray = techStackArray.filter((_, idx) => idx !== indexToRemove);
+    setTechStack(newArray.join(", "));
+  };
+
+  const handleTechStackInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setTechStackInput(value);
+    
+    const lastCommaIndex = value.lastIndexOf(",");
+    if (lastCommaIndex >= 0) {
+      const parts = value.split(",").map(s => s.trim()).filter(Boolean);
+      const newTechs = parts.slice(0, parts.length - 1);
+      newTechs.forEach(tech => addTechToStack(tech));
+      setTechStackInput(parts[parts.length - 1] || "");
+    }
+    
+    setShowSuggestions(value.trim().length > 0);
+    setSelectedIndex(-1);
+  };
+
+  const handleSelectSuggestion = (tech: string) => {
+    addTechToStack(tech);
+  };
+
+  const handleTechStackKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (suggestions.length > 0) {
+        setSelectedIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : prev
+        );
+      }
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      if (selectedIndex >= 0 && suggestions[selectedIndex]) {
+        handleSelectSuggestion(suggestions[selectedIndex]);
+      } else if (techStackInput.trim()) {
+        addTechToStack(techStackInput);
+      }
+    } else if (e.key === "Escape") {
+      setShowSuggestions(false);
+      setSelectedIndex(-1);
+    } else if (e.key === "Backspace" && !techStackInput && techStackArray.length > 0) {
+      handleRemoveTech(techStackArray.length - 1);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen && project) {
+      setTechStackInput("");
+    }
+  }, [isOpen, project]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        techStackInputRef.current &&
+        !techStackInputRef.current.contains(event.target as Node) &&
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setTitleMessage(null);
@@ -100,10 +219,20 @@ export function ProjectEditModal({
       return;
     }
 
+    let finalTechStack = techStack.trim();
+    if (techStackInput.trim()) {
+      addTechToStack(techStackInput);
+      finalTechStack = techStack.trim();
+    }
+
+    if (targetDate && targetDate < today) {
+      showToast("목표일은 오늘 이후 날짜만 선택할 수 있습니다.", "error");
+      return;
+    }
+
     const trimmedTitle = title.trim();
     const trimmedDescription = description.trim() || undefined;
-    const trimmedTechStack = techStack.trim() || undefined;
-    const finalStartDate = startDate || undefined;
+    const trimmedTechStack = finalTechStack || undefined;
     const finalTargetDate = targetDate || undefined;
 
     if (
@@ -111,7 +240,6 @@ export function ProjectEditModal({
       trimmedTitle === project.title &&
       trimmedDescription === (project.description || "") &&
       trimmedTechStack === (project.techStack || "") &&
-      finalStartDate === (project.startDate || "") &&
       finalTargetDate === (project.targetDate || "")
     ) {
       showToast("변경된 내용이 없습니다.", "info");
@@ -125,7 +253,6 @@ export function ProjectEditModal({
         title: trimmedTitle,
         description: trimmedDescription,
         techStack: trimmedTechStack,
-        startDate: finalStartDate,
         targetDate: finalTargetDate,
       });
       showToast("프로젝트가 수정되었습니다.", "success");
@@ -166,17 +293,9 @@ export function ProjectEditModal({
         className="relative w-full max-w-2xl rounded-xl bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6">
-          <div className="mb-6 flex items-center justify-between">
+        <div className="p-6 sm:p-8">
+          <div className="mb-6">
             <h2 className="text-xl font-semibold text-gray-900">프로젝트 수정</h2>
-            <button
-              onClick={onClose}
-              disabled={isLoading}
-              className="cursor-pointer rounded-lg p-2 text-gray-700 transition-colors hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label="닫기"
-            >
-              <X className="h-5 w-5" />
-            </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -185,12 +304,13 @@ export function ProjectEditModal({
                 id="title"
                 type="text"
                 label="제목"
-                placeholder="프로젝트 제목을 입력하세요"
+                placeholder="프로젝트 제목을 입력해주세요 (최대 50자)"
                 value={title}
                 onChange={(e) => {
-                  setTitle(e.target.value);
+                  const value = e.target.value;
+                  setTitle(value);
                   if (titleMessage) {
-                    const validation = validateTitle(e.target.value);
+                    const validation = validateTitle(value);
                     if (validation.valid) {
                       setTitleMessage(null);
                     } else {
@@ -200,26 +320,37 @@ export function ProjectEditModal({
                 }}
                 required
                 disabled={isLoading}
+                error={titleMessage ? "" : undefined}
               />
               {titleMessage && (
-                <p className="mt-1.5 text-sm text-red-600">{titleMessage}</p>
+                <p className="mt-1.5 text-sm text-accent-dark">{titleMessage}</p>
               )}
             </div>
 
             <div className="space-y-1.5">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                설명
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                  설명
+                </label>
+                {descriptionMessage && (
+                  <span className="text-xs text-accent-dark">{descriptionMessage}</span>
+                )}
+              </div>
               <textarea
                 id="description"
                 rows={4}
-                className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
-                placeholder="프로젝트에 대한 설명을 입력하세요"
+                className={`flex w-full rounded-lg border px-3 py-2 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 ${
+                  descriptionMessage
+                    ? "border-accent focus:border-accent focus:ring-accent"
+                    : "border-gray-300 bg-white focus:border-primary focus:ring-primary"
+                }`}
+                placeholder="프로젝트 설명을 추가할 수 있어요"
                 value={description}
                 onChange={(e) => {
-                  setDescription(e.target.value);
-                  if (descriptionMessage) {
-                    const validation = validateDescription(e.target.value);
+                  const value = e.target.value;
+                  setDescription(value);
+                  if (descriptionMessage || value.length > 0) {
+                    const validation = validateDescription(value);
                     if (validation.valid) {
                       setDescriptionMessage(null);
                     } else {
@@ -229,60 +360,124 @@ export function ProjectEditModal({
                 }}
                 disabled={isLoading}
               />
-              <div className="flex items-center justify-between">
-                {descriptionMessage && (
-                  <p className="text-sm text-red-600">{descriptionMessage}</p>
+              <p className="text-xs text-gray-500">{description.length}/1000</p>
+            </div>
+
+            <div className="space-y-1.5 w-full">
+              <label htmlFor="targetDate" className="block text-sm font-medium text-gray-700">
+                목표
+              </label>
+              <div className="relative group">
+                <input
+                  id="targetDate"
+                  type="date"
+                  value={targetDate}
+                  onChange={(e) => setTargetDate(e.target.value)}
+                  min={today}
+                  disabled={isLoading}
+                  className={cn(
+                    "flex h-10 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2 text-sm transition-all duration-200",
+                    "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
+                    "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500",
+                    "date-input-custom",
+                    !targetDate ? "text-transparent focus:text-gray-900" : "text-gray-900"
+                  )}
+                  style={{
+                    colorScheme: "light",
+                  }}
+                />
+                {!targetDate && (
+                  <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none group-focus-within:hidden">
+                    프로젝트 목표일을 설정해보세요
+                  </span>
                 )}
-                <p className={`ml-auto text-xs ${description.length > 1000 ? "text-red-600" : "text-gray-500"}`}>
-                  {description.length}/1000
-                </p>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <Input
-                id="startDate"
-                type="date"
-                label="시작일"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                disabled={isLoading}
-              />
-
-              <Input
-                id="targetDate"
-                type="date"
-                label="목표일"
-                value={targetDate}
-                onChange={(e) => setTargetDate(e.target.value)}
-                disabled={isLoading}
-              />
+            <div className="space-y-1.5 w-full">
+              <label htmlFor="techStack" className="block text-sm font-medium text-gray-700">
+                기술 스택
+              </label>
+              <div className="relative" ref={techStackInputRef}>
+                <Input
+                  id="techStack"
+                  type="text"
+                  placeholder="기술 스택을 입력하세요. 쉼표(,) 또는 Enter로 추가됩니다"
+                  value={techStackInput}
+                  onChange={handleTechStackInputChange}
+                  onKeyDown={handleTechStackKeyDown}
+                  onFocus={() => {
+                    if (techStackInput.trim()) {
+                      setShowSuggestions(true);
+                    }
+                  }}
+                  disabled={isLoading}
+                  label=""
+                />
+                {showSuggestions && suggestions.length > 0 && (
+                  <div
+                    ref={suggestionsRef}
+                    className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
+                  >
+                    {suggestions.map((tech, idx) => (
+                      <button
+                        key={tech}
+                        type="button"
+                        onClick={() => handleSelectSuggestion(tech)}
+                        disabled={isLoading}
+                        className={cn(
+                          "w-full px-3 py-2 text-left text-sm transition-colors",
+                          "hover:bg-gray-50",
+                          idx === selectedIndex && "bg-primary-50 text-primary",
+                          "disabled:opacity-50 disabled:cursor-not-allowed"
+                        )}
+                      >
+                        {tech}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {techStackArray.length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {techStackArray.map((tech, idx) => (
+                    <Badge
+                      key={`${tech}-${idx}`}
+                      variant="outline"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium"
+                    >
+                      <span>{tech}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveTech(idx)}
+                        disabled={isLoading}
+                        className="ml-0.5 -mr-0.5 rounded-full hover:bg-gray-100 p-0.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        aria-label={`${tech} 제거`}
+                      >
+                        <X className="h-3 w-3 text-gray-500" />
+                      </button>
+                    </Badge>
+                  ))}
+                </div>
+              )}
             </div>
 
-            <Input
-              id="techStack"
-              type="text"
-              label="기술 스택"
-              placeholder="예: React, TypeScript, Node.js"
-              value={techStack}
-              onChange={(e) => setTechStack(e.target.value)}
-              disabled={isLoading}
-            />
-
-            <div className="flex justify-end gap-2 pt-4">
+            <div className="flex flex-col sm:flex-row gap-3 pt-1">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 disabled={isLoading}
+                className="w-full sm:flex-1"
               >
                 취소
               </Button>
               <Button
                 type="submit"
                 isLoading={isLoading}
+                className="w-full sm:flex-1"
               >
-                수정하기
+                수정
               </Button>
             </div>
           </form>
