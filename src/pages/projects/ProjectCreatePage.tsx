@@ -74,16 +74,15 @@ export function ProjectCreatePage() {
       return;
     }
 
+    const githubUsername = user?.githubUsername;
+    if (!githubUsername) {
+      showToast("GitHub Username이 설정되지 않았습니다.", "error");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const githubUsername = user?.githubUsername;
-      if (!githubUsername) {
-        showToast("GitHub Username이 설정되지 않았습니다.", "error");
-        setIsLoading(false);
-        return;
-      }
-      
       await createProject(
         {
           title: title.trim(),
@@ -113,100 +112,100 @@ export function ProjectCreatePage() {
   }));
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">새 프로젝트 생성</h1>
-        <p className="text-sm text-gray-500">GitHub 리포지토리를 연동하여 프로젝트를 시작하세요.</p>
-      </div>
-
-      <Card className="p-6 md:p-8">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <Input
-            id="title"
-            type="text"
-            label="제목"
-            placeholder="프로젝트 제목을 입력하세요"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-
-          <div className="space-y-1.5">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-              설명
-            </label>
-            <textarea
-              id="description"
-              rows={4}
-              className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="프로젝트에 대한 설명을 입력하세요"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
+    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
+      <div className="w-full max-w-2xl">
+        <Card className="border-0 p-6 md:p-8 shadow-sm">
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">+ 새 프로젝트</h1>
           </div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <Input
-              id="targetDate"
-              type="date"
-              label="목표일"
-              value={targetDate}
-              onChange={(e) => setTargetDate(e.target.value)}
-            />
-
-            <Input
-              id="techStack"
+              id="title"
               type="text"
-              label="기술 스택"
-              placeholder="예: React, TypeScript, Node.js"
-              value={techStack}
-              onChange={(e) => setTechStack(e.target.value)}
+              label="제목"
+              placeholder="프로젝트 제목을 입력하세요"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
             />
-          </div>
 
-          <Select
-            id="repoName"
-            label="GitHub 리포지토리"
-            options={
-              isLoadingRepos
-                ? [{ value: "", label: "로딩 중..." }]
-                : repoOptions.length > 0
-                ? [{ value: "", label: "리포지토리를 선택하세요" }, ...repoOptions]
-                : [{ value: "", label: "사용 가능한 리포지토리가 없습니다" }]
-            }
-            value={repoName}
-            onChange={(e) => setRepoName(e.target.value)}
-            required
-            disabled={isLoadingRepos || repoOptions.length === 0}
-            helperText={
-              isLoadingRepos
-                ? "리포지토리 목록을 불러오는 중..."
-                : repoOptions.length === 0
-                ? "GitHub username을 설정하고 public 리포지토리가 있는지 확인해주세요."
-                : undefined
-            }
-          />
+            <div className="space-y-1.5">
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                설명
+              </label>
+              <textarea
+                id="description"
+                rows={4}
+                className="flex w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                placeholder="프로젝트에 대한 설명을 입력하세요"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate("/projects")}
-              className="flex-1"
-            >
-              취소
-            </Button>
-            <Button
-              type="submit"
-              isLoading={isLoading}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <Input
+                id="targetDate"
+                type="date"
+                label="목표일"
+                value={targetDate}
+                onChange={(e) => setTargetDate(e.target.value)}
+              />
+
+              <Input
+                id="techStack"
+                type="text"
+                label="기술 스택"
+                placeholder="예: React, TypeScript, Node.js"
+                value={techStack}
+                onChange={(e) => setTechStack(e.target.value)}
+              />
+            </div>
+
+            <Select
+              id="repoName"
+              label="GitHub 리포지토리"
+              options={
+                isLoadingRepos
+                  ? [{ value: "", label: "로딩 중..." }]
+                  : repoOptions.length > 0
+                  ? [{ value: "", label: "리포지토리를 선택하세요" }, ...repoOptions]
+                  : [{ value: "", label: "사용 가능한 리포지토리가 없습니다" }]
+              }
+              value={repoName}
+              onChange={(e) => setRepoName(e.target.value)}
+              required
               disabled={isLoadingRepos || repoOptions.length === 0}
-              className="flex-1"
-            >
-              생성하기
-            </Button>
-          </div>
-        </form>
-      </Card>
+              helperText={
+                isLoadingRepos
+                  ? "리포지토리 목록을 불러오는 중..."
+                  : repoOptions.length === 0
+                  ? "GitHub username을 설정하고 public 리포지토리가 있는지 확인해주세요."
+                  : undefined
+              }
+            />
+
+            <div className="flex gap-3 pt-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate("/projects")}
+                className="flex-1"
+              >
+                취소
+              </Button>
+              <Button
+                type="submit"
+                isLoading={isLoading}
+                disabled={isLoadingRepos || repoOptions.length === 0}
+                className="flex-1"
+              >
+                생성하기
+              </Button>
+            </div>
+          </form>
+        </Card>
+      </div>
     </div>
   );
 }
