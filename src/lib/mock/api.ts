@@ -2,10 +2,13 @@ import {
   mockUser,
   mockRepos,
   mockProjects,
+  mockProjectsDetail,
   mockProject,
   mockDashboard,
   mockWeeklyCommits,
   mockCommitSummary,
+  mockCommitHistory,
+  mockCommits,
 } from "./data";
 import {
   User,
@@ -18,9 +21,12 @@ import {
   UpdateGithubUsernameRequest,
   UpdateGithubUsernameResponse,
   UpdateProfileRequest,
+  UpdatePasswordRequest,
   ProjectStatus,
   WeeklyCommitCount,
   CommitSummary,
+  CommitHistoryCount,
+  Commit,
 } from "@/types/api";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -41,6 +47,9 @@ export const mockApi = {
       await delay(300);
       return { ...mockUser, ...data };
     },
+    updatePassword: async (_data: UpdatePasswordRequest): Promise<void> => {
+      await delay(500);
+    },
   },
 
   github: {
@@ -53,19 +62,31 @@ export const mockApi = {
   project: {
     createProject: async (data: CreateProjectRequest): Promise<Project> => {
       await delay(500);
+      const now = new Date();
+      const [repoOwner, repoName] = data.repoName.includes("/")
+        ? data.repoName.split("/")
+        : [mockUser.githubUsername || "testuser", data.repoName];
+      
+      // 기존 리포지토리 데이터가 있으면 활용
+      const existingRepo = mockRepos.find(
+        (r) => r.fullName === `${repoOwner}/${repoName}`
+      );
+      
       return {
-        projectId: Math.floor(Math.random() * 1000),
+        projectId: Math.floor(Math.random() * 1000) + 1000,
         title: data.title,
         description: data.description,
-        startDate: new Date().toISOString().split("T")[0],
+        startDate: now.toISOString().split("T")[0],
         targetDate: data.targetDate,
         techStack: data.techStack,
         status: ProjectStatus.IN_PROGRESS,
-        repoName: data.repoName,
-        repoOwner: mockUser.githubUsername || "testuser",
+        repoName: repoName,
+        repoOwner: repoOwner,
+        totalCommits: existingRepo ? Math.floor(Math.random() * 200) + 50 : 0,
+        lastCommitAt: existingRepo ? existingRepo.updatedAt : now.toISOString(),
         github: {
-          totalCommits: 0,
-          lastCommitAt: new Date().toISOString(),
+          totalCommits: existingRepo ? Math.floor(Math.random() * 200) + 50 : 0,
+          lastCommitAt: existingRepo ? existingRepo.updatedAt : now.toISOString(),
         },
       };
     },
@@ -75,6 +96,11 @@ export const mockApi = {
     },
     getProject: async (id: number): Promise<Project> => {
       await delay(300);
+      // 상세 정보가 있으면 사용, 없으면 기본 프로젝트 사용
+      const projectDetail = mockProjectsDetail[id];
+      if (projectDetail) {
+        return { ...projectDetail, projectId: id };
+      }
       return { ...mockProject, projectId: id };
     },
     updateProject: async (
@@ -82,7 +108,8 @@ export const mockApi = {
       data: UpdateProjectRequest
     ): Promise<Project> => {
       await delay(300);
-      return { ...mockProject, projectId: id, ...data };
+      const projectDetail = mockProjectsDetail[id] || mockProject;
+      return { ...projectDetail, projectId: id, ...data };
     },
     deleteProject: async (): Promise<void> => {
       await delay(300);
@@ -104,6 +131,14 @@ export const mockApi = {
     getCommitSummary: async (_projectId: number): Promise<CommitSummary> => {
       await delay(300);
       return mockCommitSummary;
+    },
+    getCommitHistory: async (_projectId: number): Promise<CommitHistoryCount[]> => {
+      await delay(300);
+      return mockCommitHistory;
+    },
+    getAllCommits: async (_projectId: number): Promise<Commit[]> => {
+      await delay(400);
+      return mockCommits;
     },
   },
 };
