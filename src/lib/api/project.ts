@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient, isApiError } from "./client";
 import {
   Project,
   CreateProjectRequest,
@@ -42,12 +42,16 @@ export async function createProject(
     });
     return { projectId: response.data };
   } catch (error) {
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
     if (import.meta.env.DEV) {
-      console.warn("프로젝트 생성 API 호출 실패, mock 데이터 사용:", error);
-      const mockProject = await mockApi.project.createProject(data);
-      return { projectId: mockProject.projectId };
+      console.warn(`프로젝트 생성 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
     }
-    throw error;
+    const mockProject = await mockApi.project.createProject(data);
+    return { projectId: mockProject.projectId };
   }
 }
 
@@ -87,11 +91,16 @@ export async function getProjects(): Promise<ProjectListItem[]> {
       startDate: p.startDate || p.createdAt,
     }));
   } catch (error) {
+    // 서버 실패 시 mock 데이터 사용
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
     if (import.meta.env.DEV) {
-      console.warn("프로젝트 목록 API 호출 실패, mock 데이터 사용:", error);
-      return mockApi.project.getProjects();
+      console.warn(`프로젝트 목록 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
     }
-    throw error;
+    return mockApi.project.getProjects();
   }
 }
 
@@ -135,11 +144,16 @@ export async function getProject(id: number): Promise<Project> {
       lastCommitAt: p.lastCommitAt || undefined,
     };
   } catch (error) {
+    // 서버 실패 시 mock 데이터 사용
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
     if (import.meta.env.DEV) {
-      console.warn("프로젝트 상세 조회 API 호출 실패, mock 데이터 사용:", error);
-      return mockApi.project.getProject(id);
+      console.warn(`프로젝트 상세 조회 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
     }
-    throw error;
+    return mockApi.project.getProject(id);
   }
 }
 
@@ -166,11 +180,15 @@ export async function updateProject(
     
     return getProject(id);
   } catch (error) {
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
     if (import.meta.env.DEV) {
-      console.warn("프로젝트 수정 API 호출 실패, mock 데이터 사용:", error);
-      return mockApi.project.updateProject(id, data);
+      console.warn(`프로젝트 수정 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
     }
-    throw error;
+    return mockApi.project.updateProject(id, data);
   }
 }
 
@@ -183,7 +201,20 @@ export async function updateProjectStatus(
     return;
   }
   
-  await apiClient.patch(`/projects/${id}/status`, { status });
+  try {
+    await apiClient.patch(`/projects/${id}/status`, { status });
+  } catch (error) {
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
+    if (import.meta.env.DEV) {
+      console.warn(`프로젝트 상태 변경 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
+    }
+    await mockApi.project.updateProject(id, { status });
+    return;
+  }
 }
 
 export async function deleteProject(id: number): Promise<void> {
@@ -191,6 +222,18 @@ export async function deleteProject(id: number): Promise<void> {
     return mockApi.project.deleteProject();
   }
   
-  await apiClient.patch(`/projects/${id}/active`, { active: false });
+  try {
+    await apiClient.patch(`/projects/${id}/active`, { active: false });
+  } catch (error) {
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
+    if (import.meta.env.DEV) {
+      console.warn(`프로젝트 삭제 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
+    }
+    return mockApi.project.deleteProject();
+  }
 }
 
