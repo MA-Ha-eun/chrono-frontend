@@ -279,7 +279,7 @@ export function ProjectDetailPage() {
   };
 
   const getTimeLabel = (daysAgo: number | null) => {
-    if (daysAgo === null) return "활동 없음";
+    if (daysAgo === null) return "오래전";
     if (daysAgo === 0) return "오늘";
     if (daysAgo === 1) return "어제";
     return `${daysAgo}일 전`;
@@ -571,36 +571,32 @@ export function ProjectDetailPage() {
                   <p className="text-sm text-gray-500">커밋 통계를 불러오는 중...</p>
                 </div>
               </div>
-            ) : commitSummary ? (
+            ) : (
               <div className="space-y-5">
-                {(commitSummary.totalCommits !== undefined || project.totalCommits !== undefined || project.github?.totalCommits !== undefined) && (
-                  <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4 min-h-[80px]">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <GitCommitVertical className="h-4 w-4 text-primary" />
-                      <span>총 커밋</span>
-                    </div>
-                    <span className="text-base font-semibold text-gray-900">
-                      {commitSummary.totalCommits ?? project.totalCommits ?? project.github?.totalCommits ?? 0}
-                    </span>
+                <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4 min-h-[80px]">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <GitCommitVertical className="h-4 w-4 text-primary" />
+                    <span>총 커밋</span>
                   </div>
-                )}
+                  <span className="text-base font-semibold text-gray-900">
+                    {commitSummary?.totalCommits ?? project.totalCommits ?? project.github?.totalCommits ?? 0}
+                  </span>
+                </div>
 
-                {daysAgo !== null && (
-                  <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4 min-h-[80px]">
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      <span>최근 활동</span>
-                    </div>
-                    <span className="text-base font-semibold text-gray-900">{getTimeLabel(daysAgo)}</span>
+                <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4 min-h-[80px]">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    <span>최근 활동</span>
                   </div>
-                )}
+                  <span className="text-base font-semibold text-gray-900">{getTimeLabel(daysAgo)}</span>
+                </div>
 
-                {weeklyCommits.length > 0 && (
+                {commitSummary && weeklyCommits.length > 0 && (
                   <div className="pt-5">
                     <div className="mb-8">
                       <div className="flex items-start justify-between">
                         <div>
-                          <h2 className="text-lg font-semibold text-gray-900">최근 일주일간 {commitSummary.commitsThisWeek}번 커밋했어요</h2>
+                          <h2 className="text-lg font-semibold text-gray-900">최근 일주일간 {commitSummary.commitsThisWeek ?? 0}번 커밋했어요</h2>
                           <p className="mt-1 text-sm text-gray-500">
                             {(() => {
                               const today = new Date();
@@ -752,13 +748,6 @@ export function ProjectDetailPage() {
                     )}
                   </div>
                 )}
-              </div>
-            ) : (
-              <div className="flex items-center justify-center rounded-lg bg-zinc-50 py-12">
-                <div className="text-center">
-                  <GitCommitVertical className="h-12 w-12 mx-auto text-gray-400 mb-3" />
-                  <p className="text-sm text-gray-500">커밋 통계를 불러올 수 없습니다.</p>
-                </div>
               </div>
             )}
           </div>

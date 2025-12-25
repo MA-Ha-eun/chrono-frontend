@@ -80,12 +80,10 @@ export function RecentProjects({
                         {project.title}
                       </h4>
                       <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                        {project.totalCommits !== undefined && (
-                          <span>
-                            {project.totalCommits}
-                            <span> 커밋</span>
-                          </span>
-                        )}
+                        <span>
+                          {project.totalCommits ?? 0}
+                          <span> 커밋</span>
+                        </span>
                         <span>·</span>
                         <span>{getTimeLabel(daysAgo)}</span>
                         {ddayInfo && project.status !== ProjectStatus.COMPLETED && (

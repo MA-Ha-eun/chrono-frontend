@@ -146,7 +146,7 @@ export function ProjectListPage() {
   };
 
   const getTimeLabel = (daysAgo: number | null) => {
-    if (daysAgo === null) return "";
+    if (daysAgo === null) return "오래전";
     if (daysAgo === 0) return "오늘";
     if (daysAgo === 1) return "어제";
     return `${daysAgo}일 전`;

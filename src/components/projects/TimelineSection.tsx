@@ -100,12 +100,10 @@ export function TimelineSection({
                   <div className="flex-1 min-w-0">
                     <h4 className={`font-medium truncate ${isSelected ? "text-primary" : "text-gray-900"}`}>{project.title}</h4>
                     <div className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                      {project.totalCommits !== undefined && (
-                        <span>
-                          <span className={showRank ? "font-semibold text-gray-900" : ""}>{project.totalCommits}</span>
-                          <span> 커밋</span>
-                        </span>
-                      )}
+                      <span>
+                        <span className={showRank ? "font-semibold text-gray-900" : ""}>{project.totalCommits ?? 0}</span>
+                        <span> 커밋</span>
+                      </span>
                       <span>·</span>
                       <span>{getTimeLabel(daysAgo)}</span>
                       {ddayInfo && project.status !== ProjectStatus.COMPLETED && (

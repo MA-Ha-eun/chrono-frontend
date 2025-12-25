@@ -54,25 +54,21 @@ export function ProjectPreview({
       )}
 
       <div className="space-y-3">
-        {project.totalCommits !== undefined && (
-          <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <GitCommitVertical className="h-4 w-4 text-primary" />
-              <span>총 커밋</span>
-            </div>
-            <span className="text-base font-medium text-gray-900">{project.totalCommits}</span>
+        <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <GitCommitVertical className="h-4 w-4 text-primary" />
+            <span>총 커밋</span>
           </div>
-        )}
+          <span className="text-base font-medium text-gray-900">{project.totalCommits ?? 0}</span>
+        </div>
 
-        {daysAgo !== null && (
-          <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4">
-            <div className="flex items-center gap-2 text-sm text-gray-500">
-              <Calendar className="h-4 w-4 text-primary" />
-              <span>최근 활동</span>
-            </div>
-            <span className="text-base font-medium text-gray-900">{getTimeLabel(daysAgo)}</span>
+        <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Calendar className="h-4 w-4 text-primary" />
+            <span>최근 활동</span>
           </div>
-        )}
+          <span className="text-base font-medium text-gray-900">{getTimeLabel(daysAgo)}</span>
+        </div>
 
         {project.targetDate && (
           <div
