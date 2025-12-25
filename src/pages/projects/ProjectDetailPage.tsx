@@ -238,7 +238,6 @@ export function ProjectDetailPage() {
     try {
       await updateProject(project.projectId, data);
       await loadProject();
-      showToast("프로젝트가 수정되었습니다.", "success");
     } catch (err) {
       if (isApiError(err)) {
         throw new Error(err.message || "프로젝트 수정에 실패했습니다.");
