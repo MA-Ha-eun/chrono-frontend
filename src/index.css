@@ -38,3 +38,14 @@ input:-webkit-autofill:active {
   box-shadow: 0 0 0 30px white inset !important;
   -webkit-text-fill-color: #111827 !important;
 }
+
+/* Date input 캘린더 아이콘 커스터마이징 */
+input.date-input-custom::-webkit-calendar-picker-indicator {
+  position: absolute;
+  left: 0.75rem;
+  cursor: pointer;
+  opacity: 1;
+  width: 16px;
+  height: 16px;
+  filter: brightness(0) saturate(100%);
+}
