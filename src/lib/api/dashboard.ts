@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient, isApiError } from "./client";
 import { DashboardResponse } from "@/types/api";
 import { mockApi } from "@/lib/mock/api";
 
@@ -11,11 +11,16 @@ export async function getDashboard(): Promise<DashboardResponse> {
     const response = await apiClient.get<DashboardResponse>("/dashboard");
     return response.data;
   } catch (error) {
+    // 서버 실패 시 mock 데이터 사용
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
     if (import.meta.env.DEV) {
-      console.warn("대시보드 API 호출 실패, mock 데이터 사용:", error);
-      return mockApi.dashboard.getDashboard();
+      console.warn(`대시보드 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
     }
-    throw error;
+    return mockApi.dashboard.getDashboard();
   }
 }
 

@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient, isApiError } from "./client";
 import {
   CommitSummary,
   WeeklyCommitCount,
@@ -41,11 +41,16 @@ export async function getCommitSummary(
     );
     return response.data;
   } catch (error) {
+    // 서버 실패 시 mock 데이터 사용
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
     if (import.meta.env.DEV) {
-      console.warn("커밋 통계 API 호출 실패, mock 데이터 사용:", error);
-      return mockApi.commit.getCommitSummary(projectId);
+      console.warn(`커밋 통계 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
     }
-    throw error;
+    return mockApi.commit.getCommitSummary(projectId);
   }
 }
 
@@ -62,27 +67,66 @@ export async function getWeeklyCommits(
     );
     return response.data;
   } catch (error) {
+    // 서버 실패 시 mock 데이터 사용
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
     if (import.meta.env.DEV) {
-      console.warn("주간 커밋 통계 API 호출 실패, mock 데이터 사용:", error);
-      return mockApi.commit.getWeeklyCommits(projectId);
+      console.warn(`주간 커밋 통계 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
     }
-    throw error;
+    return mockApi.commit.getWeeklyCommits(projectId);
   }
 }
 
 export async function getCommitHistory(
   projectId: number
 ): Promise<CommitHistoryCount[]> {
-  const response = await apiClient.get<CommitHistoryCount[]>(
-    `/projects/${projectId}/commits/history`
-  );
-  return response.data;
+  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+    return mockApi.commit.getCommitHistory(projectId);
+  }
+  
+  try {
+    const response = await apiClient.get<CommitHistoryCount[]>(
+      `/projects/${projectId}/commits/history`
+    );
+    return response.data;
+  } catch (error) {
+    // 서버 실패 시 mock 데이터 사용
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
+    if (import.meta.env.DEV) {
+      console.warn(`커밋 히스토리 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
+    }
+    return mockApi.commit.getCommitHistory(projectId);
+  }
 }
 
 export async function getAllCommits(projectId: number): Promise<Commit[]> {
-  const response = await apiClient.get<Commit[]>(
-    `/projects/${projectId}/commits`
-  );
-  return response.data;
+  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+    return mockApi.commit.getAllCommits(projectId);
+  }
+  
+  try {
+    const response = await apiClient.get<Commit[]>(
+      `/projects/${projectId}/commits`
+    );
+    return response.data;
+  } catch (error) {
+    // 서버 실패 시 mock 데이터 사용
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
+    if (import.meta.env.DEV) {
+      console.warn(`커밋 목록 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
+    }
+    return mockApi.commit.getAllCommits(projectId);
+  }
 }
 

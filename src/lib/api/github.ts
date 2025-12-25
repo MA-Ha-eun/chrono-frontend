@@ -1,4 +1,4 @@
-import { apiClient } from "./client";
+import { apiClient, isApiError } from "./client";
 import { GitHubRepo, GitHubUsernameValidation, GitHubConnectBasicRequest, GitHubConnectBasicResponse, GitHubConnectPatRequest, GitHubConnectPatResponse, GitHubDisconnectPatResponse } from "@/types/api";
 import { mockApi } from "@/lib/mock/api";
 
@@ -28,7 +28,21 @@ export async function getRepos(): Promise<GitHubRepo[]> {
   if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
     return mockApi.github.getRepos();
   }
-  const response = await apiClient.get<GitHubRepo[]>("/github/repos");
-  return response.data;
+  
+  try {
+    const response = await apiClient.get<GitHubRepo[]>("/github/repos");
+    return response.data;
+  } catch (error) {
+    // 서버 실패 시 mock 데이터 사용
+    const errorInfo = isApiError(error)
+      ? `[${error.code}] ${error.message}`
+      : error instanceof Error
+      ? error.message
+      : "알 수 없는 오류";
+    if (import.meta.env.DEV) {
+      console.warn(`GitHub 리포지토리 조회 API 호출 실패, mock 데이터 사용: ${errorInfo}`, error);
+    }
+    return mockApi.github.getRepos();
+  }
 }
 
