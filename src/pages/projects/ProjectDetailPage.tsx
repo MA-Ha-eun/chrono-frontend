@@ -53,43 +53,44 @@ function CommitHistoryChart({ history }: { history: CommitHistoryCount[] }) {
   const maxCount = Math.max(...displayHistory.map((h) => h.count), 1);
 
   return (
-    <div className="flex items-end justify-between gap-0">
-      {displayHistory.map((item, index) => {
-        const height = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-        const intensity = getCommitIntensity(item.count);
-        return (
-          <div
-            key={`${item.date}-${index}`}
-            className="group flex flex-1 flex-col items-center gap-2"
-          >
-            <div className="relative flex w-full items-end" style={{ height: "60px" }}>
-              {item.count > 0 && (
-                <span
-                  className="absolute left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap"
+    <div className="overflow-x-auto -mx-1.5 px-1.5 sm:-mx-2 sm:px-2 md:mx-0 md:px-0">
+      <div className="flex items-end justify-between gap-0.5 sm:gap-1 md:gap-0 min-w-fit">
+        {displayHistory.map((item, index) => {
+          const height = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
+          const intensity = getCommitIntensity(item.count);
+          return (
+            <div
+              key={`${item.date}-${index}`}
+              className="group flex flex-1 flex-col items-center gap-1.5 sm:gap-2 min-w-[32px] sm:min-w-[36px] md:min-w-0"
+            >
+              <div className="relative flex w-full items-end" style={{ height: "60px" }}>
+                {item.count > 0 && (
+                  <span
+                    className="absolute left-1/2 -translate-x-1/2 text-xs text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 whitespace-nowrap z-10"
+                    style={{
+                      bottom: `${60 * (Math.max(height, item.count > 0 ? 12 : 4) / 100) + 6}px`,
+                    }}
+                  >
+                    {item.count}
+                  </span>
+                )}
+                <div
+                  className={`w-full rounded-t ${intensity.bg} transition-all hover:opacity-80`}
                   style={{
-                    bottom: `${60 * (Math.max(height, item.count > 0 ? 12 : 4) / 100) + 6}px`,
+                    height: `${Math.max(height, item.count > 0 ? 12 : 4)}%`,
+                    minHeight: item.count > 0 ? "16px" : "4px",
                   }}
-                >
-                  {item.count}
-                </span>
-              )}
-              <div
-                className={`w-full rounded-t ${intensity.bg} transition-all hover:opacity-80`}
-                style={{
-                  height: `${Math.max(height, item.count > 0 ? 12 : 4)}%`,
-                  minHeight: item.count > 0 ? "16px" : "4px",
-                }}
-                title={`${formatDate(item.date)}: ${item.count} commits`}
-              />
+                  title={`${formatDate(item.date)}: ${item.count} commits`}
+                />
+              </div>
+              <span className="text-[10px] sm:text-[11px] text-gray-500 text-center whitespace-nowrap">{formatDate(item.date)}</span>
             </div>
-            <span className="text-[11px] text-gray-500">{formatDate(item.date)}</span>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 }
-
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -659,20 +660,20 @@ export function ProjectDetailPage() {
                 </div>
 
                 <div className="pt-5">
-                  <div className="mb-8">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h2 className="text-lg font-semibold text-gray-900">
+                  <div className="mb-6 sm:mb-8">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-base sm:text-lg font-semibold text-gray-900">
                           최근 14일간 {totalCommits}번 커밋했어요
                         </h2>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <p className="mt-1 text-xs sm:text-sm text-gray-500 break-words">
                           {dateRange}
                         </p>
                       </div>
                       <button
                         onClick={handleSyncCommits}
                         disabled={isSyncing}
-                        className="text-gray-400 hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        className="flex-shrink-0 text-gray-400 hover:text-primary transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         title="커밋 동기화"
                       >
                         <RefreshCw className={`h-4 w-4 ${isSyncing ? "animate-spin" : ""}`} />
