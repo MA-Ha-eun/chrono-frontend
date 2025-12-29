@@ -183,7 +183,7 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
       });
       onUpdate(patUsername.trim());
       setPatUsernameValidation({ status: 'idle', message: null });
-      showToast("Private repository 분석이 활성화되었습니다.", "success");
+      showToast("PAT 연동에 성공했습니다.", "success");
       setPatToken("");
     } catch (err) {
       if (isApiError(err)) {
@@ -284,17 +284,17 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
             <span>PAT 연동 (선택)</span>
             <span
               className="group relative inline-flex cursor-help"
-              title="PAT은 GitHub에서 발급하는 개인 인증 토큰이며, private repository 접근에만 사용됩니다."
+              title="PAT(Personal Access Token)은 GitHub에서 발급하는 개인 인증 토큰입니다."
             >
               <HelpCircle className="h-4 w-4 text-gray-400 transition-colors hover:text-gray-600" />
-              <span className="absolute left-1/2 top-full z-10 mt-2 hidden w-64 -translate-x-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-lg group-hover:block">
-                PAT은 GitHub에서 발급하는 개인 인증 토큰이며, private repository 접근에만 사용됩니다.
+              <span className="absolute left-1/2 top-full z-10 mt-2 hidden w-66 -translate-x-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-lg group-hover:block">
+                PAT(Personal Access Token)은 GitHub에서 발급하는 개인 인증 토큰입니다.
                 <span className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900"></span>
               </span>
             </span>
           </h3>
           <p className="text-xs text-gray-500">
-            Personal Access Token(PAT)을 등록하면 private repository까지 분석할 수 있어요.
+            PAT을 등록하면 private repository까지 분석할 수 있어요(Classic 기준 repo 권한 필요).
           </p>
         </div>
 
@@ -371,7 +371,7 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
             <div className="flex items-center gap-1">
               <span className="text-xs text-gray-500">PAT 생성 가이드:</span>
               <a
-                href="https://github.com/settings/tokens?type=beta"
+                href="https://github.com/settings/tokens"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-dark underline"
