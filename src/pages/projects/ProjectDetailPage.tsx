@@ -137,7 +137,9 @@ export function ProjectDetailPage() {
       const summary = await getCommitSummary(Number(id));
       setCommitSummary(summary);
     } catch (err) {
-      console.error("커밋 통계를 불러오는데 실패했습니다:", err);
+      if (import.meta.env.DEV) {
+        console.error("커밋 통계를 불러오는데 실패했습니다:", err);
+      }
     } finally {
       setIsLoadingSummary(false);
     }
@@ -151,7 +153,9 @@ export function ProjectDetailPage() {
       const history = await getCommitHistory(Number(id));
       setCommitHistory(history);
     } catch (err) {
-      console.error("커밋 히스토리를 불러오는데 실패했습니다:", err);
+      if (import.meta.env.DEV) {
+        console.error("커밋 히스토리를 불러오는데 실패했습니다:", err);
+      }
     } finally {
       setIsLoadingHistory(false);
     }
@@ -500,7 +504,7 @@ export function ProjectDetailPage() {
             <p className="mt-1 text-sm text-gray-500">{project.description}</p>
           )}
           {!project.description && (
-            <p className="mt-1 text-sm text-gray-500">프로젝트 상세 정보를 확인하세요.</p>
+            <p className="mt-1 text-sm text-gray-500">프로젝트를 확인하고 관리하세요.</p>
           )}
         </div>
       </div>
@@ -526,34 +530,36 @@ export function ProjectDetailPage() {
                 </div>
               </a>
 
-              {project.startDate && (
-                <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4 min-h-[80px]">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar className="h-4 w-4 text-primary" />
-                    <span>시작일</span>
-                  </div>
-                  <span className="text-base font-semibold text-gray-900">
-                    {new Date(project.startDate).toLocaleDateString("ko-KR", {
+              <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-5 min-h-[85px]">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Calendar className="h-4 w-4 text-primary" />
+                  <span>시작일</span>
+                </div>
+                <span className="text-base font-semibold text-gray-900">
+                  {project.startDate ? (
+                    new Date(project.startDate).toLocaleDateString("ko-KR", {
                       year: "numeric",
                       month: "long",
                       day: "numeric",
-                    })}
-                  </span>
-                </div>
-              )}
+                    })
+                  ) : (
+                    <span className="text-base font-semibold text-gray-500">설정 없음</span>
+                  )}
+                </span>
+              </div>
 
-              {project.targetDate && (
-                <div className={`flex items-center justify-between rounded-lg p-4 min-h-[80px] ${
-                  project.status === ProjectStatus.COMPLETED
-                    ? "bg-zinc-50"
-                    : ddayInfo?.isOverdue
-                    ? "bg-accent-50"
-                    : "bg-zinc-50"
-                }`}>
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Target className="h-4 w-4 text-primary" />
-                    <span>목표</span>
-                  </div>
+              <div className={`flex items-center justify-between rounded-lg p-5 min-h-[85px] ${
+                project.status === ProjectStatus.COMPLETED
+                  ? "bg-zinc-50"
+                  : ddayInfo?.isOverdue
+                  ? "bg-accent-50"
+                  : "bg-zinc-50"
+              }`}>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Target className="h-4 w-4 text-primary" />
+                  <span>목표</span>
+                </div>
+                {project.targetDate ? (
                   <div className="flex flex-col items-end gap-1">
                     <div className="flex items-center gap-2">
                       {ddayInfo && project.status !== ProjectStatus.COMPLETED && (
@@ -585,12 +591,14 @@ export function ProjectDetailPage() {
                       })}
                     </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <span className="text-base font-semibold text-gray-500">설정 없음</span>
+                )}
+              </div>
 
-              {techStackArray.length > 0 && (
-                <div className="pt-5">
-                  <h2 className="mb-4 text-lg font-semibold text-gray-900">다음 기술 스택을 사용했어요</h2>
+              <div className="pt-5">
+                <h2 className="mb-4 text-lg font-semibold text-gray-900">다음 기술 스택을 사용했어요</h2>
+                {techStackArray.length > 0 ? (
                   <div className="flex flex-wrap items-center justify-center gap-4">
                     {techStackArray.slice(0, 7).map((tech, idx) => (
                       <React.Fragment key={idx}>
@@ -623,8 +631,10 @@ export function ProjectDetailPage() {
                       </>
                     )}
                   </div>
-                </div>
-              )}
+                ) : (
+                  <p className="text-sm text-gray-500 text-center">기술 스택 정보가 없습니다</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -641,7 +651,7 @@ export function ProjectDetailPage() {
               </div>
             ) : (
               <div className="space-y-5">
-                <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4 min-h-[80px]">
+                <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-5 min-h-[85px]">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <GitCommitVertical className="h-4 w-4 text-primary" />
                     <span>총 커밋</span>
@@ -651,7 +661,7 @@ export function ProjectDetailPage() {
                   </span>
                 </div>
 
-                <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-4 min-h-[80px]">
+                <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-5 min-h-[85px]">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Calendar className="h-4 w-4 text-primary" />
                     <span>최근 활동</span>
