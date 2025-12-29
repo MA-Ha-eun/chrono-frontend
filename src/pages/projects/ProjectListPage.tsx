@@ -175,7 +175,7 @@ export function ProjectListPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">프로젝트</h1>
-          <p className="mt-1 text-sm text-gray-500">관리 중인 사이드 프로젝트 목록입니다.</p>
+          <p className="mt-1 text-sm text-gray-500">관리 중인 프로젝트를 확인하세요.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -200,7 +200,7 @@ export function ProjectListPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">프로젝트</h1>
-          <p className="mt-1 text-sm text-gray-500">관리 중인 사이드 프로젝트 목록입니다.</p>
+          <p className="mt-1 text-sm text-gray-500">관리 중인 프로젝트를 확인하세요.</p>
         </div>
         <ErrorState
           title={error}
@@ -217,7 +217,7 @@ export function ProjectListPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">프로젝트</h1>
-          <p className="mt-1 text-sm text-gray-500">관리 중인 사이드 프로젝트 목록입니다.</p>
+          <p className="mt-1 text-sm text-gray-500">관리 중인 프로젝트를 확인하세요.</p>
         </div>
         <EmptyState
           icon={GitCommitVertical}
@@ -235,7 +235,7 @@ export function ProjectListPage() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">프로젝트</h1>
-          <p className="mt-1 text-sm text-gray-500">관리 중인 사이드 프로젝트 목록입니다.</p>
+          <p className="mt-1 text-sm text-gray-500">관리 중인 프로젝트를 확인하세요.</p>
         </div>
         <Link
           to="/projects/new"
