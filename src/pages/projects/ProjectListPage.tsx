@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { GitCommitVertical, ChevronDown } from "lucide-react";
 import { getProjects } from "@/lib/api/project";
@@ -21,25 +21,45 @@ export function ProjectListPage() {
   const [sortBy, setSortBy] = useState<SortOption>("created");
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
-  useEffect(() => {
-    loadProjects();
-  }, []);
+  const loadProjects = useCallback(async () => {
+    let mounted = true;
 
-  const loadProjects = async () => {
     try {
       setIsLoading(true);
+      setError(null);
+
       const data = await getProjects();
+      if (!mounted) return;
+
       setProjects(data);
     } catch (err) {
+      if (!mounted) return;
+
       if (isApiError(err)) {
         setError(err.message || "프로젝트 목록을 불러오는데 실패했습니다.");
       } else {
         setError("프로젝트 목록을 불러오는데 실패했습니다.");
       }
     } finally {
-      setIsLoading(false);
+      if (mounted) setIsLoading(false);
     }
-  };
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cleanup: void | (() => void);
+
+    (async () => {
+      cleanup = await loadProjects();
+    })();
+
+    return () => {
+      if (cleanup) cleanup();
+    };
+  }, [loadProjects]);
 
   const filteredAndSortedProjects = useMemo(() => {
     let filtered = projects;
@@ -98,7 +118,9 @@ export function ProjectListPage() {
         olderProjects.push(project);
         return;
       }
+
       const targetDate = new Date(dateValue);
+
       if (targetDate >= today) {
         todayProjects.push(project);
       } else if (targetDate >= weekAgo) {
@@ -114,13 +136,13 @@ export function ProjectListPage() {
   }, [filteredAndSortedProjects, sortBy]);
 
   useEffect(() => {
-    if (filteredAndSortedProjects.length > 0) {
-      setSelectedProjectId(filteredAndSortedProjects[0].projectId);
+    if (filteredAndSortedProjects.length === 0) {
+      if (selectedProjectId !== null) setSelectedProjectId(null);
+      return;
     }
-  }, [filteredAndSortedProjects]);
 
-  useEffect(() => {
-    if (filteredAndSortedProjects.length > 0 && selectedProjectId === null) {
+    const exists = filteredAndSortedProjects.some((p) => p.projectId === selectedProjectId);
+    if (!exists) {
       setSelectedProjectId(filteredAndSortedProjects[0].projectId);
     }
   }, [filteredAndSortedProjects, selectedProjectId]);
@@ -384,4 +406,3 @@ export function ProjectListPage() {
     </div>
   );
 }
-
