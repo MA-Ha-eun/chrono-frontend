@@ -57,7 +57,7 @@ export function LandingPage() {
             </h1>
                       
             <p className="mb-10 text-lg text-gray-600 md:text-xl">
-              GitHub 커밋 데이터를 기반으로 개발 활동을 정리합니다.<br className="hidden md:block" />
+              GitHub 커밋 데이터를 기반으로 개발 활동을 정리합니다. <br className="hidden md:block" />
               프로젝트의 진행과 성장을 함께 기록해보세요.
             </p>
             
