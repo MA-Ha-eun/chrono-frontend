@@ -129,7 +129,7 @@ export function LoginPage() {
               <button
                 type="button"
                 onClick={fillDemoAccount}
-                className="mt-4 text-sm font-medium text-gray-300 hover:text-primary cursor-pointer"
+                className="mt-3.5 text-sm font-medium text-gray-300 hover:text-primary cursor-pointer"
               >
                 데모계정으로 둘러보기
               </button>
