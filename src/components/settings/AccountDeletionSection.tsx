@@ -9,18 +9,33 @@ import { isApiError } from "@/lib/api/client";
 import { useAuthStore } from "@/stores/authStore";
 import { useToastStore } from "@/stores/toastStore";
 
+const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL ?? "";
+
 export function AccountDeletionSection() {
   const navigate = useNavigate();
   const logout = useAuthStore((state) => state.logout);
+  const userEmail = useAuthStore((state) => state.user?.email);
+  const isDemoUser = !!DEMO_EMAIL && userEmail === DEMO_EMAIL;
+
   const showToast = useToastStore((state) => state.showToast);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteAccountClick = () => {
+    if (isDemoUser) {
+      showToast("데모 계정에서는 회원 탈퇴를 할 수 없습니다.", "error");
+      return;
+    }
     setIsDeleteModalOpen(true);
   };
 
   const handleDeleteAccountConfirm = async () => {
+    if (isDemoUser) {
+      showToast("데모 계정에서는 회원 탈퇴를 할 수 없습니다.", "error");
+      setIsDeleteModalOpen(false);
+      return;
+    }
+
     try {
       setIsDeleting(true);
       await deleteAccount();
@@ -45,7 +60,7 @@ export function AccountDeletionSection() {
 
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <p className="flex items-start gap-1 text-sm text-accent-dark">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-accent-dark" />
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <span>
             <strong>주의:</strong> 회원 탈퇴 후에는 프로젝트 기록 및 데이터를 복구할 수 없습니다. 그래도 탈퇴하시겠습니까?
           </span>
@@ -62,6 +77,13 @@ export function AccountDeletionSection() {
         </Button>
       </div>
 
+      {isDemoUser && (
+        <p className="mt-0.5 flex items-start gap-1 text-sm text-accent-dark">
+          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span><strong>데모 계정에서는 보안상 회원 탈퇴가 제한됩니다.</strong></span>
+        </p>
+      )}
+
       <ConfirmModal
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}
@@ -76,4 +98,3 @@ export function AccountDeletionSection() {
     </Card>
   );
 }
-
