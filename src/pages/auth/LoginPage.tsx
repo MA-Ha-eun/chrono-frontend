@@ -63,6 +63,7 @@ export function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                hideRequiredMark
                 autoComplete="email"
               />
               <Input
@@ -73,6 +74,7 @@ export function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                hideRequiredMark
                 autoComplete="current-password"
               />
             </div>
