@@ -43,15 +43,19 @@ export function DashboardPage() {
     mostActiveDayIndex,
     streakDays,
   } = useMemo(() => {
-    // 월요일부터 일요일 순서 (MySQL DAYOFWEEK: 2=월, 3=화, ..., 1=일)
+    // 월요일부터 일요일 순서 (MySQL DAYOFWEEK: 2=월, ..., 1=일)
     const dayOrder = [2, 3, 4, 5, 6, 7, 1];
     const countsByDay = new Map<number, number>();
+
     weeklyCommits.forEach((commit) => {
       countsByDay.set(commit.dayOfWeek, commit.count ?? 0);
     });
 
-    const counts = dayOrder.map((dayOfWeek) => countsByDay.get(dayOfWeek) ?? 0);
-    const max = counts.length > 0 ? Math.max(...counts) : 1;
+    const counts = dayOrder.map(
+      (dayOfWeek) => countsByDay.get(dayOfWeek) ?? 0
+    );
+
+    const max = counts.length > 0 ? Math.max(...counts) : 0;
     const total = counts.reduce((s, v) => s + v, 0);
 
     let mostIdx = 0;
@@ -59,10 +63,19 @@ export function DashboardPage() {
       if (c > counts[mostIdx]) mostIdx = i;
     });
 
+    const today = new Date();
+    const jsDay = today.getDay(); // 1=월, ..., 0=일
+
+    // JS 요일 → counts index (월=0 ... 일=6)
+    const todayIndex = jsDay === 0 ? 6 : jsDay - 1;
+
     let streak = 0;
-    for (let i = counts.length - 1; i >= 0; i--) {
-      if (counts[i] > 0) streak++;
-      else break;
+
+    if (counts[todayIndex] > 0) {
+      for (let i = todayIndex; i >= 0; i--) {
+        if (counts[i] > 0) streak++;
+        else break;
+      }
     }
 
     return {
