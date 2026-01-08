@@ -325,49 +325,41 @@ export function ProjectDetailPage() {
   }, [commitHistory]);
 
   const streakDays = useMemo(() => {
-    if (commitHistory.length === 0) return 0;
+    if (!commitHistory.length) return 0;
+  
+    const committedDates = commitHistory
+      .filter(h => h.date && h.count > 0)
+      .map(h => {
+        const d = new Date(h.date);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime();
+      });
     
-    const validHistory = commitHistory.filter((h) => h.date != null);
-    const sortedHistory = [...validHistory].sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    if (committedDates.length === 0) return 0;
     
-    let count = 0;
-    let previousDate: Date | null = null;
+    const uniqueDates = Array.from(new Set(committedDates)).sort((a, b) => b - a);
     
-    for (const item of sortedHistory) {
-      if (item.count === 0) break;
-      
-      const currentDate = new Date(item.date);
-      currentDate.setHours(0, 0, 0, 0);
-      
-      if (previousDate === null) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const diffDays = Math.floor((today.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 0) {
-          count = 1;
-          previousDate = currentDate;
-        } else if (diffDays === 1) {
-          count = 1;
-          previousDate = currentDate;
-        } else {
-          break;
-        }
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    if (uniqueDates[0] !== today.getTime()) {
+      return 0;
+    }
+  
+    let streak = 1;
+  
+    for (let i = 1; i < uniqueDates.length; i++) {
+      const diffDays =
+        (uniqueDates[i - 1] - uniqueDates[i]) / (1000 * 60 * 60 * 24);
+    
+      if (diffDays === 1) {
+        streak++;
       } else {
-        const diffDays = Math.floor((previousDate.getTime() - currentDate.getTime()) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) {
-          count++;
-          previousDate = currentDate;
-        } else {
-          break;
-        }
+        break;
       }
     }
-    
-    return count;
+  
+    return streak;
   }, [commitHistory]);
 
   const mostActiveDayName = useMemo(() => {
