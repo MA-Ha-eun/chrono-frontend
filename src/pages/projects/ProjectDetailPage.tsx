@@ -100,7 +100,7 @@ export function ProjectDetailPage() {
   const [project, setProject] = useState<Project | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [commitSummary, setCommitSummary] = useState<CommitSummary | null>(null);
+  const [, setCommitSummary] = useState<CommitSummary | null>(null);
   const [commitHistory, setCommitHistory] = useState<CommitHistoryCount[]>([]);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isLoadingSummary, setIsLoadingSummary] = useState(false);
@@ -657,7 +657,7 @@ export function ProjectDetailPage() {
                     <span>총 커밋</span>
                   </div>
                   <span className="text-base font-semibold text-gray-900">
-                    {commitSummary?.totalCommits ?? project.totalCommits ?? project.github?.totalCommits ?? 0}
+                    {project.totalCommits ?? 0}
                   </span>
                 </div>
 
