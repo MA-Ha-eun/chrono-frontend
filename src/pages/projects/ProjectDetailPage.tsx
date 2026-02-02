@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -262,33 +262,10 @@ export function ProjectDetailPage() {
     return diffDays;
   };
 
-  const lastCommitAt = project?.lastCommitAt || project?.github?.lastCommitAt;
-  const daysAgo = lastCommitAt ? getDaysSinceLastCommit(lastCommitAt) : null;
+  const getStreakDays = (history: CommitHistoryCount[]): number => {
+    if (!history.length) return 0;
 
-  const dateRange = useMemo(() => {
-    const today = new Date();
-    const firstDate = new Date(today);
-    firstDate.setDate(today.getDate() - 13);
-    const lastDate = new Date(today);
-    const formatDate = (date: Date) => {
-      return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-    };
-    return `${formatDate(firstDate)} ~ ${formatDate(lastDate)}`;
-  }, []);
-
-  const totalCommits = useMemo(() => {
-    const validHistory = commitHistory.filter((h) => h.date != null);
-    const sortedHistory = [...validHistory].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-    const last14Days = sortedHistory.slice(-14);
-    return last14Days.reduce((sum, h) => sum + h.count, 0);
-  }, [commitHistory]);
-
-  const streakDays = useMemo(() => {
-    if (!commitHistory.length) return 0;
-
-    const committedDates = commitHistory
+    const committedDates = history
       .filter((h) => h.date && h.count > 0)
       .map((h) => {
         const d = new Date(h.date);
@@ -323,10 +300,12 @@ export function ProjectDetailPage() {
     }
 
     return streak;
-  }, [commitHistory]);
+  };
 
-  const mostActiveDayName = useMemo(() => {
-    const validHistory = commitHistory.filter((h) => h.date != null);
+  const getMostActiveDayName = (
+    history: CommitHistoryCount[]
+  ): string | null => {
+    const validHistory = history.filter((h) => h.date != null);
     if (validHistory.length === 0) return null;
     const sortedHistory = [...validHistory].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -347,7 +326,29 @@ export function ProjectDetailPage() {
       "토요일",
     ];
     return dayNames[date.getDay()];
-  }, [commitHistory]);
+  };
+
+  const lastCommitAt = project?.lastCommitAt || project?.github?.lastCommitAt;
+  const daysAgo = lastCommitAt ? getDaysSinceLastCommit(lastCommitAt) : null;
+
+  const today = new Date();
+  const firstDate = new Date(today);
+  firstDate.setDate(today.getDate() - 13);
+  const lastDate = new Date(today);
+  const formatDate = (date: Date) => {
+    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+  };
+  const dateRange = `${formatDate(firstDate)} ~ ${formatDate(lastDate)}`;
+
+  const validHistory = commitHistory.filter((h) => h.date != null);
+  const sortedHistory = [...validHistory].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  const last14Days = sortedHistory.slice(-14);
+  const totalCommits = last14Days.reduce((sum, h) => sum + h.count, 0);
+
+  const streakDays = getStreakDays(commitHistory);
+  const mostActiveDayName = getMostActiveDayName(commitHistory);
 
   const techStackArray = project?.techStack
     ? project.techStack.split(",").map((s) => s.trim())
