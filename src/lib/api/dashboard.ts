@@ -1,4 +1,5 @@
-import { apiClient, isApiError, shouldUseMockFallback } from "./client";
+import { apiClient, shouldUseMockFallback } from "./client";
+import { getErrorInfo } from "@/lib/utils";
 import { DailyCommitCount, DashboardResponse } from "@/types/api";
 import { mockApi } from "@/lib/mock/api";
 
@@ -15,11 +16,7 @@ export async function getDashboard(): Promise<DashboardResponse> {
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `대시보드 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
@@ -45,11 +42,7 @@ export async function getRecent7DaysCommits(): Promise<DailyCommitCount[]> {
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `recent-7-days API 호출 실패, mock 데이터 사용: ${errorInfo}`,

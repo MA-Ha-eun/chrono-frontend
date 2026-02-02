@@ -1,4 +1,5 @@
-import { apiClient, isApiError, shouldUseMockFallback } from "./client";
+import { apiClient, shouldUseMockFallback } from "./client";
+import { getErrorInfo } from "@/lib/utils";
 import {
   CommitSummary,
   WeeklyCommitCount,
@@ -44,11 +45,7 @@ export async function getCommitSummary(
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `커밋 통계 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
@@ -76,11 +73,7 @@ export async function getWeeklyCommits(
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `주간 커밋 통계 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
@@ -108,11 +101,7 @@ export async function getCommitHistory(
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `커밋 히스토리 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
