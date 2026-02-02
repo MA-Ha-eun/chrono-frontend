@@ -3,56 +3,20 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "./Button";
 
 export interface ConfirmModalProps {
-  /**
-   * 모달 열림/닫힘 상태
-   */
   isOpen: boolean;
-  /**
-   * 모달 닫기 핸들러
-   */
   onClose: () => void;
-  /**
-   * 확인 버튼 클릭 핸들러
-   */
   onConfirm: () => void;
-  /**
-   * 모달 제목
-   */
   title: string;
-  /**
-   * 모달 설명
-   */
   description?: string;
-  /**
-   * 확인 버튼 텍스트 (기본: "확인")
-   */
   confirmText?: string;
-  /**
-   * 취소 버튼 텍스트 (기본: "취소")
-   */
   cancelText?: string;
-  /**
-   * 확인 버튼 variant (기본: "accent")
-   */
   confirmVariant?: "primary" | "accent";
-  /**
-   * 확인 버튼 로딩 상태
-   */
   isLoading?: boolean;
-  /**
-   * 배경 클릭 시 닫기 여부 (기본: true)
-   */
   closeOnBackdropClick?: boolean;
-  /**
-   * 아이콘 표시 여부 (기본: true)
-   */
   showIcon?: boolean;
 }
 
-/**
- * 확인 모달 컴포넌트
- * 사용자 확인이 필요한 작업에 사용합니다.
- */
+// 확인 모달 (사용자 확인 필요 시)
 export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   isOpen,
   onClose,
@@ -107,15 +71,17 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         <div className="p-6">
           <div className="flex items-start gap-3">
             {showIcon && (
-              <AlertTriangle className="h-5 w-5 shrink-0 text-accent-dark mt-0.5" />
+              <AlertTriangle className="text-accent-dark mt-0.5 h-5 w-5 shrink-0" />
             )}
-            <div className="flex-1 min-w-0">
-              <h3 className="text-lg font-semibold text-gray-900 leading-tight">{title}</h3>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-lg leading-tight font-semibold text-gray-900">
+                {title}
+              </h3>
               {description && (
-                <p className="mt-3 text-sm text-gray-500 leading-relaxed">
+                <p className="mt-3 text-sm leading-relaxed text-gray-500">
                   {description
-                    .replace(/\\n/g, '\n')
-                    .split('\n')
+                    .replace(/\\n/g, "\n")
+                    .split("\n")
                     .map((line, index, array) => (
                       <React.Fragment key={index}>
                         {line}
@@ -128,11 +94,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
           </div>
 
           <div className="mt-6 flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              disabled={isLoading}
-            >
+            <Button variant="outline" onClick={onClose} disabled={isLoading}>
               {cancelText}
             </Button>
             <Button
@@ -148,4 +110,3 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
     </div>
   );
 };
-

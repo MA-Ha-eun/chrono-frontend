@@ -1,17 +1,15 @@
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ExternalLink,
   GitCommitVertical,
-  GitCommitHorizontal,
   Calendar,
   Target,
   CircleAlert,
   Flame,
   Github,
   RefreshCw,
-  Sparkle,
   ChevronLeft,
   ChevronDown,
 } from "lucide-react";
@@ -44,90 +42,9 @@ import {
   Skeleton,
 } from "@/components/common/Skeleton";
 import { ErrorState } from "@/components/common/ErrorState";
-import { getCommitIntensity } from "@/utils/dashboard";
-
-function CommitHistoryChart({ history }: { history: CommitHistoryCount[] }) {
-  const validHistory = history.filter((h) => h.date != null);
-  const sortedHistory = [...validHistory].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${month}/${day}`;
-  };
-
-  const generateLast14Days = (): CommitHistoryCount[] => {
-    const days: CommitHistoryCount[] = [];
-    const today = new Date();
-    for (let i = 13; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
-      const dateStr = `${year}-${month}-${day}`;
-      const existing = sortedHistory.find((h) => {
-        const backendDate = h.date?.split("T")[0] || h.date;
-        return backendDate === dateStr;
-      });
-      days.push({
-        date: dateStr,
-        count: existing?.count ?? 0,
-      });
-    }
-    return days;
-  };
-
-  const displayHistory = generateLast14Days();
-  const maxCount = Math.max(...displayHistory.map((h) => h.count), 1);
-
-  return (
-    <div className="-mx-1.5 overflow-x-auto px-1.5 sm:-mx-2 sm:px-2 md:mx-0 md:px-0">
-      <div className="flex min-w-fit items-end justify-between gap-0.5 sm:gap-1 md:gap-0">
-        {displayHistory.map((item, index) => {
-          const height = maxCount > 0 ? (item.count / maxCount) * 100 : 0;
-          const intensity = getCommitIntensity(item.count);
-          return (
-            <div
-              key={`${item.date}-${index}`}
-              className="group flex min-w-[32px] flex-1 flex-col items-center gap-1.5 sm:min-w-[36px] sm:gap-2 md:min-w-0"
-            >
-              <div
-                className="relative flex w-full items-end"
-                style={{ height: "60px" }}
-              >
-                {item.count > 0 && (
-                  <span
-                    className="absolute left-1/2 z-10 -translate-x-1/2 text-xs whitespace-nowrap text-gray-500 opacity-0 transition-opacity group-hover:opacity-100"
-                    style={{
-                      bottom: `${60 * (Math.max(height, item.count > 0 ? 12 : 4) / 100) + 6}px`,
-                    }}
-                  >
-                    {item.count}
-                  </span>
-                )}
-                <div
-                  className={`w-full rounded-t ${intensity.bg} transition-all hover:opacity-80`}
-                  style={{
-                    height: `${Math.max(height, item.count > 0 ? 12 : 4)}%`,
-                    minHeight: item.count > 0 ? "16px" : "4px",
-                  }}
-                  title={`${formatDate(item.date)}: ${item.count} commits`}
-                />
-              </div>
-              <span className="text-center text-[10px] whitespace-nowrap text-gray-500 sm:text-[11px]">
-                {formatDate(item.date)}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
+import { CommitHistoryChart } from "@/components/projects/CommitHistoryChart";
+import { InfoCard } from "@/components/common/InfoCard";
+import { CommitStatsBadges } from "@/components/projects/CommitStatsBadges";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -345,33 +262,10 @@ export function ProjectDetailPage() {
     return diffDays;
   };
 
-  const lastCommitAt = project?.lastCommitAt || project?.github?.lastCommitAt;
-  const daysAgo = lastCommitAt ? getDaysSinceLastCommit(lastCommitAt) : null;
+  const getStreakDays = (history: CommitHistoryCount[]): number => {
+    if (!history.length) return 0;
 
-  const dateRange = useMemo(() => {
-    const today = new Date();
-    const firstDate = new Date(today);
-    firstDate.setDate(today.getDate() - 13);
-    const lastDate = new Date(today);
-    const formatDate = (date: Date) => {
-      return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
-    };
-    return `${formatDate(firstDate)} ~ ${formatDate(lastDate)}`;
-  }, []);
-
-  const totalCommits = useMemo(() => {
-    const validHistory = commitHistory.filter((h) => h.date != null);
-    const sortedHistory = [...validHistory].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
-    const last14Days = sortedHistory.slice(-14);
-    return last14Days.reduce((sum, h) => sum + h.count, 0);
-  }, [commitHistory]);
-
-  const streakDays = useMemo(() => {
-    if (!commitHistory.length) return 0;
-
-    const committedDates = commitHistory
+    const committedDates = history
       .filter((h) => h.date && h.count > 0)
       .map((h) => {
         const d = new Date(h.date);
@@ -406,10 +300,12 @@ export function ProjectDetailPage() {
     }
 
     return streak;
-  }, [commitHistory]);
+  };
 
-  const mostActiveDayName = useMemo(() => {
-    const validHistory = commitHistory.filter((h) => h.date != null);
+  const getMostActiveDayName = (
+    history: CommitHistoryCount[]
+  ): string | null => {
+    const validHistory = history.filter((h) => h.date != null);
     if (validHistory.length === 0) return null;
     const sortedHistory = [...validHistory].sort(
       (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
@@ -430,7 +326,29 @@ export function ProjectDetailPage() {
       "토요일",
     ];
     return dayNames[date.getDay()];
-  }, [commitHistory]);
+  };
+
+  const lastCommitAt = project?.lastCommitAt || project?.github?.lastCommitAt;
+  const daysAgo = lastCommitAt ? getDaysSinceLastCommit(lastCommitAt) : null;
+
+  const today = new Date();
+  const firstDate = new Date(today);
+  firstDate.setDate(today.getDate() - 13);
+  const lastDate = new Date(today);
+  const formatDate = (date: Date) => {
+    return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+  };
+  const dateRange = `${formatDate(firstDate)} ~ ${formatDate(lastDate)}`;
+
+  const validHistory = commitHistory.filter((h) => h.date != null);
+  const sortedHistory = [...validHistory].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+  const last14Days = sortedHistory.slice(-14);
+  const totalCommits = last14Days.reduce((sum, h) => sum + h.count, 0);
+
+  const streakDays = getStreakDays(commitHistory);
+  const mostActiveDayName = getMostActiveDayName(commitHistory);
 
   const techStackArray = project?.techStack
     ? project.techStack.split(",").map((s) => s.trim())
@@ -607,13 +525,11 @@ export function ProjectDetailPage() {
                 </div>
               </a>
 
-              <div className="flex min-h-[85px] items-center justify-between rounded-lg bg-zinc-50 p-5">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Calendar className="text-primary h-4 w-4" />
-                  <span>시작일</span>
-                </div>
-                <span className="text-base font-semibold text-gray-900">
-                  {project.startDate ? (
+              <InfoCard
+                icon={Calendar}
+                label="시작일"
+                value={
+                  project.startDate ? (
                     new Date(project.startDate).toLocaleDateString("ko-KR", {
                       year: "numeric",
                       month: "long",
@@ -623,9 +539,9 @@ export function ProjectDetailPage() {
                     <span className="text-base font-semibold text-gray-500">
                       설정 없음
                     </span>
-                  )}
-                </span>
-              </div>
+                  )
+                }
+              />
 
               <div
                 className={`flex min-h-[85px] items-center justify-between rounded-lg p-5 ${
@@ -745,25 +661,17 @@ export function ProjectDetailPage() {
               </div>
             ) : (
               <div className="space-y-5">
-                <div className="flex min-h-[85px] items-center justify-between rounded-lg bg-zinc-50 p-5">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <GitCommitVertical className="text-primary h-4 w-4" />
-                    <span>총 커밋</span>
-                  </div>
-                  <span className="text-base font-semibold text-gray-900">
-                    {project.totalCommits ?? 0}
-                  </span>
-                </div>
+                <InfoCard
+                  icon={GitCommitVertical}
+                  label="총 커밋"
+                  value={project.totalCommits ?? 0}
+                />
 
-                <div className="flex min-h-[85px] items-center justify-between rounded-lg bg-zinc-50 p-5">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar className="text-primary h-4 w-4" />
-                    <span>최근 활동</span>
-                  </div>
-                  <span className="text-base font-semibold text-gray-900">
-                    {getTimeLabel(daysAgo)}
-                  </span>
-                </div>
+                <InfoCard
+                  icon={Calendar}
+                  label="최근 활동"
+                  value={getTimeLabel(daysAgo)}
+                />
 
                 <div className="pt-5">
                   <div className="mb-6 sm:mb-8">
@@ -798,22 +706,10 @@ export function ProjectDetailPage() {
                       <CommitHistoryChart history={commitHistory} />
                     )}
 
-                    <div className="flex flex-wrap items-center justify-center gap-4 border-t border-gray-100 pt-4">
-                      <div className="bg-accent-50 flex items-center gap-2 rounded-lg px-3 py-1.5">
-                        <GitCommitHorizontal className="text-accent h-4 w-4" />
-                        <span className="text-accent text-xs font-medium">
-                          {streakDays}일 연속
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Sparkle className="text-accent h-4 w-4" />
-                        <span className="text-xs font-medium text-gray-500">
-                          {mostActiveDayName
-                            ? `${mostActiveDayName}에 가장 활발했어요`
-                            : "최근 활동이 없어요"}
-                        </span>
-                      </div>
-                    </div>
+                    <CommitStatsBadges
+                      streakDays={streakDays}
+                      mostActiveDayName={mostActiveDayName}
+                    />
                   </div>
                 </div>
               </div>

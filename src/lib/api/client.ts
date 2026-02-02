@@ -18,6 +18,26 @@ export const refreshClient = axios.create({
   timeout: 10000,
 });
 
+refreshClient.interceptors.response.use(
+  (response) => {
+    if (
+      response.data &&
+      typeof response.data === "object" &&
+      "success" in response.data &&
+      "data" in response.data
+    ) {
+      return {
+        ...response,
+        data: response.data.data,
+      };
+    }
+    return response;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -60,7 +80,8 @@ apiClient.interceptors.response.use(
     };
 
     if (
-      error.response?.status === 401 &&
+      (error.response?.status === 401 || error.response?.status === 403) &&
+      // 401(인증 만료) 또는 403(토큰 만료 시 백엔드가 403 반환하는 경우)
       originalRequest &&
       !originalRequest._retry
     ) {
@@ -95,18 +116,9 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshResponse = await refreshClient.post<
-          { success: boolean; message: string; data: string } | string
-        >("/auth/refresh");
-        const responseData = refreshResponse.data;
-        const newAccessToken =
-          typeof responseData === "object" &&
-          responseData &&
-          "data" in responseData
-            ? responseData.data
-            : typeof responseData === "string"
-              ? responseData
-              : "";
+        const refreshResponse =
+          await refreshClient.post<string>("/auth/refresh");
+        const newAccessToken = refreshResponse.data;
         useAuthStore.getState().setToken(newAccessToken);
 
         refreshSubscribers.forEach((callback) => callback(newAccessToken));
@@ -136,7 +148,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(error.response.data);
     }
 
-    // 백엔드에서 에러 메시지가 없을 경우 status code별 기본 메시지 제공
+    // 백엔드 에러 메시지 없을 경우 status code별 기본 메시지 제공
     const statusCode = error.response?.status;
     let message = "요청 처리 중 오류가 발생했습니다.";
     let code = ErrorCode.SERVER_ERROR;

@@ -1,4 +1,5 @@
-import { apiClient, isApiError, shouldUseMockFallback } from "./client";
+import { apiClient, shouldUseMockFallback } from "./client";
+import { getErrorInfo } from "@/lib/utils";
 import {
   Project,
   CreateProjectRequest,
@@ -49,11 +50,7 @@ export async function createProject(
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `프로젝트 생성 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
@@ -105,11 +102,7 @@ export async function getProjects(): Promise<ProjectListItem[]> {
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `프로젝트 목록 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
@@ -166,11 +159,7 @@ export async function getProject(id: number): Promise<Project> {
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `프로젝트 상세 조회 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
@@ -211,11 +200,7 @@ export async function updateProject(
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `프로젝트 수정 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
@@ -242,11 +227,7 @@ export async function updateProjectStatus(
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `프로젝트 상태 변경 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
@@ -270,11 +251,7 @@ export async function deleteProject(id: number): Promise<void> {
       throw error;
     }
 
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
         `프로젝트 삭제 API 호출 실패, mock 데이터 사용: ${errorInfo}`,

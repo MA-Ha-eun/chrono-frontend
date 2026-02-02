@@ -1,8 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { GitCommitVertical, Calendar, ChevronRight, Target, CircleAlert, Flame } from "lucide-react";
+import {
+  GitCommitVertical,
+  Calendar,
+  ChevronRight,
+  Target,
+  CircleAlert,
+  Flame,
+} from "lucide-react";
 import { ProjectListItem, ProjectStatus } from "@/types/api";
 import { Badge } from "@/components/common/Badge";
+import { InfoCard } from "@/components/common/InfoCard";
 import { getDaysSinceLastCommit } from "@/utils/dashboard";
 
 interface ProjectPreviewProps {
@@ -11,7 +19,9 @@ interface ProjectPreviewProps {
   getStatusVariant: (status: ProjectStatus) => "primary" | "accent";
   getTimeLabel: (daysAgo: number | null) => string;
   getDday: (targetDate?: string) => number | null;
-  getDdayLabel: (dday: number | null) => { label: string; isUrgent?: boolean; isOverdue?: boolean } | null;
+  getDdayLabel: (
+    dday: number | null
+  ) => { label: string; isUrgent?: boolean; isOverdue?: boolean } | null;
 }
 
 export function ProjectPreview({
@@ -26,7 +36,10 @@ export function ProjectPreview({
   const techStackArray = project.techStack
     ? project.techStack.split(",").map((s) => s.trim())
     : [];
-  const dday = project.status !== ProjectStatus.COMPLETED ? getDday(project.targetDate) : null;
+  const dday =
+    project.status !== ProjectStatus.COMPLETED
+      ? getDday(project.targetDate)
+      : null;
   const ddayInfo = dday !== null ? getDdayLabel(dday) : null;
 
   return (
@@ -36,33 +49,29 @@ export function ProjectPreview({
       </div>
 
       <div className="space-y-3">
-        <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-5 min-h-[85px]">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <GitCommitVertical className="h-4 w-4 text-primary" />
-            <span>총 커밋</span>
-          </div>
-          <span className="text-base font-semibold text-gray-900">{project.totalCommits ?? 0}</span>
-        </div>
+        <InfoCard
+          icon={GitCommitVertical}
+          label="총 커밋"
+          value={project.totalCommits ?? 0}
+        />
 
-        <div className="flex items-center justify-between rounded-lg bg-zinc-50 p-5 min-h-[85px]">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Calendar className="h-4 w-4 text-primary" />
-            <span>최근 활동</span>
-          </div>
-          <span className="text-base font-semibold text-gray-900">{getTimeLabel(daysAgo)}</span>
-        </div>
+        <InfoCard
+          icon={Calendar}
+          label="최근 활동"
+          value={getTimeLabel(daysAgo)}
+        />
 
         <div
-          className={`flex items-center justify-between rounded-lg p-5 min-h-[85px] ${
+          className={`flex min-h-[85px] items-center justify-between rounded-lg p-5 ${
             project.status === ProjectStatus.COMPLETED
               ? "bg-zinc-50"
               : ddayInfo?.isOverdue
-              ? "bg-accent-50"
-              : "bg-zinc-50"
+                ? "bg-accent-50"
+                : "bg-zinc-50"
           }`}
         >
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Target className="h-4 w-4 text-primary" />
+            <Target className="text-primary h-4 w-4" />
             <span>목표</span>
           </div>
           {project.targetDate ? (
@@ -74,8 +83,8 @@ export function ProjectPreview({
                       ddayInfo.isOverdue
                         ? "text-gray-300"
                         : ddayInfo.isUrgent
-                        ? "text-accent"
-                        : "text-gray-700"
+                          ? "text-accent"
+                          : "text-gray-700"
                     }`}
                   >
                     {ddayInfo.label}
@@ -87,7 +96,9 @@ export function ProjectPreview({
                     )}
                   </div>
                 )}
-                <Badge variant={getStatusVariant(project.status)}>{getStatusLabel(project.status)}</Badge>
+                <Badge variant={getStatusVariant(project.status)}>
+                  {getStatusLabel(project.status)}
+                </Badge>
               </div>
               <div className="text-xs text-gray-500">
                 {new Date(project.targetDate).toLocaleDateString("ko-KR", {
@@ -98,7 +109,9 @@ export function ProjectPreview({
               </div>
             </div>
           ) : (
-            <span className="text-base font-semibold text-gray-500">설정 없음</span>
+            <span className="text-base font-semibold text-gray-500">
+              설정 없음
+            </span>
           )}
         </div>
       </div>
@@ -119,18 +132,18 @@ export function ProjectPreview({
             {techStackArray.length > 5 && (
               <>
                 <div className="mx-2 h-4 border-l border-gray-100"></div>
-                <div className="relative group">
-                  <span className="rounded-md px-5 py-2.5 text-sm font-semibold text-gray-900 cursor-pointer">
+                <div className="group relative">
+                  <span className="cursor-pointer rounded-md px-5 py-2.5 text-sm font-semibold text-gray-900">
                     외 {techStackArray.length - 5}가지
                   </span>
-                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full mb-2 hidden group-hover:block z-10">
-                    <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg text-center">
+                  <div className="absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 group-hover:block">
+                    <div className="rounded-lg bg-gray-900 px-3 py-2 text-center text-xs text-white shadow-lg">
                       <div className="flex flex-col gap-1">
                         {techStackArray.slice(5).map((tech, idx) => (
                           <span key={idx}>{tech}</span>
                         ))}
                       </div>
-                      <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                      <div className="absolute top-full left-1/2 h-0 w-0 -translate-x-1/2 border-t-4 border-r-4 border-l-4 border-transparent border-t-gray-900"></div>
                     </div>
                   </div>
                 </div>
@@ -138,13 +151,15 @@ export function ProjectPreview({
             )}
           </>
         ) : (
-          <span className="rounded-md px-5 py-2.5 text-sm font-medium text-gray-500">기술 스택 정보가 없습니다</span>
+          <span className="rounded-md px-5 py-2.5 text-sm font-medium text-gray-500">
+            기술 스택 정보가 없습니다
+          </span>
         )}
       </div>
 
       <Link
         to={`/projects/${project.projectId}`}
-        className="flex h-10 items-center justify-center gap-1.5 rounded-lg bg-primary text-sm font-medium text-white transition-colors hover:bg-primary-dark"
+        className="bg-primary hover:bg-primary-dark flex h-10 items-center justify-center gap-1.5 rounded-lg text-sm font-medium text-white transition-colors"
       >
         상세보기
         <ChevronRight className="h-4 w-4" />
@@ -152,4 +167,3 @@ export function ProjectPreview({
     </div>
   );
 }
-

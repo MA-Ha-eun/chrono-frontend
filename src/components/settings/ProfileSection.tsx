@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { updateProfile } from "@/lib/api/user";
@@ -23,7 +23,9 @@ export function ProfileSection({ user, onUpdate }: ProfileSectionProps) {
     }
   }, [user?.nickname]);
 
-  const validateNickname = (name: string): { valid: boolean; message?: string } => {
+  const validateNickname = (
+    name: string
+  ): { valid: boolean; message?: string } => {
     if (!name.trim()) {
       return { valid: false, message: "닉네임을 입력해주세요." };
     }
@@ -33,13 +35,15 @@ export function ProfileSection({ user, onUpdate }: ProfileSectionProps) {
     return { valid: true };
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setNicknameMessage(null);
 
     const nicknameValidation = validateNickname(nickname);
     if (!nicknameValidation.valid) {
-      setNicknameMessage(nicknameValidation.message || "닉네임 조건을 만족하지 않습니다.");
+      setNicknameMessage(
+        nicknameValidation.message || "닉네임 조건을 만족하지 않습니다."
+      );
       return;
     }
 
@@ -82,12 +86,12 @@ export function ProfileSection({ user, onUpdate }: ProfileSectionProps) {
 
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="mb-2">
-          <div className="flex items-center justify-between mb-1.5">
+          <div className="mb-1.5 flex items-center justify-between">
             <label className="block text-sm font-medium text-gray-700">
               닉네임
             </label>
             {nicknameMessage && (
-              <span className="text-xs text-accent-dark">
+              <span className="text-accent-dark text-xs">
                 {nicknameMessage}
               </span>
             )}
@@ -102,7 +106,10 @@ export function ProfileSection({ user, onUpdate }: ProfileSectionProps) {
               if (value.length <= 20) {
                 setNickname(value);
                 if (value && !validateNickname(value).valid) {
-                  setNicknameMessage(validateNickname(value).message || "닉네임 조건을 만족하지 않습니다.");
+                  setNicknameMessage(
+                    validateNickname(value).message ||
+                      "닉네임 조건을 만족하지 않습니다."
+                  );
                 } else {
                   setNicknameMessage(null);
                 }
@@ -115,11 +122,14 @@ export function ProfileSection({ user, onUpdate }: ProfileSectionProps) {
           />
         </div>
 
-        <Button type="submit" isLoading={isLoading} className="w-full md:w-auto mb-7">
+        <Button
+          type="submit"
+          isLoading={isLoading}
+          className="mb-7 w-full md:w-auto"
+        >
           닉네임 변경
         </Button>
       </form>
     </>
   );
 }
-

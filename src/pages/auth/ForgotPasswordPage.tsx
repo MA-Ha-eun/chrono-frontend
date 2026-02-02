@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
@@ -23,7 +23,9 @@ export function ForgotPasswordPage() {
   const [codeMessage, setCodeMessage] = useState<string | null>(null);
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
 
-  const validatePassword = (pwd: string): { valid: boolean; message?: string } => {
+  const validatePassword = (
+    pwd: string
+  ): { valid: boolean; message?: string } => {
     if (pwd.length < 8) {
       return { valid: false, message: "비밀번호는 8자 이상이어야 합니다." };
     }
@@ -33,13 +35,16 @@ export function ForgotPasswordPage() {
     if (!/\d/.test(pwd)) {
       return { valid: false, message: "비밀번호는 숫자를 포함해야 합니다." };
     }
-    if (!/[!@#$%^&*()_+\-={}\[\]|;:'",.<>/?`~]/.test(pwd)) {
-      return { valid: false, message: "비밀번호는 특수문자를 포함해야 합니다." };
+    if (!/[!@#$%^&*()_+\-={}[\]|;:'",.<>/?`~]/.test(pwd)) {
+      return {
+        valid: false,
+        message: "비밀번호는 특수문자를 포함해야 합니다.",
+      };
     }
     return { valid: true };
   };
 
-  const handleSendCode = async (e: React.FormEvent) => {
+  const handleSendCode = async (e: FormEvent) => {
     e.preventDefault();
     if (!email.trim()) {
       setEmailMessage("이메일을 입력해주세요.");
@@ -64,7 +69,7 @@ export function ForgotPasswordPage() {
     }
   };
 
-  const handleResetPassword = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: FormEvent) => {
     e.preventDefault();
     setCodeMessage(null);
     setPasswordMessage(null);
@@ -81,7 +86,9 @@ export function ForgotPasswordPage() {
 
     const passwordValidation = validatePassword(newPassword);
     if (!passwordValidation.valid) {
-      setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
+      setPasswordMessage(
+        passwordValidation.message || "비밀번호 조건을 만족하지 않습니다."
+      );
       return;
     }
 
@@ -103,7 +110,10 @@ export function ForgotPasswordPage() {
     } catch (err) {
       if (isApiError(err)) {
         const errorMessage = err.message || "비밀번호 재설정에 실패했습니다.";
-        if (errorMessage.includes("인증 코드") || errorMessage.includes("코드")) {
+        if (
+          errorMessage.includes("인증 코드") ||
+          errorMessage.includes("코드")
+        ) {
           setCodeMessage(errorMessage);
         } else if (errorMessage.includes("이메일")) {
           setEmailMessage(errorMessage);
@@ -123,27 +133,38 @@ export function ForgotPasswordPage() {
       <div className="flex flex-1 items-center justify-center p-4">
         <div className="w-full max-w-[400px] space-y-8">
           <div className="flex flex-col items-center justify-center text-center">
-            <Link to="/" className="mb-6 flex flex-col items-center gap-3 transition-opacity hover:opacity-80">
+            <Link
+              to="/"
+              className="mb-6 flex flex-col items-center gap-3 transition-opacity hover:opacity-80"
+            >
               <span className="text-5xl font-extrabold tracking-[-0.015em] text-gray-900">
-                chrono<span className="text-primary text-6xl leading-none">.</span>
+                chrono
+                <span className="text-primary text-6xl leading-none">.</span>
               </span>
             </Link>
             <p className="text-sm text-gray-500">
-              {step === 1 ? "비밀번호를 재설정하기 위해 이메일을 입력해주세요." : "인증코드를 확인하고 새 비밀번호를 입력해주세요."}
+              {step === 1
+                ? "비밀번호를 재설정하기 위해 이메일을 입력해주세요."
+                : "인증코드를 확인하고 새 비밀번호를 입력해주세요."}
             </p>
           </div>
 
-          <Card className="p-6 sm:p-8 border-gray-100 shadow-lg shadow-zinc-100/50">
+          <Card className="border-gray-100 p-6 shadow-lg shadow-zinc-100/50 sm:p-8">
             {step === 1 ? (
               <form onSubmit={handleSendCode} className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label
+                        htmlFor="email"
+                        className="block text-sm font-medium text-gray-700"
+                      >
                         이메일
                       </label>
                       {emailMessage && (
-                        <span className={`text-xs ${emailMessage.includes("발송되었습니다") ? "text-primary-dark" : "text-accent-dark"}`}>
+                        <span
+                          className={`text-xs ${emailMessage.includes("발송되었습니다") ? "text-primary-dark" : "text-accent-dark"}`}
+                        >
                           {emailMessage}
                         </span>
                       )}
@@ -166,7 +187,7 @@ export function ForgotPasswordPage() {
 
                 <Button
                   type="submit"
-                  className="w-full -mt-2"
+                  className="-mt-2 w-full"
                   isLoading={isSendingCode}
                 >
                   인증코드 발송
@@ -176,12 +197,15 @@ export function ForgotPasswordPage() {
               <form onSubmit={handleResetPassword} className="space-y-6">
                 <div className="space-y-4">
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label htmlFor="code" className="block text-sm font-medium text-gray-700">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label
+                        htmlFor="code"
+                        className="block text-sm font-medium text-gray-700"
+                      >
                         인증코드
                       </label>
                       {codeMessage && (
-                        <span className="text-xs text-accent-dark">
+                        <span className="text-accent-dark text-xs">
                           {codeMessage}
                         </span>
                       )}
@@ -201,11 +225,13 @@ export function ForgotPasswordPage() {
                     />
                   </div>
 
-                  <div className="space-y-1.5 mb-2">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <label className="block text-sm font-medium text-gray-700">새 비밀번호</label>
+                  <div className="mb-2 space-y-1.5">
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        새 비밀번호
+                      </label>
                       {passwordMessage && (
-                        <span className="text-xs text-accent-dark">
+                        <span className="text-accent-dark text-xs">
                           {passwordMessage}
                         </span>
                       )}
@@ -219,13 +245,24 @@ export function ForgotPasswordPage() {
                         onChange={(e) => {
                           const value = e.target.value;
                           setNewPassword(value);
-                          
+
                           const passwordValidation = validatePassword(value);
                           if (value && !passwordValidation.valid) {
-                            setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
-                          } else if (value && confirmPassword && value !== confirmPassword) {
+                            setPasswordMessage(
+                              passwordValidation.message ||
+                                "비밀번호 조건을 만족하지 않습니다."
+                            );
+                          } else if (
+                            value &&
+                            confirmPassword &&
+                            value !== confirmPassword
+                          ) {
                             setPasswordMessage("비밀번호가 일치하지 않습니다.");
-                          } else if (value && confirmPassword && value === confirmPassword) {
+                          } else if (
+                            value &&
+                            confirmPassword &&
+                            value === confirmPassword
+                          ) {
                             setPasswordMessage(null);
                           } else {
                             setPasswordMessage(null);
@@ -242,14 +279,20 @@ export function ForgotPasswordPage() {
                         onChange={(e) => {
                           const value = e.target.value;
                           setConfirmPassword(value);
-                          
+
                           if (value && newPassword) {
                             if (value !== newPassword) {
-                              setPasswordMessage("비밀번호가 일치하지 않습니다.");
+                              setPasswordMessage(
+                                "비밀번호가 일치하지 않습니다."
+                              );
                             } else {
-                              const passwordValidation = validatePassword(newPassword);
+                              const passwordValidation =
+                                validatePassword(newPassword);
                               if (!passwordValidation.valid) {
-                                setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
+                                setPasswordMessage(
+                                  passwordValidation.message ||
+                                    "비밀번호 조건을 만족하지 않습니다."
+                                );
                               } else {
                                 setPasswordMessage(null);
                               }
@@ -267,13 +310,13 @@ export function ForgotPasswordPage() {
 
                 <Button
                   type="submit"
-                  className="w-full -mt-2"
+                  className="-mt-2 w-full"
                   isLoading={isResetting}
                 >
                   비밀번호 재설정
                 </Button>
 
-                <div className="text-center -mt-4">
+                <div className="-mt-4 text-center">
                   <button
                     type="button"
                     onClick={() => {
@@ -284,7 +327,7 @@ export function ForgotPasswordPage() {
                       setCodeMessage(null);
                       setPasswordMessage(null);
                     }}
-                    className="text-xs uppercase text-gray-500 hover:text-primary cursor-pointer"
+                    className="hover:text-primary cursor-pointer text-xs text-gray-500 uppercase"
                   >
                     이메일 다시 입력
                   </button>
@@ -307,7 +350,7 @@ export function ForgotPasswordPage() {
               <div className="mt-6 text-center">
                 <Link
                   to="/login"
-                  className="text-sm font-medium text-primary hover:text-primary-dark"
+                  className="text-primary hover:text-primary-dark text-sm font-medium"
                 >
                   로그인하기
                 </Link>
@@ -320,4 +363,3 @@ export function ForgotPasswordPage() {
     </div>
   );
 }
-

@@ -1,4 +1,5 @@
-import { apiClient, refreshClient, isApiError } from "./client";
+import { apiClient, refreshClient } from "./client";
+import { getErrorInfo } from "@/lib/utils";
 import {
   LoginRequest,
   LoginResponse,
@@ -47,11 +48,7 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
       },
     };
   } catch (error) {
-    const errorInfo = isApiError(error)
-      ? `[${error.code}] ${error.message}`
-      : error instanceof Error
-        ? error.message
-        : "알 수 없는 오류";
+    const errorInfo = getErrorInfo(error);
 
     if (import.meta.env.DEV) {
       console.warn(
@@ -65,20 +62,8 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
 }
 
 export async function refreshToken(): Promise<string> {
-  const response = await refreshClient.post<{
-    success: boolean;
-    message: string;
-    data: string;
-  }>("/auth/refresh");
-  if (
-    response.data &&
-    typeof response.data === "object" &&
-    "success" in response.data &&
-    "data" in response.data
-  ) {
-    return response.data.data;
-  }
-  return typeof response.data === "string" ? response.data : "";
+  const response = await refreshClient.post<string>("/auth/refresh");
+  return response.data;
 }
 
 export async function logout(): Promise<void> {

@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
@@ -16,12 +16,12 @@ export function LoginPage() {
   const location = useLocation();
   const login = useAuthStore((state) => state.login);
   const showToast = useToastStore((state) => state.showToast);
-  
+
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
@@ -50,92 +50,94 @@ export function LoginPage() {
     <div className="flex min-h-screen flex-col bg-zinc-100">
       <div className="flex flex-1 items-center justify-center p-4">
         <div className="w-full max-w-[400px] space-y-8">
-        <div className="flex flex-col items-center justify-center text-center">
-          <Link to="/" className="mb-6 flex flex-col items-center gap-3 transition-opacity hover:opacity-80">
-            <span className="text-5xl font-extrabold tracking-[-0.015em] text-gray-900">
-              chrono<span className="text-primary text-6xl leading-none">.</span>
-            </span>
-          </Link>
-          <p className="text-sm text-gray-500">
-            돌아오신 것을 환영합니다!
-          </p>
-        </div>
-
-        <Card className="p-6 sm:p-8 border-gray-100 shadow-lg shadow-zinc-100/50">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <Input
-                id="email"
-                type="email"
-                label="이메일"
-                placeholder="email@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                hideRequiredMark
-                autoComplete="email"
-              />
-              <Input
-                id="password"
-                type="password"
-                label="비밀번호"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                hideRequiredMark
-                autoComplete="current-password"
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full -mt-2"
-              isLoading={isLoading}
+          <div className="flex flex-col items-center justify-center text-center">
+            <Link
+              to="/"
+              className="mb-6 flex flex-col items-center gap-3 transition-opacity hover:opacity-80"
             >
-              로그인
-            </Button>
-
-            <div className="text-center -mt-4">
-              <Link
-                to="/forgot-password"
-                className="text-xs uppercase text-gray-500 hover:text-primary"
-              >
-                비밀번호 찾기
-              </Link>
-            </div>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">
-                  아직 계정이 없으신가요?
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center">
-              <Link
-                to="/signup"
-                className="block text-sm font-medium text-primary hover:text-primary-dark"
-              >
-                회원가입하고 시작하기
-              </Link>
-
-              <button
-                type="button"
-                onClick={fillDemoAccount}
-                className="mt-3.5 text-sm font-medium text-gray-300 hover:text-primary cursor-pointer"
-              >
-                데모계정으로 둘러보기
-              </button>
-            </div>
+              <span className="text-5xl font-extrabold tracking-[-0.015em] text-gray-900">
+                chrono
+                <span className="text-primary text-6xl leading-none">.</span>
+              </span>
+            </Link>
+            <p className="text-sm text-gray-500">돌아오신 것을 환영합니다!</p>
           </div>
-        </Card>
+
+          <Card className="border-gray-100 p-6 shadow-lg shadow-zinc-100/50 sm:p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <Input
+                  id="email"
+                  type="email"
+                  label="이메일"
+                  placeholder="email@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  hideRequiredMark
+                  autoComplete="email"
+                />
+                <Input
+                  id="password"
+                  type="password"
+                  label="비밀번호"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  hideRequiredMark
+                  autoComplete="current-password"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="-mt-2 w-full"
+                isLoading={isLoading}
+              >
+                로그인
+              </Button>
+
+              <div className="-mt-4 text-center">
+                <Link
+                  to="/forgot-password"
+                  className="hover:text-primary text-xs text-gray-500 uppercase"
+                >
+                  비밀번호 찾기
+                </Link>
+              </div>
+            </form>
+
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-500">
+                    아직 계정이 없으신가요?
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 text-center">
+                <Link
+                  to="/signup"
+                  className="text-primary hover:text-primary-dark block text-sm font-medium"
+                >
+                  회원가입하고 시작하기
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={fillDemoAccount}
+                  className="hover:text-primary mt-3.5 cursor-pointer text-sm font-medium text-gray-300"
+                >
+                  데모계정으로 둘러보기
+                </button>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
       <Footer />

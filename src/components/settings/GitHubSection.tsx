@@ -1,10 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
 import { updateGithubUsername } from "@/lib/api/user";
-import { connectGitHubPat, disconnectGitHubPat, validateGitHubUsername } from "@/lib/api/github";
+import {
+  connectGitHubPat,
+  disconnectGitHubPat,
+  validateGitHubUsername,
+} from "@/lib/api/github";
 import { isApiError } from "@/lib/api/client";
 import { useToastStore } from "@/stores/toastStore";
 import { Github, ExternalLink, HelpCircle, ShieldCheck } from "lucide-react";
@@ -14,90 +18,110 @@ interface GitHubSectionProps {
   onUpdate: (username: string) => void;
 }
 
-type ValidationStatus = 'idle' | 'validating' | 'valid' | 'invalid';
+type ValidationStatus = "idle" | "validating" | "valid" | "invalid";
 
 interface ValidationState {
   status: ValidationStatus;
   message: string | null;
 }
 
-export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps) {
+export function GitHubSection({
+  initialUsername,
+  onUpdate,
+}: GitHubSectionProps) {
   const showToast = useToastStore((state) => state.showToast);
   const [isLoading, setIsLoading] = useState(false);
   const [githubUsername, setGithubUsername] = useState(initialUsername);
-  const [githubUsernameValidation, setGithubUsernameValidation] = useState<ValidationState>({
-    status: 'idle',
-    message: null,
-  });
-  
+  const [githubUsernameValidation, setGithubUsernameValidation] =
+    useState<ValidationState>({
+      status: "idle",
+      message: null,
+    });
+
   const [isPatLoading, setIsPatLoading] = useState(false);
   const [patUsername, setPatUsername] = useState(initialUsername);
-  const [patUsernameValidation, setPatUsernameValidation] = useState<ValidationState>({
-    status: 'idle',
-    message: null,
-  });
+  const [patUsernameValidation, setPatUsernameValidation] =
+    useState<ValidationState>({
+      status: "idle",
+      message: null,
+    });
   const [patToken, setPatToken] = useState("");
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [isDisconnectModalOpen, setIsDisconnectModalOpen] = useState(false);
 
-  const githubUsernameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const patUsernameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const githubUsernameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const patUsernameTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   useEffect(() => {
     setGithubUsername(initialUsername);
     setPatUsername(initialUsername);
   }, [initialUsername]);
 
-  const validateUsername = useCallback(async (username: string, setValidation: (state: ValidationState) => void) => {
-    if (!username.trim()) {
-      setValidation({ status: 'idle', message: null });
-      return;
-    }
-
-    if (username.trim() === initialUsername) {
-      setValidation({ status: 'idle', message: null });
-      return;
-    }
-
-    setValidation({ status: 'validating', message: '...' });
-
-    try {
-      const result = await validateGitHubUsername(username.trim());
-      if (result.valid) {
-        setValidation({
-          status: 'valid',
-          message: '사용 가능한 GitHub Username',
-        });
-      } else {
-        const errorMessage = result.message || '존재하지 않는 GitHub Username';
-        setValidation({
-          status: 'invalid',
-          message: errorMessage.includes('사용자') || errorMessage.includes('사용자를 찾을 수 없습니다') || errorMessage.includes('존재하지 않는')
-            ? '존재하지 않는 GitHub Username'
-            : errorMessage,
-        });
+  const validateUsername = useCallback(
+    async (
+      username: string,
+      setValidation: (state: ValidationState) => void
+    ) => {
+      const trimmed = username.trim();
+      if (!trimmed) {
+        setValidation({ status: "idle", message: null });
+        return;
       }
-    } catch (err) {
-      if (isApiError(err)) {
-        if (err.code === 'GITHUB_RATE_LIMIT') {
+
+      if (trimmed === initialUsername) {
+        setValidation({ status: "idle", message: null });
+        return;
+      }
+
+      setValidation({ status: "validating", message: "..." });
+
+      try {
+        const result = await validateGitHubUsername(trimmed);
+        if (result.valid) {
           setValidation({
-            status: 'invalid',
-            message: '요청이 너무 많습니다. 잠시 후 다시 시도해주세요',
+            status: "valid",
+            message: "사용 가능한 GitHub Username",
           });
         } else {
+          const errorMessage =
+            result.message || "존재하지 않는 GitHub Username";
           setValidation({
-            status: 'invalid',
-            message: err.message || '검증 중 오류가 발생했습니다',
+            status: "invalid",
+            message:
+              errorMessage.includes("사용자") ||
+              errorMessage.includes("사용자를 찾을 수 없습니다") ||
+              errorMessage.includes("존재하지 않는")
+                ? "존재하지 않는 GitHub Username"
+                : errorMessage,
           });
         }
-      } else {
-        setValidation({
-          status: 'invalid',
-          message: '검증 중 오류가 발생했습니다',
-        });
+      } catch (err) {
+        if (isApiError(err)) {
+          if (err.code === "GITHUB_RATE_LIMIT") {
+            setValidation({
+              status: "invalid",
+              message: "요청이 너무 많습니다. 잠시 후 다시 시도해주세요",
+            });
+          } else {
+            setValidation({
+              status: "invalid",
+              message: err.message || "검증 중 오류가 발생했습니다",
+            });
+          }
+        } else {
+          setValidation({
+            status: "invalid",
+            message: "검증 중 오류가 발생했습니다",
+          });
+        }
       }
-    }
-  }, [initialUsername]);
+    },
+    [initialUsername]
+  );
 
   useEffect(() => {
     if (githubUsernameTimeoutRef.current) {
@@ -147,16 +171,21 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
     setIsLoading(true);
 
     try {
-      const updated = await updateGithubUsername({ githubUsername: githubUsername.trim() });
+      const updated = await updateGithubUsername({
+        githubUsername: githubUsername.trim(),
+      });
       onUpdate(updated.githubUsername);
-      setGithubUsernameValidation({ status: 'idle', message: null });
+      setGithubUsernameValidation({ status: "idle", message: null });
       showToast("GitHub Username이 업데이트되었습니다.", "success");
     } catch (err) {
       if (isApiError(err)) {
         if (err.code === "GITHUB_USER_NOT_FOUND") {
           showToast("존재하지 않는 GitHub Username입니다.", "error");
         } else {
-          showToast(err.message || "GitHub Username 업데이트에 실패했습니다.", "error");
+          showToast(
+            err.message || "GitHub Username 업데이트에 실패했습니다.",
+            "error"
+          );
         }
       } else {
         showToast("GitHub Username 업데이트 중 오류가 발생했습니다.", "error");
@@ -182,15 +211,25 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
         pat: patToken.trim(),
       });
       onUpdate(patUsername.trim());
-      setPatUsernameValidation({ status: 'idle', message: null });
+      setPatUsernameValidation({ status: "idle", message: null });
       showToast("PAT 연동에 성공했습니다.", "success");
       setPatToken("");
     } catch (err) {
       if (isApiError(err)) {
         const errorMessage = err.message || "PAT 연동에 실패했습니다.";
-        if (errorMessage.includes("401") || errorMessage.includes("Unauthorized") || errorMessage.includes("인증")) {
-          showToast("이 토큰에는 private repository 접근 권한이 없습니다. `repo` 권한이 필요합니다.", "error");
-        } else if (errorMessage.includes("404") || errorMessage.includes("Not Found")) {
+        if (
+          errorMessage.includes("401") ||
+          errorMessage.includes("Unauthorized") ||
+          errorMessage.includes("인증")
+        ) {
+          showToast(
+            "이 토큰에는 private repository 접근 권한이 없습니다. `repo` 권한이 필요합니다.",
+            "error"
+          );
+        } else if (
+          errorMessage.includes("404") ||
+          errorMessage.includes("Not Found")
+        ) {
           showToast("존재하지 않는 GitHub Username입니다.", "error");
         } else {
           showToast(errorMessage, "error");
@@ -239,19 +278,22 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="space-y-1.5 mb-2">
+        <div className="mb-2 space-y-1.5">
           <div className="flex items-center justify-between">
-            <label htmlFor="githubUsername" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="githubUsername"
+              className="block text-sm font-medium text-gray-700"
+            >
               GitHub Username
             </label>
             {githubUsernameValidation.message && (
               <span
                 className={`text-xs ${
-                  githubUsernameValidation.status === 'valid'
-                    ? 'text-primary-dark'
-                    : githubUsernameValidation.status === 'invalid'
-                    ? 'text-accent-dark'
-                    : 'text-gray-500'
+                  githubUsernameValidation.status === "valid"
+                    ? "text-primary-dark"
+                    : githubUsernameValidation.status === "invalid"
+                      ? "text-accent-dark"
+                      : "text-gray-500"
                 }`}
               >
                 {githubUsernameValidation.message}
@@ -265,53 +307,64 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
             value={githubUsername}
             onChange={(e) => {
               setGithubUsername(e.target.value);
-              setGithubUsernameValidation({ status: 'idle', message: null });
+              setGithubUsernameValidation({ status: "idle", message: null });
             }}
             required
             label=""
-            error={githubUsernameValidation.status === 'invalid' ? '' : undefined}
+            error={
+              githubUsernameValidation.status === "invalid" ? "" : undefined
+            }
           />
         </div>
 
-        <Button type="submit" isLoading={isLoading} className="w-full md:w-auto">
+        <Button
+          type="submit"
+          isLoading={isLoading}
+          className="w-full md:w-auto"
+        >
           GitHub 연동
         </Button>
       </form>
 
       <div className="mt-3 rounded-lg bg-zinc-50 p-6">
         <div className="mb-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2 flex items-center gap-1.5">
+          <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-gray-900">
             <span>PAT 연동 (선택)</span>
             <span
               className="group relative inline-flex cursor-help"
               title="PAT(Personal Access Token)은 GitHub에서 발급하는 개인 인증 토큰입니다."
             >
               <HelpCircle className="h-4 w-4 text-gray-400 transition-colors hover:text-gray-600" />
-              <span className="absolute left-1/2 top-full z-10 mt-2 hidden w-66 -translate-x-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-lg group-hover:block">
-                PAT(Personal Access Token)은 GitHub에서 발급하는 개인 인증 토큰입니다.
+              <span className="absolute top-full left-1/2 z-10 mt-2 hidden w-66 -translate-x-1/2 rounded-lg bg-gray-900 px-3 py-2 text-xs text-white shadow-lg group-hover:block">
+                PAT(Personal Access Token)은 GitHub에서 발급하는 개인 인증
+                토큰입니다.
                 <span className="absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-gray-900"></span>
               </span>
             </span>
           </h3>
           <p className="text-xs text-gray-500">
-            PAT을 등록하면 private repository까지 분석할 수 있어요(Classic 기준 repo 권한 필요).
+            PAT을 등록하면 private repository까지 분석할 수 있어요(Classic 기준
+            repo 권한 필요).
           </p>
         </div>
 
         <form onSubmit={handlePatSubmit} className="space-y-5">
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label htmlFor="patUsername" className="block text-sm font-medium text-gray-700">
+            <div className="mb-1.5 flex items-center justify-between">
+              <label
+                htmlFor="patUsername"
+                className="block text-sm font-medium text-gray-700"
+              >
                 GitHub Username
               </label>
               {patUsernameValidation.message && (
                 <span
                   className={`text-xs ${
-                    patUsernameValidation.status === 'valid'
-                      ? 'text-primary-dark'
-                      : patUsernameValidation.status === 'invalid'
-                      ? 'text-accent-dark'
-                      : 'text-gray-500'
+                    patUsernameValidation.status === "valid"
+                      ? "text-primary-dark"
+                      : patUsernameValidation.status === "invalid"
+                        ? "text-accent-dark"
+                        : "text-gray-500"
                   }`}
                 >
                   {patUsernameValidation.message}
@@ -325,11 +378,13 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
               value={patUsername}
               onChange={(e) => {
                 setPatUsername(e.target.value);
-                setPatUsernameValidation({ status: 'idle', message: null });
+                setPatUsernameValidation({ status: "idle", message: null });
               }}
               required
               label=""
-              error={patUsernameValidation.status === 'invalid' ? '' : undefined}
+              error={
+                patUsernameValidation.status === "invalid" ? "" : undefined
+              }
             />
           </div>
 
@@ -346,7 +401,11 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
           </div>
 
           <div className="flex items-center gap-2">
-            <Button type="submit" isLoading={isPatLoading} className="w-full md:w-auto">
+            <Button
+              type="submit"
+              isLoading={isPatLoading}
+              className="w-full md:w-auto"
+            >
               PAT 연동
             </Button>
             <Button
@@ -363,7 +422,7 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
 
           <div className="space-y-1 pt-1">
             <div className="flex items-start gap-1">
-              <ShieldCheck className="h-3.5 w-3.5 text-gray-400 shrink-0 mt-0.5" />
+              <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gray-400" />
               <p className="text-xs text-gray-500">
                 PAT은 암호화되어 저장되며, 언제든지 삭제할 수 있습니다.
               </p>
@@ -374,7 +433,7 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
                 href="https://github.com/settings/tokens"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-dark underline"
+                className="text-primary hover:text-primary-dark inline-flex items-center gap-1 text-xs underline"
               >
                 GitHub Settings
                 <ExternalLink className="h-3 w-3" />
@@ -398,4 +457,3 @@ export function GitHubSection({ initialUsername, onUpdate }: GitHubSectionProps)
     </Card>
   );
 }
-
