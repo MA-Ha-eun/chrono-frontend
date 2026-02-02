@@ -18,6 +18,26 @@ export const refreshClient = axios.create({
   timeout: 10000,
 });
 
+refreshClient.interceptors.response.use(
+  (response) => {
+    if (
+      response.data &&
+      typeof response.data === "object" &&
+      "success" in response.data &&
+      "data" in response.data
+    ) {
+      return {
+        ...response,
+        data: response.data.data,
+      };
+    }
+    return response;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 export const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -95,18 +115,9 @@ apiClient.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshResponse = await refreshClient.post<
-          { success: boolean; message: string; data: string } | string
-        >("/auth/refresh");
-        const responseData = refreshResponse.data;
-        const newAccessToken =
-          typeof responseData === "object" &&
-          responseData &&
-          "data" in responseData
-            ? responseData.data
-            : typeof responseData === "string"
-              ? responseData
-              : "";
+        const refreshResponse =
+          await refreshClient.post<string>("/auth/refresh");
+        const newAccessToken = refreshResponse.data;
         useAuthStore.getState().setToken(newAccessToken);
 
         refreshSubscribers.forEach((callback) => callback(newAccessToken));
