@@ -1,4 +1,12 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  type FormEvent,
+  type ChangeEvent,
+  type KeyboardEvent,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { ExternalLink, X } from "lucide-react";
 import { Button } from "@/components/common/Button";
@@ -25,8 +33,8 @@ export function ProjectCreatePage() {
   const getTodayString = () => {
     const now = new Date();
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
   const today = getTodayString();
@@ -41,13 +49,15 @@ export function ProjectCreatePage() {
   const [techStack, setTechStack] = useState("");
   const [repoName, setRepoName] = useState("");
   const [titleMessage, setTitleMessage] = useState<string | null>(null);
-  const [descriptionMessage, setDescriptionMessage] = useState<string | null>(null);
+  const [descriptionMessage, setDescriptionMessage] = useState<string | null>(
+    null
+  );
   const hasLoadedRef = useRef(false);
   const isLoadingRef = useRef(false);
 
   useEffect(() => {
     if (hasLoadedRef.current || isLoadingRef.current) return;
-    
+
     const loadUserAndRepos = async () => {
       isLoadingRef.current = true;
       try {
@@ -71,7 +81,10 @@ export function ProjectCreatePage() {
           if (err.code === "GITHUB_USERNAME_NOT_SET") {
             return;
           } else {
-            showToast(err.message || "리포지토리 목록을 불러오는데 실패했습니다.", "error");
+            showToast(
+              err.message || "리포지토리 목록을 불러오는데 실패했습니다.",
+              "error"
+            );
           }
         } else {
           showToast("리포지토리 목록을 불러오는데 실패했습니다.", "error");
@@ -83,9 +96,11 @@ export function ProjectCreatePage() {
     };
 
     loadUserAndRepos();
-  }, [user?.githubUsername]);
+  }, [user?.githubUsername, setUser, showToast]);
 
-  const validateTitle = (value: string): { valid: boolean; message?: string } => {
+  const validateTitle = (
+    value: string
+  ): { valid: boolean; message?: string } => {
     if (!value.trim()) {
       return { valid: false, message: "제목을 입력해주세요." };
     }
@@ -95,27 +110,33 @@ export function ProjectCreatePage() {
     return { valid: true };
   };
 
-  const validateDescription = (value: string): { valid: boolean; message?: string } => {
+  const validateDescription = (
+    value: string
+  ): { valid: boolean; message?: string } => {
     if (value.length > 1000) {
       return { valid: false, message: "설명은 1000자 이하여야 합니다." };
     }
     return { valid: true };
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setTitleMessage(null);
     setDescriptionMessage(null);
 
     const titleValidation = validateTitle(title);
     if (!titleValidation.valid) {
-      setTitleMessage(titleValidation.message || "제목 조건을 만족하지 않습니다.");
+      setTitleMessage(
+        titleValidation.message || "제목 조건을 만족하지 않습니다."
+      );
       return;
     }
 
     const descriptionValidation = validateDescription(description);
     if (!descriptionValidation.valid) {
-      setDescriptionMessage(descriptionValidation.message || "설명 조건을 만족하지 않습니다.");
+      setDescriptionMessage(
+        descriptionValidation.message || "설명 조건을 만족하지 않습니다."
+      );
       return;
     }
 
@@ -205,7 +226,11 @@ export function ProjectCreatePage() {
   const addTechToStack = (tech: string) => {
     if (!tech.trim()) return;
     const trimmedTech = tech.trim();
-    if (!techStackArray.map((s) => s.toLowerCase()).includes(trimmedTech.toLowerCase())) {
+    if (
+      !techStackArray
+        .map((s) => s.toLowerCase())
+        .includes(trimmedTech.toLowerCase())
+    ) {
       const newArray = [...techStackArray, trimmedTech];
       setTechStack(newArray.join(", "));
     }
@@ -214,18 +239,21 @@ export function ProjectCreatePage() {
     setSelectedIndex(-1);
   };
 
-  const handleTechStackInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTechStackInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setTechStackInput(value);
-    
+
     const lastCommaIndex = value.lastIndexOf(",");
     if (lastCommaIndex >= 0) {
-      const parts = value.split(",").map(s => s.trim()).filter(Boolean);
+      const parts = value
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
       const newTechs = parts.slice(0, parts.length - 1);
-      newTechs.forEach(tech => addTechToStack(tech));
+      newTechs.forEach((tech) => addTechToStack(tech));
       setTechStackInput(parts[parts.length - 1] || "");
     }
-    
+
     setShowSuggestions(value.trim().length > 0);
     setSelectedIndex(-1);
   };
@@ -234,7 +262,7 @@ export function ProjectCreatePage() {
     addTechToStack(tech);
   };
 
-  const handleTechStackKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleTechStackKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
       if (suggestions.length > 0) {
@@ -255,7 +283,11 @@ export function ProjectCreatePage() {
     } else if (e.key === "Escape") {
       setShowSuggestions(false);
       setSelectedIndex(-1);
-    } else if (e.key === "Backspace" && !techStackInput && techStackArray.length > 0) {
+    } else if (
+      e.key === "Backspace" &&
+      !techStackInput &&
+      techStackArray.length > 0
+    ) {
       handleRemoveTech(techStackArray.length - 1);
     }
   };
@@ -279,9 +311,11 @@ export function ProjectCreatePage() {
   return (
     <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
       <div className="w-full max-w-3xl">
-        <Card className="border-0 p-6 sm:p-8 shadow-sm">
+        <Card className="border-0 p-6 shadow-sm sm:p-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">+ 새 프로젝트</h1>
+            <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
+              + 새 프로젝트
+            </h1>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
@@ -307,26 +341,33 @@ export function ProjectCreatePage() {
                 error={titleMessage ? "" : undefined}
               />
               {titleMessage && (
-                <p className="mt-1.5 text-sm text-accent-dark">{titleMessage}</p>
+                <p className="text-accent-dark mt-1.5 text-sm">
+                  {titleMessage}
+                </p>
               )}
             </div>
 
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between mb-1.5">
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              <div className="mb-1.5 flex items-center justify-between">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-medium text-gray-700"
+                >
                   설명
                 </label>
                 {descriptionMessage && (
-                  <span className="text-xs text-accent-dark">{descriptionMessage}</span>
+                  <span className="text-accent-dark text-xs">
+                    {descriptionMessage}
+                  </span>
                 )}
               </div>
               <textarea
                 id="description"
                 rows={4}
-                className={`flex w-full rounded-lg border px-3 py-2 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:outline-none focus:ring-1 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 ${
+                className={`flex w-full rounded-lg border px-3 py-2 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:ring-1 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500 ${
                   descriptionMessage
                     ? "border-accent focus:border-accent focus:ring-accent"
-                    : "border-gray-300 bg-white focus:border-primary focus:ring-primary"
+                    : "focus:border-primary focus:ring-primary border-gray-300 bg-white"
                 }`}
                 placeholder="프로젝트 설명을 추가할 수 있어요"
                 value={description}
@@ -346,11 +387,14 @@ export function ProjectCreatePage() {
               <p className="text-xs text-gray-500">{description.length}/1000</p>
             </div>
 
-            <div className="space-y-1.5 w-full">
-              <label htmlFor="targetDate" className="block text-sm font-medium text-gray-700">
+            <div className="w-full space-y-1.5">
+              <label
+                htmlFor="targetDate"
+                className="block text-sm font-medium text-gray-700"
+              >
                 목표
               </label>
-              <div className="relative group">
+              <div className="group relative">
                 <input
                   id="targetDate"
                   type="date"
@@ -358,26 +402,31 @@ export function ProjectCreatePage() {
                   onChange={(e) => setTargetDate(e.target.value)}
                   min={today}
                   className={cn(
-                    "flex h-10 w-full rounded-lg border border-gray-300 bg-white pl-10 pr-3 py-2 text-sm transition-all duration-200",
-                    "focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary",
+                    "flex h-10 w-full rounded-lg border border-gray-300 bg-white py-2 pr-3 pl-10 text-sm transition-all duration-200",
+                    "focus:border-primary focus:ring-primary focus:ring-1 focus:outline-none",
                     "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500",
                     "date-input-custom",
-                    !targetDate ? "text-transparent focus:text-gray-900" : "text-gray-900"
+                    !targetDate
+                      ? "text-transparent focus:text-gray-900"
+                      : "text-gray-900"
                   )}
                   style={{
                     colorScheme: "light",
                   }}
                 />
                 {!targetDate && (
-                  <span className="absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-400 pointer-events-none group-focus-within:hidden">
+                  <span className="pointer-events-none absolute top-1/2 left-10 -translate-y-1/2 text-sm text-gray-400 group-focus-within:hidden">
                     프로젝트 목표일을 설정해보세요
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="space-y-1.5 w-full">
-              <label htmlFor="techStack" className="block text-sm font-medium text-gray-700">
+            <div className="w-full space-y-1.5">
+              <label
+                htmlFor="techStack"
+                className="block text-sm font-medium text-gray-700"
+              >
                 기술 스택
               </label>
               <div className="relative" ref={techStackInputRef}>
@@ -398,7 +447,7 @@ export function ProjectCreatePage() {
                 {showSuggestions && suggestions.length > 0 && (
                   <div
                     ref={suggestionsRef}
-                    className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg max-h-60 overflow-auto"
+                    className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg"
                   >
                     {suggestions.map((tech, idx) => (
                       <button
@@ -418,7 +467,7 @@ export function ProjectCreatePage() {
                 )}
               </div>
               {techStackArray.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   {techStackArray.map((tech, idx) => (
                     <Badge
                       key={`${tech}-${idx}`}
@@ -429,7 +478,7 @@ export function ProjectCreatePage() {
                       <button
                         type="button"
                         onClick={() => handleRemoveTech(idx)}
-                        className="ml-0.5 -mr-0.5 rounded-full hover:bg-gray-100 p-0.5 transition-colors"
+                        className="-mr-0.5 ml-0.5 rounded-full p-0.5 transition-colors hover:bg-gray-100"
                         aria-label={`${tech} 제거`}
                       >
                         <X className="h-3 w-3 text-gray-500" />
@@ -447,8 +496,16 @@ export function ProjectCreatePage() {
                 isLoadingRepos
                   ? [{ value: "", label: "로딩 중..." }]
                   : repoOptions.length > 0
-                  ? [{ value: "", label: "GitHub 리포지토리 선택" }, ...repoOptions]
-                  : [{ value: "", label: "GitHub 리포지토리를 선택할 수 없습니다" }]
+                    ? [
+                        { value: "", label: "GitHub 리포지토리 선택" },
+                        ...repoOptions,
+                      ]
+                    : [
+                        {
+                          value: "",
+                          label: "GitHub 리포지토리를 선택할 수 없습니다",
+                        },
+                      ]
               }
               value={repoName}
               onChange={(e) => setRepoName(e.target.value)}
@@ -458,15 +515,17 @@ export function ProjectCreatePage() {
                 isLoadingRepos ? (
                   "리포지토리 목록을 불러오는 중..."
                 ) : repoOptions.length === 0 ? (
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1">
-                    <span className="text-xs text-gray-500">GitHub Username을 먼저 등록하고 리포지토리를 확인해주세요</span>
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center">
+                    <span className="text-xs text-gray-500">
+                      GitHub Username을 먼저 등록하고 리포지토리를 확인해주세요
+                    </span>
                     <a
                       href="#"
                       onClick={(e) => {
                         e.preventDefault();
                         navigate("/settings");
                       }}
-                      className="inline-flex items-center gap-1 text-xs text-primary hover:text-primary-dark underline cursor-pointer shrink-0"
+                      className="text-primary hover:text-primary-dark inline-flex shrink-0 cursor-pointer items-center gap-1 text-xs underline"
                     >
                       GitHub Username 등록 바로가기
                       <ExternalLink className="h-3 w-3" />
@@ -476,7 +535,7 @@ export function ProjectCreatePage() {
               }
             />
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-1">
+            <div className="flex flex-col gap-3 pt-1 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"

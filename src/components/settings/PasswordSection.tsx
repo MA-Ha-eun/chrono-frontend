@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { useToastStore } from "@/stores/toastStore";
@@ -20,7 +20,9 @@ export function PasswordSection() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
 
-  const validatePassword = (pwd: string): { valid: boolean; message?: string } => {
+  const validatePassword = (
+    pwd: string
+  ): { valid: boolean; message?: string } => {
     if (pwd.length < 8) {
       return { valid: false, message: "비밀번호는 8자 이상이어야 합니다." };
     }
@@ -30,13 +32,16 @@ export function PasswordSection() {
     if (!/\d/.test(pwd)) {
       return { valid: false, message: "비밀번호는 숫자를 포함해야 합니다." };
     }
-    if (!/[!@#$%^&*()_+\-={}\[\]|;:'",.<>/?`~]/.test(pwd)) {
-      return { valid: false, message: "비밀번호는 특수문자를 포함해야 합니다." };
+    if (!/[!@#$%^&*()_+\-={}[\]|;:'",.<>/?`~]/.test(pwd)) {
+      return {
+        valid: false,
+        message: "비밀번호는 특수문자를 포함해야 합니다.",
+      };
     }
     return { valid: true };
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (isDemoUser) {
@@ -53,7 +58,9 @@ export function PasswordSection() {
 
     const passwordValidation = validatePassword(newPassword);
     if (!passwordValidation.valid) {
-      setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
+      setPasswordMessage(
+        passwordValidation.message || "비밀번호 조건을 만족하지 않습니다."
+      );
       return;
     }
 
@@ -96,13 +103,13 @@ export function PasswordSection() {
         onChange={(e) => setCurrentPassword(e.target.value)}
       />
 
-      <div className="space-y-1.5 mb-2">
-        <div className="flex items-center justify-between mb-1.5">
-          <label className="block text-sm font-medium text-gray-700">새 비밀번호</label>
+      <div className="mb-2 space-y-1.5">
+        <div className="mb-1.5 flex items-center justify-between">
+          <label className="block text-sm font-medium text-gray-700">
+            새 비밀번호
+          </label>
           {passwordMessage && (
-            <span className="text-xs text-accent-dark">
-              {passwordMessage}
-            </span>
+            <span className="text-accent-dark text-xs">{passwordMessage}</span>
           )}
         </div>
         <div className="space-y-2">
@@ -117,10 +124,21 @@ export function PasswordSection() {
 
               const passwordValidation = validatePassword(value);
               if (value && !passwordValidation.valid) {
-                setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
-              } else if (value && confirmPassword && value !== confirmPassword) {
+                setPasswordMessage(
+                  passwordValidation.message ||
+                    "비밀번호 조건을 만족하지 않습니다."
+                );
+              } else if (
+                value &&
+                confirmPassword &&
+                value !== confirmPassword
+              ) {
                 setPasswordMessage("비밀번호가 일치하지 않습니다.");
-              } else if (value && confirmPassword && value === confirmPassword) {
+              } else if (
+                value &&
+                confirmPassword &&
+                value === confirmPassword
+              ) {
                 setPasswordMessage(null);
               } else {
                 setPasswordMessage(null);
@@ -143,7 +161,10 @@ export function PasswordSection() {
                 } else {
                   const passwordValidation = validatePassword(newPassword);
                   if (!passwordValidation.valid) {
-                    setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
+                    setPasswordMessage(
+                      passwordValidation.message ||
+                        "비밀번호 조건을 만족하지 않습니다."
+                    );
                   } else {
                     setPasswordMessage(null);
                   }
@@ -162,9 +183,11 @@ export function PasswordSection() {
       </Button>
 
       {isDemoUser && (
-        <p className="flex items-start gap-1 text-sm text-accent-dark">
+        <p className="text-accent-dark flex items-start gap-1 text-sm">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-          <span><strong>데모계정에서는 보안상 비밀번호 변경이 제한됩니다.</strong></span>
+          <span>
+            <strong>데모계정에서는 보안상 비밀번호 변경이 제한됩니다.</strong>
+          </span>
         </p>
       )}
     </form>

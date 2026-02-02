@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/common/Button";
 import { Input } from "@/components/common/Input";
 import { Card } from "@/components/common/Card";
@@ -22,12 +22,18 @@ export function SignupPage() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [nickname, setNickname] = useState("");
   const [emailMessage, setEmailMessage] = useState<string | null>(null);
-  const [verificationCodeMessage, setVerificationCodeMessage] = useState<string | null>(null);
+  const [verificationCodeMessage, setVerificationCodeMessage] = useState<
+    string | null
+  >(null);
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
-  const [passwordConfirmMessage, setPasswordConfirmMessage] = useState<string | null>(null);
+  const [passwordConfirmMessage, setPasswordConfirmMessage] = useState<
+    string | null
+  >(null);
   const [nicknameMessage, setNicknameMessage] = useState<string | null>(null);
 
-  const validatePassword = (pwd: string): { valid: boolean; message?: string } => {
+  const validatePassword = (
+    pwd: string
+  ): { valid: boolean; message?: string } => {
     if (pwd.length < 8) {
       return { valid: false, message: "비밀번호는 8자 이상이어야 합니다." };
     }
@@ -37,13 +43,18 @@ export function SignupPage() {
     if (!/\d/.test(pwd)) {
       return { valid: false, message: "비밀번호는 숫자를 포함해야 합니다." };
     }
-    if (!/[!@#$%^&*()_+\-={}\[\]|;:'",.<>/?`~]/.test(pwd)) {
-      return { valid: false, message: "비밀번호는 특수문자를 포함해야 합니다." };
+    if (!/[!@#$%^&*()_+\-={}[\]|;:'",.<>/?`~]/.test(pwd)) {
+      return {
+        valid: false,
+        message: "비밀번호는 특수문자를 포함해야 합니다.",
+      };
     }
     return { valid: true };
   };
 
-  const validateNickname = (name: string): { valid: boolean; message?: string } => {
+  const validateNickname = (
+    name: string
+  ): { valid: boolean; message?: string } => {
     if (!name.trim()) {
       return { valid: false, message: "닉네임을 입력해주세요." };
     }
@@ -86,12 +97,17 @@ export function SignupPage() {
     setIsVerifyingCode(true);
 
     try {
-      await verifyEmailCode({ email: email.trim(), code: verificationCode.trim() });
+      await verifyEmailCode({
+        email: email.trim(),
+        code: verificationCode.trim(),
+      });
       setEmailVerified(true);
       setVerificationCodeMessage("인증이 완료되었습니다.");
     } catch (err) {
       if (isApiError(err)) {
-        setVerificationCodeMessage(err.message || "인증코드 확인에 실패했습니다.");
+        setVerificationCodeMessage(
+          err.message || "인증코드 확인에 실패했습니다."
+        );
       } else {
         setVerificationCodeMessage("인증코드 확인 중 오류가 발생했습니다.");
       }
@@ -100,7 +116,7 @@ export function SignupPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!emailVerified) {
@@ -110,7 +126,9 @@ export function SignupPage() {
 
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.valid) {
-      setPasswordMessage(passwordValidation.message || "비밀번호 조건을 만족하지 않습니다.");
+      setPasswordMessage(
+        passwordValidation.message || "비밀번호 조건을 만족하지 않습니다."
+      );
       return;
     }
     setPasswordMessage(null);
@@ -123,7 +141,9 @@ export function SignupPage() {
 
     const nicknameValidation = validateNickname(nickname);
     if (!nicknameValidation.valid) {
-      setNicknameMessage(nicknameValidation.message || "닉네임 조건을 만족하지 않습니다.");
+      setNicknameMessage(
+        nicknameValidation.message || "닉네임 조건을 만족하지 않습니다."
+      );
       return;
     }
     setNicknameMessage(null);
@@ -133,7 +153,9 @@ export function SignupPage() {
     try {
       await signup({ email, password, nickname: nickname.trim() });
       showToast("회원가입이 완료되었습니다.", "success");
-      navigate("/login", { state: { message: "회원가입이 완료되었습니다. 로그인해주세요." } });
+      navigate("/login", {
+        state: { message: "회원가입이 완료되었습니다. 로그인해주세요." },
+      });
     } catch (err) {
       if (isApiError(err)) {
         const errorMessage = err.message || "회원가입에 실패했습니다.";
@@ -153,240 +175,266 @@ export function SignupPage() {
     <div className="flex min-h-screen flex-col bg-zinc-100">
       <div className="flex flex-1 items-center justify-center p-4">
         <div className="w-full max-w-[400px] space-y-8">
-        <div className="flex flex-col items-center justify-center text-center">
-          <Link to="/" className="mb-6 flex flex-col items-center gap-3 transition-opacity hover:opacity-80">
-            <span className="text-5xl font-extrabold tracking-[-0.015em] text-gray-900">
-              chrono<span className="text-primary text-6xl leading-none">.</span>
-            </span>
-          </Link>
-          <p className="text-sm text-gray-500">
-            이메일로 간편하게 시작하세요!
-          </p>
-        </div>
-
-        <Card className="p-6 sm:p-8 border-gray-100 shadow-lg shadow-zinc-100/50">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-3">
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-sm font-medium text-gray-700">
-                      이메일
-                    </label>
-                    {emailMessage && (
-                      <span className={`text-xs ${emailMessage.includes("발송되었습니다") ? "text-primary-dark" : "text-accent-dark"}`}>
-                        {emailMessage}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex">
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="email@example.com"
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        setEmailVerified(false);
-                        setVerificationCode("");
-                        setEmailMessage(null);
-                        setVerificationCodeMessage(null);
-                      }}
-                      disabled={emailVerified}
-                      required
-                      autoComplete="email"
-                      className="flex-1 rounded-r-none border-r-0"
-                      label=""
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleSendVerificationCode}
-                      disabled={emailVerified || isSendingCode}
-                      isLoading={isSendingCode}
-                      className="h-10 rounded-l-none whitespace-nowrap px-4 min-w-[100px]"
-                    >
-                      {emailVerified ? "인증완료" : "인증하기"}
-                    </Button>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-sm font-medium text-gray-700">
-                      인증코드
-                    </label>
-                    {verificationCodeMessage && (
-                      <span className={`text-xs ${verificationCodeMessage.includes("완료") ? "text-primary-dark" : "text-accent-dark"}`}>
-                        {verificationCodeMessage}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex">
-                    <Input
-                      id="verificationCode"
-                      type="text"
-                      placeholder="인증코드를 입력하세요"
-                      value={verificationCode}
-                      onChange={(e) => {
-                        const value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "");
-                        setVerificationCode(value);
-                        setVerificationCodeMessage(null);
-                      }}
-                      maxLength={8}
-                      disabled={emailVerified}
-                      className="flex-1 rounded-r-none border-r-0"
-                      label=""
-                    />
-                    <Button
-                      type="button"
-                      onClick={handleVerifyCode}
-                      disabled={emailVerified || !verificationCode.trim() || isVerifyingCode}
-                      isLoading={isVerifyingCode}
-                      className="h-10 rounded-l-none whitespace-nowrap px-4 min-w-[100px]"
-                    >
-                      {emailVerified ? "인증완료" : "인증확인"}
-                    </Button>
-                  </div>
-                </div>
-
-              </div>
-
-              <div className={emailVerified ? "space-y-4" : "space-y-4 opacity-50 pointer-events-none"}>
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-sm font-medium text-gray-700">
-                      비밀번호
-                    </label>
-                    {passwordMessage && (
-                      <span className="text-xs text-accent-dark">
-                        {passwordMessage}
-                      </span>
-                    )}
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="영문, 숫자, 특수문자 포함 8자 이상"
-                    value={password}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setPassword(value);
-                      if (value && !validatePassword(value).valid) {
-                        setPasswordMessage(validatePassword(value).message || "비밀번호 조건을 만족하지 않습니다.");
-                      } else {
-                        setPasswordMessage(null);
-                      }
-                      if (passwordConfirm && value !== passwordConfirm) {
-                        setPasswordConfirmMessage(null);
-                      }
-                    }}
-                    required
-                    autoComplete="new-password"
-                    label=""
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-sm font-medium text-gray-700">
-                      비밀번호 확인
-                    </label>
-                    {passwordConfirmMessage && (
-                      <span className="text-xs text-accent-dark">
-                        {passwordConfirmMessage}
-                      </span>
-                    )}
-                  </div>
-                  <Input
-                    id="passwordConfirm"
-                    type="password"
-                    placeholder="비밀번호를 다시 입력하세요"
-                    value={passwordConfirm}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      setPasswordConfirm(value);
-                      if (value && password && value !== password) {
-                        setPasswordConfirmMessage("비밀번호가 일치하지 않습니다.");
-                      } else {
-                        setPasswordConfirmMessage(null);
-                      }
-                    }}
-                    required
-                    autoComplete="new-password"
-                    label=""
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="block text-sm font-medium text-gray-700">
-                      닉네임
-                    </label>
-                    {nicknameMessage && (
-                      <span className="text-xs text-accent-dark">
-                        {nicknameMessage}
-                      </span>
-                    )}
-                  </div>
-                  <Input
-                    id="nickname"
-                    type="text"
-                    placeholder="닉네임을 입력하세요 (최대 20자)"
-                    value={nickname}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value.length <= 20) {
-                        setNickname(value);
-                        if (value && !validateNickname(value).valid) {
-                          setNicknameMessage(validateNickname(value).message || "닉네임 조건을 만족하지 않습니다.");
-                        } else {
-                          setNicknameMessage(null);
-                        }
-                      }
-                    }}
-                    maxLength={20}
-                    required
-                    autoComplete="nickname"
-                    label=""
-                  />
-                </div>
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full -mt-2"
-              isLoading={isLoading}
-              disabled={!emailVerified}
+          <div className="flex flex-col items-center justify-center text-center">
+            <Link
+              to="/"
+              className="mb-6 flex flex-col items-center gap-3 transition-opacity hover:opacity-80"
             >
-              회원가입
-            </Button>
-          </form>
-
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-2 text-gray-500">
-                  이미 계정이 있으신가요?
-                </span>
-              </div>
-            </div>
-
-            <div className="mt-6 text-center">
-              <Link
-                to="/login"
-                className="text-sm font-medium text-primary hover:text-primary-dark"
-              >
-                로그인하기
-              </Link>
-            </div>
+              <span className="text-5xl font-extrabold tracking-[-0.015em] text-gray-900">
+                chrono
+                <span className="text-primary text-6xl leading-none">.</span>
+              </span>
+            </Link>
+            <p className="text-sm text-gray-500">
+              이메일로 간편하게 시작하세요!
+            </p>
           </div>
-        </Card>
+
+          <Card className="border-gray-100 p-6 shadow-lg shadow-zinc-100/50 sm:p-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-3">
+                  <div>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        이메일
+                      </label>
+                      {emailMessage && (
+                        <span
+                          className={`text-xs ${emailMessage.includes("발송되었습니다") ? "text-primary-dark" : "text-accent-dark"}`}
+                        >
+                          {emailMessage}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex">
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="email@example.com"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          setEmailVerified(false);
+                          setVerificationCode("");
+                          setEmailMessage(null);
+                          setVerificationCodeMessage(null);
+                        }}
+                        disabled={emailVerified}
+                        required
+                        autoComplete="email"
+                        className="flex-1 rounded-r-none border-r-0"
+                        label=""
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleSendVerificationCode}
+                        disabled={emailVerified || isSendingCode}
+                        isLoading={isSendingCode}
+                        className="h-10 min-w-[100px] rounded-l-none px-4 whitespace-nowrap"
+                      >
+                        {emailVerified ? "인증완료" : "인증하기"}
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        인증코드
+                      </label>
+                      {verificationCodeMessage && (
+                        <span
+                          className={`text-xs ${verificationCodeMessage.includes("완료") ? "text-primary-dark" : "text-accent-dark"}`}
+                        >
+                          {verificationCodeMessage}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex">
+                      <Input
+                        id="verificationCode"
+                        type="text"
+                        placeholder="인증코드를 입력하세요"
+                        value={verificationCode}
+                        onChange={(e) => {
+                          const value = e.target.value
+                            .toUpperCase()
+                            .replace(/[^A-Z0-9]/g, "");
+                          setVerificationCode(value);
+                          setVerificationCodeMessage(null);
+                        }}
+                        maxLength={8}
+                        disabled={emailVerified}
+                        className="flex-1 rounded-r-none border-r-0"
+                        label=""
+                      />
+                      <Button
+                        type="button"
+                        onClick={handleVerifyCode}
+                        disabled={
+                          emailVerified ||
+                          !verificationCode.trim() ||
+                          isVerifyingCode
+                        }
+                        isLoading={isVerifyingCode}
+                        className="h-10 min-w-[100px] rounded-l-none px-4 whitespace-nowrap"
+                      >
+                        {emailVerified ? "인증완료" : "인증확인"}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={
+                    emailVerified
+                      ? "space-y-4"
+                      : "pointer-events-none space-y-4 opacity-50"
+                  }
+                >
+                  <div>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        비밀번호
+                      </label>
+                      {passwordMessage && (
+                        <span className="text-accent-dark text-xs">
+                          {passwordMessage}
+                        </span>
+                      )}
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+                      value={password}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setPassword(value);
+                        if (value && !validatePassword(value).valid) {
+                          setPasswordMessage(
+                            validatePassword(value).message ||
+                              "비밀번호 조건을 만족하지 않습니다."
+                          );
+                        } else {
+                          setPasswordMessage(null);
+                        }
+                        if (passwordConfirm && value !== passwordConfirm) {
+                          setPasswordConfirmMessage(null);
+                        }
+                      }}
+                      required
+                      autoComplete="new-password"
+                      label=""
+                    />
+                  </div>
+                  <div>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        비밀번호 확인
+                      </label>
+                      {passwordConfirmMessage && (
+                        <span className="text-accent-dark text-xs">
+                          {passwordConfirmMessage}
+                        </span>
+                      )}
+                    </div>
+                    <Input
+                      id="passwordConfirm"
+                      type="password"
+                      placeholder="비밀번호를 다시 입력하세요"
+                      value={passwordConfirm}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        setPasswordConfirm(value);
+                        if (value && password && value !== password) {
+                          setPasswordConfirmMessage(
+                            "비밀번호가 일치하지 않습니다."
+                          );
+                        } else {
+                          setPasswordConfirmMessage(null);
+                        }
+                      }}
+                      required
+                      autoComplete="new-password"
+                      label=""
+                    />
+                  </div>
+                  <div>
+                    <div className="mb-1.5 flex items-center justify-between">
+                      <label className="block text-sm font-medium text-gray-700">
+                        닉네임
+                      </label>
+                      {nicknameMessage && (
+                        <span className="text-accent-dark text-xs">
+                          {nicknameMessage}
+                        </span>
+                      )}
+                    </div>
+                    <Input
+                      id="nickname"
+                      type="text"
+                      placeholder="닉네임을 입력하세요 (최대 20자)"
+                      value={nickname}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (value.length <= 20) {
+                          setNickname(value);
+                          if (value && !validateNickname(value).valid) {
+                            setNicknameMessage(
+                              validateNickname(value).message ||
+                                "닉네임 조건을 만족하지 않습니다."
+                            );
+                          } else {
+                            setNicknameMessage(null);
+                          }
+                        }
+                      }}
+                      maxLength={20}
+                      required
+                      autoComplete="nickname"
+                      label=""
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="-mt-2 w-full"
+                isLoading={isLoading}
+                disabled={!emailVerified}
+              >
+                회원가입
+              </Button>
+            </form>
+
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-white px-2 text-gray-500">
+                    이미 계정이 있으신가요?
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 text-center">
+                <Link
+                  to="/login"
+                  className="text-primary hover:text-primary-dark text-sm font-medium"
+                >
+                  로그인하기
+                </Link>
+              </div>
+            </div>
+          </Card>
         </div>
       </div>
       <Footer />
     </div>
   );
 }
-
