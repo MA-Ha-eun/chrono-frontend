@@ -1,5 +1,5 @@
+import React from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { useEffect } from "react";
 import { useAuthStore } from "@/stores/authStore";
 
 interface ProtectedRouteProps {
@@ -7,18 +7,8 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { isAuthenticated, accessToken } = useAuthStore();
+  const { isAuthenticated } = useAuthStore();
   const location = useLocation();
-
-  useEffect(() => {
-    if (!accessToken) return;
-    
-    const storedAuthStorage = localStorage.getItem("auth-storage");
-    
-    if (!storedAuthStorage && accessToken) {
-      useAuthStore.getState().logout();
-    }
-  }, [accessToken]);
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
@@ -26,4 +16,3 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   return <>{children}</>;
 }
-
