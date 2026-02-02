@@ -80,7 +80,8 @@ apiClient.interceptors.response.use(
     };
 
     if (
-      error.response?.status === 401 &&
+      (error.response?.status === 401 || error.response?.status === 403) &&
+      // 401(인증 만료) 또는 403(토큰 만료 시 백엔드가 403 반환하는 경우)
       originalRequest &&
       !originalRequest._retry
     ) {
@@ -147,7 +148,7 @@ apiClient.interceptors.response.use(
       return Promise.reject(error.response.data);
     }
 
-    // 백엔드에서 에러 메시지가 없을 경우 status code별 기본 메시지 제공
+    // 백엔드 에러 메시지 없을 경우 status code별 기본 메시지 제공
     const statusCode = error.response?.status;
     let message = "요청 처리 중 오류가 발생했습니다.";
     let code = ErrorCode.SERVER_ERROR;
