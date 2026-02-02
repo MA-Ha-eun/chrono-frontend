@@ -1,14 +1,4 @@
-/**
- * 자동완성에 사용되는 인기 기술 스택 목록
- * 
- * 카테고리별로 정리:
- * - 프론트엔드 프레임워크/라이브러리
- * - 백엔드 프레임워크/언어
- * - 데이터베이스
- * - 인프라/도구
- * - 테스팅/개발 도구
- */
-
+// 인기 기술 스택 (자동완성용, 카테고리별)
 export const POPULAR_TECH_STACKS = [
   // 프론트엔드 프레임워크/라이브러리
   "React",
@@ -18,7 +8,7 @@ export const POPULAR_TECH_STACKS = [
   "Nuxt.js",
   "Gatsby",
   "Svelte",
-  
+
   // 상태 관리/라우팅
   "Zustand",
   "Redux",
@@ -26,7 +16,7 @@ export const POPULAR_TECH_STACKS = [
   "Vue Router",
   "TanStack Query",
   "SWR",
-  
+
   // 언어
   "TypeScript",
   "JavaScript",
@@ -38,7 +28,7 @@ export const POPULAR_TECH_STACKS = [
   "C#",
   "PHP",
   "Ruby",
-  
+
   // 백엔드 프레임워크
   "Node.js",
   "Express",
@@ -51,7 +41,7 @@ export const POPULAR_TECH_STACKS = [
   "ASP.NET",
   "Laravel",
   "Ruby on Rails",
-  
+
   // 데이터베이스
   "PostgreSQL",
   "MySQL",
@@ -61,7 +51,7 @@ export const POPULAR_TECH_STACKS = [
   "Firebase",
   "Supabase",
   "Prisma",
-  
+
   // 스타일링
   "Tailwind CSS",
   "CSS",
@@ -72,7 +62,7 @@ export const POPULAR_TECH_STACKS = [
   "Bootstrap",
   "Material UI",
   "Chakra UI",
-  
+
   // 인프라/클라우드
   "Docker",
   "Kubernetes",
@@ -83,7 +73,7 @@ export const POPULAR_TECH_STACKS = [
   "Netlify",
   "Heroku",
   "Cloudflare",
-  
+
   // 개발 도구
   "Git",
   "GitHub",
@@ -92,39 +82,39 @@ export const POPULAR_TECH_STACKS = [
   "Webpack",
   "Turbo",
   "npm",
-  
+
   // HTTP 클라이언트
   "Axios",
   "Fetch API",
   "Apollo Client",
   "tRPC",
-  
+
   // API/통신
   "GraphQL",
   "REST API",
   "WebSocket",
   "gRPC",
-  
+
   // 테스팅
   "Jest",
   "Vitest",
   "Cypress",
   "Playwright",
   "Testing Library",
-  
+
   // 코드 품질
   "ESLint",
   "Prettier",
   "Husky",
   "Lint-staged",
-  
+
   // 모바일
   "React Native",
   "Expo",
   "Flutter",
   "Swift",
   "Kotlin",
-  
+
   // 기타 인기 기술
   "MDX",
   "D3.js",
@@ -138,4 +128,3 @@ export const POPULAR_TECH_STACKS = [
   "Storybook",
   "Framer Motion",
 ];
-

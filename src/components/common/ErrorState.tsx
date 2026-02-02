@@ -5,49 +5,18 @@ import { cn } from "@/lib/utils";
 import { Button } from "./Button";
 
 export interface ErrorStateProps {
-  /**
-   * 아이콘 컴포넌트 (lucide-react)
-   * 기본값: AlertCircle
-   */
   icon?: LucideIcon;
-  /**
-   * 제목
-   */
   title: string;
-  /**
-   * 설명
-   */
   description?: string;
-  /**
-   * 액션 버튼 텍스트
-   */
   actionLabel?: string;
-  /**
-   * 액션 버튼 클릭 핸들러 (Link 사용 시 무시됨)
-   */
   onAction?: () => void;
-  /**
-   * 액션 버튼 링크 (onAction보다 우선)
-   */
   actionLink?: string;
-  /**
-   * 커스텀 클래스명
-   */
   className?: string;
-  /**
-   * 아이콘 배경색 (기본: "bg-accent-50")
-   */
   iconBg?: string;
-  /**
-   * 아이콘 색상 (기본: "text-accent-dark")
-   */
   iconColor?: string;
 }
 
-/**
- * 에러 상태를 표시하는 컴포넌트
- * 에러 발생 시 사용자에게 안내를 제공합니다.
- */
+// 에러 상태 표시
 export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
   (
     {
@@ -71,7 +40,7 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
         {actionLink ? (
           <Link
             to={actionLink}
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
+            className="bg-primary hover:bg-primary-dark inline-flex h-10 items-center justify-center rounded-lg px-4 text-sm font-medium text-white transition-colors"
           >
             {actionLabel}
           </Link>
@@ -106,4 +75,3 @@ export const ErrorState = React.forwardRef<HTMLDivElement, ErrorStateProps>(
 );
 
 ErrorState.displayName = "ErrorState";
-
