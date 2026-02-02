@@ -45,6 +45,7 @@ import {
 } from "@/components/common/Skeleton";
 import { ErrorState } from "@/components/common/ErrorState";
 import { CommitHistoryChart } from "@/components/projects/CommitHistoryChart";
+import { InfoCard } from "@/components/common/InfoCard";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -525,13 +526,11 @@ export function ProjectDetailPage() {
                 </div>
               </a>
 
-              <div className="flex min-h-[85px] items-center justify-between rounded-lg bg-zinc-50 p-5">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Calendar className="text-primary h-4 w-4" />
-                  <span>시작일</span>
-                </div>
-                <span className="text-base font-semibold text-gray-900">
-                  {project.startDate ? (
+              <InfoCard
+                icon={Calendar}
+                label="시작일"
+                value={
+                  project.startDate ? (
                     new Date(project.startDate).toLocaleDateString("ko-KR", {
                       year: "numeric",
                       month: "long",
@@ -541,9 +540,9 @@ export function ProjectDetailPage() {
                     <span className="text-base font-semibold text-gray-500">
                       설정 없음
                     </span>
-                  )}
-                </span>
-              </div>
+                  )
+                }
+              />
 
               <div
                 className={`flex min-h-[85px] items-center justify-between rounded-lg p-5 ${
@@ -663,25 +662,17 @@ export function ProjectDetailPage() {
               </div>
             ) : (
               <div className="space-y-5">
-                <div className="flex min-h-[85px] items-center justify-between rounded-lg bg-zinc-50 p-5">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <GitCommitVertical className="text-primary h-4 w-4" />
-                    <span>총 커밋</span>
-                  </div>
-                  <span className="text-base font-semibold text-gray-900">
-                    {project.totalCommits ?? 0}
-                  </span>
-                </div>
+                <InfoCard
+                  icon={GitCommitVertical}
+                  label="총 커밋"
+                  value={project.totalCommits ?? 0}
+                />
 
-                <div className="flex min-h-[85px] items-center justify-between rounded-lg bg-zinc-50 p-5">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
-                    <Calendar className="text-primary h-4 w-4" />
-                    <span>최근 활동</span>
-                  </div>
-                  <span className="text-base font-semibold text-gray-900">
-                    {getTimeLabel(daysAgo)}
-                  </span>
-                </div>
+                <InfoCard
+                  icon={Calendar}
+                  label="최근 활동"
+                  value={getTimeLabel(daysAgo)}
+                />
 
                 <div className="pt-5">
                   <div className="mb-6 sm:mb-8">
