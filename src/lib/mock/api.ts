@@ -9,6 +9,8 @@ import {
   mockWeeklyCommits,
   mockCommitSummary,
   mockCommitHistory,
+  mockMessages,
+  mockMessageUsers,
 } from "./data";
 import {
   User,
@@ -29,12 +31,36 @@ import {
   DailyCommitCount,
   LoginRequest,
   LoginResponse,
+  MessageListItem,
+  MessageDetail,
+  MessageUserSearchItem,
+  PageResponse,
+  SendMessageRequest,
+  UnreadMessageCountResponse,
 } from "@/types/api";
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL ?? "demo@example.com";
 const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD ?? "demo123!";
+
+function paginate<T>(items: T[], page: number, size: number): PageResponse<T> {
+  const start = page * size;
+  const end = start + size;
+  const content = items.slice(start, end);
+  const totalElements = items.length;
+  const totalPages = Math.max(1, Math.ceil(totalElements / size));
+
+  return {
+    content,
+    totalElements,
+    totalPages,
+    size,
+    number: page,
+    first: page === 0,
+    last: page >= totalPages - 1,
+  };
+}
 
 export const mockApi = {
   auth: {
@@ -166,6 +192,126 @@ export const mockApi = {
     ): Promise<CommitHistoryCount[]> => {
       await delay(300);
       return mockCommitHistory;
+    },
+  },
+
+  message: {
+    sendMessage: async (data: SendMessageRequest): Promise<void> => {
+      await delay(200);
+      const now = new Date();
+      const receiver =
+        mockMessageUsers.find((u) => u.userId === data.receiverId) ?? null;
+
+      const newMessage: MessageListItem = {
+        messageId:
+          (mockMessages.reduce((max, m) => Math.max(max, m.messageId), 0) ||
+            0) + 1,
+        senderId: mockUser.userId ?? 1,
+        senderNickname: mockUser.nickname,
+        receiverId: data.receiverId,
+        receiverNickname: receiver?.nickname ?? `사용자 ${data.receiverId}`,
+        content: data.content,
+        read: false,
+        createdAt: now.toISOString(),
+      };
+
+      mockMessages.unshift(newMessage);
+    },
+
+    getInboxMessages: async (
+      page = 0,
+      size = 20
+    ): Promise<PageResponse<MessageListItem>> => {
+      await delay(200);
+      const inbox = mockMessages
+        .filter((m) => m.receiverId === mockUser.userId)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      return paginate(inbox, page, size);
+    },
+
+    getSentMessages: async (
+      page = 0,
+      size = 20
+    ): Promise<PageResponse<MessageListItem>> => {
+      await delay(200);
+      const sent = mockMessages
+        .filter((m) => m.senderId === mockUser.userId)
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      return paginate(sent, page, size);
+    },
+
+    getMessageDetail: async (id: number): Promise<MessageDetail> => {
+      await delay(200);
+      const found = mockMessages.find((m) => m.messageId === id);
+      if (!found) {
+        throw new Error("쪽지를 찾을 수 없습니다.");
+      }
+
+      return {
+        messageId: found.messageId,
+        senderId: found.senderId ?? mockUser.userId ?? 1,
+        senderNickname: found.senderNickname ?? mockUser.nickname,
+        receiverId: found.receiverId ?? mockUser.userId ?? 1,
+        receiverNickname: found.receiverNickname ?? mockUser.nickname,
+        content: found.content,
+        read: found.read,
+        createdAt: found.createdAt,
+      };
+    },
+
+    deleteMessage: async (id: number): Promise<void> => {
+      await delay(150);
+      const index = mockMessages.findIndex((m) => m.messageId === id);
+      if (index !== -1) {
+        mockMessages.splice(index, 1);
+      }
+    },
+
+    searchUsers: async (
+      keyword: string,
+      page = 0,
+      size = 20
+    ): Promise<PageResponse<MessageUserSearchItem>> => {
+      await delay(200);
+      const normalized = keyword.trim().toLowerCase();
+      if (!normalized) {
+        return paginate([], page, size);
+      }
+
+      const allCandidates: MessageUserSearchItem[] = [
+        {
+          userId: mockUser.userId ?? 1,
+          nickname: mockUser.nickname,
+          email: mockUser.email,
+          githubUsername: mockUser.githubUsername,
+        },
+        ...mockMessageUsers,
+      ];
+
+      const filtered = allCandidates.filter((u) => {
+        // 자기 자신 제외 (백엔드와 동일)
+        if (u.userId === mockUser.userId) return false;
+        const target = `${u.nickname ?? ""} ${u.email ?? ""} ${
+          u.githubUsername ?? ""
+        }`.toLowerCase();
+        return target.includes(normalized);
+      });
+
+      return paginate(filtered, page, size);
+    },
+
+    getUnreadMessageCount: async (): Promise<UnreadMessageCountResponse> => {
+      await delay(150);
+      const count = mockMessages.filter(
+        (m) => m.receiverId === mockUser.userId && !m.read
+      ).length;
+      return { count };
     },
   },
 };
