@@ -13,6 +13,7 @@ import { ProjectCreatePage } from "@/pages/projects/ProjectCreatePage";
 import { ProjectDetailPage } from "@/pages/projects/ProjectDetailPage";
 import { MessagesPage } from "@/pages/MessagesPage";
 import { MessageDetailPage } from "@/pages/MessageDetailPage";
+import { MessageComposePage } from "@/pages/MessageComposePage";
 
 export const router = createBrowserRouter([
   {
@@ -60,6 +61,14 @@ export const router = createBrowserRouter([
             element: (
               <ProtectedRoute>
                 <MessagesPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "new",
+            element: (
+              <ProtectedRoute>
+                <MessageComposePage />
               </ProtectedRoute>
             ),
           },
