@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Mail } from "lucide-react";
+import { Button } from "@/components/common/Button";
 import { getInboxMessages, getSentMessages } from "@/lib/api/message";
 import { MessageListItem } from "@/types/api";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -88,10 +89,32 @@ export function MessagesPage() {
 
   if (error) {
     return (
-      <div className="space-y-4">
-        <h1 className="text-xl font-semibold text-gray-900 md:text-2xl">
-          쪽지함
-        </h1>
+      <div className="space-y-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
+              쪽지
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              chrono. 사용자들과 쪽지를 주고받을 수 있어요.
+            </p>
+          </div>
+          <Button
+            size="md"
+            type="button"
+            className="inline-flex h-10 px-4 text-sm font-medium"
+            onClick={(e) => {
+              e.preventDefault();
+              window.open(
+                "/messages/new",
+                "message-compose",
+                "width=560,height=640,noopener,noreferrer"
+              );
+            }}
+          >
+            쪽지 보내기
+          </Button>
+        </div>
         <ErrorState
           title={error}
           actionLabel="다시 시도"
@@ -102,10 +125,30 @@ export function MessagesPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-gray-900 md:text-2xl">
-        쪽지함
-      </h1>
+    <div className="space-y-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">쪽지</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            chrono. 사용자들과 쪽지를 주고받을 수 있어요.
+          </p>
+        </div>
+        <Button
+          size="md"
+          type="button"
+          className="inline-flex h-10 px-4 text-sm font-medium"
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(
+              "/messages/new",
+              "message-compose",
+              "width=560,height=640,noopener,noreferrer"
+            );
+          }}
+        >
+          쪽지 보내기
+        </Button>
+      </div>
 
       <div
         className="flex gap-1 rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
