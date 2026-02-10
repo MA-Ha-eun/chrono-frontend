@@ -2,10 +2,10 @@
 
 **Chrono – API 명세서**
 
-버전: v1.2
+버전: v1.3
 
 작성일: 2025-12-02  
-수정일: 2025-12-29
+수정일: 2026-02-11
 
 기반 문서: PRD.md, FRS.md
 
@@ -56,6 +56,7 @@
 ```
 
 **프론트엔드 처리:**
+
 - `response.data.data`로 실제 데이터 접근 필요
 - 또는 axios interceptor에서 자동 처리 가능
 
@@ -535,6 +536,7 @@ Query Parameter: `username` (String)
 ### Response 200
 
 **성공 시:**
+
 ```json
 {
   "success": true,
@@ -549,6 +551,7 @@ Query Parameter: `username` (String)
 ```
 
 **실패 시:**
+
 ```json
 {
   "success": true,
@@ -596,7 +599,8 @@ Query Parameter: `username` (String)
 }
 ```
 
-**비고:** 
+**비고:**
+
 - Public repository만 접근 가능
 - MVP에서는 기본 방식으로 사용
 
@@ -632,6 +636,7 @@ Query Parameter: `username` (String)
 ```
 
 **비고:**
+
 - PAT는 암호화되어 저장됨
 - Private repository 접근 가능
 - 향후 버전에서 기본 연동 후 PAT 입력 옵션 제공 예정
@@ -711,11 +716,13 @@ Query Parameter: `username` (String)
 ```
 
 **필수 필드:**
+
 - `owner`: GitHub username
 - `repoName`: Repository 이름
 - `repoUrl`: Repository URL
 
 **선택 필드:**
+
 - `title`, `description`, `techStack`, `startDate`, `targetDate`
 
 ### Response 200
@@ -810,7 +817,8 @@ Query Parameter: `username` (String)
 }
 ```
 
-**비고:** 
+**비고:**
+
 - `active: false` → 프로젝트 비활성화 (소프트 삭제)
 - `active: true` → 프로젝트 활성화 (복구)
 - 비활성화된 프로젝트는 목록 조회에서 제외됨
@@ -881,6 +889,7 @@ Query Parameter: `username` (String)
 ```
 
 **비고:**
+
 - `active: false`인 프로젝트는 목록에 포함되지 않음
 - `techStack`은 문자열 배열
 - `title`, `startDate`, `targetDate`는 null 가능 (메타데이터 미입력 시)
@@ -920,6 +929,7 @@ Query Parameter: `username` (String)
 ```
 
 **비고:**
+
 - `active: false`인 프로젝트는 조회 불가 (404 에러)
 - `techStack`은 문자열 배열
 - `totalCommit` (단수형) 주의
@@ -1153,12 +1163,12 @@ status ∈ {
 
 # 11. GitHub API 호출 정책
 
-| 내용               | 방식                                        |
-| ------------------ | ------------------------------------------- |
-| 커밋 수집          | 프로젝트 생성 시 동기 호출                  |
-| Repo 리스트        | GitHub username 기반                        |
-| Rate Limit 발생 시 | 캐시된 데이터 유지                          |
-| Private Repo       | PAT 기반 접근 지원                          |
+| 내용               | 방식                       |
+| ------------------ | -------------------------- |
+| 커밋 수집          | 프로젝트 생성 시 동기 호출 |
+| Repo 리스트        | GitHub username 기반       |
+| Rate Limit 발생 시 | 캐시된 데이터 유지         |
+| Private Repo       | PAT 기반 접근 지원         |
 
 ---
 
@@ -1171,6 +1181,168 @@ status ∈ {
 5. **날짜 형식**: `LocalDate`는 `"YYYY-MM-DD"`, `LocalDateTime`은 ISO 8601 형식
 6. **비밀번호 변경**: `PUT`이 아닌 `PATCH /api/users/me/password` 사용
 7. **회원 탈퇴**: `DELETE /api/users/me`가 아닌 `DELETE /api/auth` 사용
+
+---
+
+# 13. 쪽지(Message) API
+
+## ✔ 13.1 쪽지 전송
+
+- **URL**: `POST /api/v1/messages`
+- **인증**: 필요
+
+### Request
+
+```json
+{
+  "receiverId": 1,
+  "content": "쪽지 테스트"
+}
+```
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": null
+}
+```
+
+---
+
+## ✔ 13.2 받은 쪽지 목록 조회
+
+- **URL**: `GET /api/v1/messages/inbox`
+- **인증**: 필요
+- **비고**: 페이지네이션(기본 20개) 적용
+
+### Response 200 (예시)
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "content": [
+      {
+        "messageId": 1,
+        "senderId": 4,
+        "senderNickname": "상어어어",
+        "receiverId": 3,
+        "receiverNickname": "고래",
+        "content": "쪽지 테스트",
+        "read": true,
+        "createdAt": "2026-01-31T14:40:01.278762"
+      }
+    ],
+    "totalElements": 1,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+## ✔ 13.3 보낸 쪽지 목록 조회
+
+- **URL**: `GET /api/v1/messages/sent`
+- **인증**: 필요
+- **비고**: 응답 구조는 받은 쪽지와 동일 (보낸 사람/받는 사람 필드만 다름)
+
+---
+
+## ✔ 13.4 쪽지 상세 조회
+
+- **URL**: `GET /api/v1/messages/{messageId}`
+- **인증**: 필요
+
+### Response 200 (예시)
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "messageId": 1,
+    "senderId": 4,
+    "senderNickname": "상어어어",
+    "receiverId": 3,
+    "receiverNickname": "고래",
+    "content": "쪽지 테스트",
+    "read": true,
+    "createdAt": "2026-01-31T14:40:01.278762"
+  }
+}
+```
+
+---
+
+## ✔ 13.5 쪽지 삭제
+
+- **URL**: `DELETE /api/v1/messages/{messageId}`
+- **인증**: 필요
+- **비고**: 쪽지를 보낸 사람/받은 사람만 삭제 가능, 이미 삭제한 쪽지는 조회 불가
+
+---
+
+## ✔ 13.6 사용자 검색 (쪽지 수신 대상)
+
+- **URL**: `GET /api/v1/messages/users/search`
+- **인증**: 필요
+
+### Query Parameters
+
+- `keyword` (String, 필수): 검색 키워드 (닉네임 기준)
+- `page` (Integer, 선택): 페이지 번호
+- `size` (Integer, 선택): 페이지 크기
+
+### Response 200 (예시)
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "content": [
+      {
+        "userId": 3,
+        "nickname": "고래"
+      }
+    ],
+    "totalElements": 1,
+    "totalPages": 1
+  }
+}
+```
+
+---
+
+## ✔ 13.7 읽지 않은 쪽지 수 조회
+
+- **URL**: `GET /api/v1/messages/unread-count`
+- **인증**: 필요
+
+### Response 200 (예시)
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": {
+    "count": 3
+  }
+}
+```
+
+---
+
+## ✔ 13.8 SSE 구독 (실시간 알림)
+
+- **URL**: `GET /api/v1/messages/subscribe`
+- **인증**: 필요
+- **설명**: Server-Sent Events(SSE)를 이용해 **새 쪽지 도착 시 실시간 알림**을 받기 위한 연결 엔드포인트
 
 ---
 
