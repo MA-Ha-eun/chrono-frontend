@@ -1,7 +1,7 @@
-import { createBrowserRouter, Navigate } from "react-router-dom";
+import { createBrowserRouter } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
-import { useAuthStore } from "@/stores/authStore";
+import { RootRedirect } from "@/components/RootRedirect";
 import { LoginPage } from "@/pages/auth/LoginPage";
 import { SignupPage } from "@/pages/auth/SignupPage";
 import { ForgotPasswordPage } from "@/pages/auth/ForgotPasswordPage";
@@ -11,16 +11,8 @@ import { SettingsPage } from "@/pages/SettingsPage";
 import { ProjectListPage } from "@/pages/projects/ProjectListPage";
 import { ProjectCreatePage } from "@/pages/projects/ProjectCreatePage";
 import { ProjectDetailPage } from "@/pages/projects/ProjectDetailPage";
-
-function RootRedirect() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return <Navigate to="/landing" replace />;
-}
+import { MessagesPage } from "@/pages/MessagesPage";
+import { MessageDetailPage } from "@/pages/MessageDetailPage";
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +51,27 @@ export const router = createBrowserRouter([
             <SettingsPage />
           </ProtectedRoute>
         ),
+      },
+      {
+        path: "messages",
+        children: [
+          {
+            index: true,
+            element: (
+              <ProtectedRoute>
+                <MessagesPage />
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: ":id",
+            element: (
+              <ProtectedRoute>
+                <MessageDetailPage />
+              </ProtectedRoute>
+            ),
+          },
+        ],
       },
       {
         path: "projects",
