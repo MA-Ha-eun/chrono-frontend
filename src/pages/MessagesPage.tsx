@@ -219,6 +219,7 @@ function MessageRow({ item, tab }: { item: MessageListItem; tab: Tab }) {
     tab === "inbox"
       ? (item.senderNickname ?? "알 수 없음")
       : (item.receiverNickname ?? "알 수 없음");
+  const roleLabel = tab === "inbox" ? "from" : "to";
   const preview =
     item.content.length > 60 ? `${item.content.slice(0, 60)}…` : item.content;
 
@@ -231,18 +232,20 @@ function MessageRow({ item, tab }: { item: MessageListItem; tab: Tab }) {
           !item.read && tab === "inbox" && "border-primary/20 bg-primary-50/50"
         )}
       >
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
-              <span className="font-medium text-gray-900">{name}</span>
+              <span className="text-xs text-gray-500">{roleLabel}</span>
+              <span className="truncate font-medium text-gray-900">{name}</span>
               {tab === "inbox" && !item.read && (
                 <span className="bg-primary rounded px-1.5 py-0.5 text-[10px] font-medium text-white">
                   새 쪽지
                 </span>
               )}
             </div>
-            <p className="mt-1 truncate text-sm text-gray-600">{preview}</p>
+            <p className="mt-1 text-sm break-words text-gray-600">{preview}</p>
           </div>
+
           <span className="shrink-0 text-xs text-gray-500 sm:pt-0.5">
             {formatDate(item.createdAt)}
           </span>

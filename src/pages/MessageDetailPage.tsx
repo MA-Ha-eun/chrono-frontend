@@ -116,7 +116,21 @@ export function MessageDetailPage() {
       <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm text-gray-500">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+                쪽지
+              </span>
+              <span
+                className={
+                  message.read
+                    ? "rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600"
+                    : "text-primary bg-primary-50 rounded-full px-2 py-0.5 text-[11px] font-medium"
+                }
+              >
+                {message.read ? "읽음" : "읽지 않음"}
+              </span>
+            </div>
+            <p className="mt-2 text-sm text-gray-500">
               보낸 사람:{" "}
               <span className="font-medium text-gray-900">
                 {message.senderNickname}
@@ -130,7 +144,6 @@ export function MessageDetailPage() {
             </p>
             <p className="mt-1 text-xs text-gray-400">
               {formatDateTime(message.createdAt)}
-              {message.read && <span className="ml-2">· 읽음</span>}
             </p>
           </div>
           <Button
@@ -144,8 +157,10 @@ export function MessageDetailPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="min-h-40 text-sm whitespace-pre-wrap text-gray-800 sm:text-base">
-            {message.content}
+          <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-4 sm:p-5">
+            <div className="min-h-32 text-sm whitespace-pre-wrap text-gray-800 sm:text-base">
+              {message.content}
+            </div>
           </div>
         </CardContent>
       </Card>
