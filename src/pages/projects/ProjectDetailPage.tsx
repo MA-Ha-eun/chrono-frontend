@@ -45,6 +45,7 @@ import { ErrorState } from "@/components/common/ErrorState";
 import { CommitHistoryChart } from "@/components/projects/CommitHistoryChart";
 import { InfoCard } from "@/components/common/InfoCard";
 import { CommitStatsBadges } from "@/components/projects/CommitStatsBadges";
+import { cn } from "@/lib/utils";
 
 export function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -374,8 +375,8 @@ export function ProjectDetailPage() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div>
             <SkeletonCard>
               <div className="space-y-4">
                 <Skeleton width="w-64" height="h-8" rounded="md" />
@@ -426,13 +427,15 @@ export function ProjectDetailPage() {
             </h1>
             <div className="relative">
               <button
+                type="button"
                 onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                 disabled={isUpdatingStatus}
-                className={`focus:ring-primary inline-flex cursor-pointer items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
+                className={cn(
+                  "focus:ring-primary inline-flex cursor-pointer items-center gap-1.5 rounded-full px-2.5 py-1.5 text-xs font-medium transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
                   project.status === ProjectStatus.COMPLETED
                     ? "bg-accent-50 text-accent"
                     : "bg-primary-50 text-primary"
-                }`}
+                )}
               >
                 <span>{getStatusLabel(project.status)}</span>
                 <ChevronDown
@@ -447,44 +450,36 @@ export function ProjectDetailPage() {
                   />
                   <div className="absolute top-full left-0 z-20 mt-2 min-w-[120px] rounded-lg border border-gray-200 bg-white shadow-lg">
                     <button
+                      type="button"
                       onClick={() => {
                         if (project.status !== ProjectStatus.IN_PROGRESS) {
                           handleStatusChange(ProjectStatus.IN_PROGRESS);
                         }
                         setIsStatusDropdownOpen(false);
                       }}
-                      className="w-full cursor-pointer px-3 py-2 text-left text-xs font-medium transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-gray-50"
-                      style={{
-                        backgroundColor:
-                          project.status === ProjectStatus.IN_PROGRESS
-                            ? "rgba(53, 193, 183, 0.1)"
-                            : "transparent",
-                        color:
-                          project.status === ProjectStatus.IN_PROGRESS
-                            ? "#35c1b7"
-                            : "#374151",
-                      }}
+                      className={cn(
+                        "w-full cursor-pointer px-3 py-2 text-left text-xs font-medium transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-gray-50",
+                        project.status === ProjectStatus.IN_PROGRESS
+                          ? "bg-primary-50 text-primary"
+                          : "text-gray-700"
+                      )}
                     >
                       진행 중
                     </button>
                     <button
+                      type="button"
                       onClick={() => {
                         if (project.status !== ProjectStatus.COMPLETED) {
                           handleStatusChange(ProjectStatus.COMPLETED);
                         }
                         setIsStatusDropdownOpen(false);
                       }}
-                      className="w-full cursor-pointer px-3 py-2 text-left text-xs font-medium transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-gray-50"
-                      style={{
-                        backgroundColor:
-                          project.status === ProjectStatus.COMPLETED
-                            ? "rgba(16, 185, 129, 0.1)"
-                            : "transparent",
-                        color:
-                          project.status === ProjectStatus.COMPLETED
-                            ? "#10b981"
-                            : "#374151",
-                      }}
+                      className={cn(
+                        "w-full cursor-pointer px-3 py-2 text-left text-xs font-medium transition-colors first:rounded-t-lg last:rounded-b-lg hover:bg-gray-50",
+                        project.status === ProjectStatus.COMPLETED
+                          ? "bg-accent-50 text-accent"
+                          : "text-gray-700"
+                      )}
                     >
                       완료
                     </button>
