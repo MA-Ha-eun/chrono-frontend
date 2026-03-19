@@ -1,20 +1,20 @@
 import { useState, useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 import { getMessageDetail, deleteMessage } from "@/lib/api/message";
 import { MessageDetail as MessageDetailType } from "@/types/api";
-import { Card, CardHeader, CardContent } from "@/components/common/Card";
-import { Button } from "@/components/common/Button";
 import { ErrorState } from "@/components/common/ErrorState";
 import { isApiError } from "@/lib/api/client";
+import { Badge } from "@/components/common/Badge";
 
-function formatDateTime(s: string) {
+function formatDateTimeFull(s: string) {
   return new Date(s).toLocaleString("ko-KR", {
     year: "numeric",
     month: "long",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
   });
 }
 
@@ -69,34 +69,52 @@ export function MessageDetailPage() {
     }
   };
 
+  const listRow = (
+    <div className="flex items-center justify-between gap-4">
+      <button
+        type="button"
+        onClick={() => navigate("/messages")}
+        className="hover:text-primary flex min-w-0 cursor-pointer items-center gap-1.5 text-sm text-gray-500 transition-colors"
+      >
+        <ChevronLeft className="h-4 w-4 shrink-0" />
+        <span>목록으로</span>
+      </button>
+      <div className="flex shrink-0 justify-end">
+        {message && !error ? (
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={deleting}
+            className="hover:text-accent cursor-pointer text-sm text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {deleting ? "삭제 중…" : "삭제"}
+          </button>
+        ) : (
+          <span className="invisible inline-block text-sm" aria-hidden>
+            삭제
+          </span>
+        )}
+      </div>
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="space-y-4">
-        <Link
-          to="/messages"
-          className="hover:text-primary inline-flex items-center gap-1 text-sm font-medium text-gray-600 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          쪽지함으로
-        </Link>
-        <div className="h-64 animate-pulse rounded-xl border border-gray-200 bg-white" />
+      <div className="space-y-6">
+        {listRow}
+        <div className="h-64 animate-pulse rounded-xl bg-white shadow-sm" />
       </div>
     );
   }
 
   if (error || !message) {
     return (
-      <div className="space-y-4">
-        <Link
-          to="/messages"
-          className="hover:text-primary inline-flex items-center gap-1 text-sm font-medium text-gray-600 transition-colors"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          쪽지함으로
-        </Link>
+      <div className="space-y-6">
+        {listRow}
         <ErrorState
           title={error ?? "쪽지를 찾을 수 없습니다."}
-          actionLabel="쪽지함으로"
+          description="쪽지가 삭제되었거나 접근 권한이 없습니다."
+          actionLabel="목록으로"
           actionLink="/messages"
         />
       </div>
@@ -104,66 +122,52 @@ export function MessageDetailPage() {
   }
 
   return (
-    <div className="space-y-4">
-      <Link
-        to="/messages"
-        className="hover:text-primary inline-flex items-center gap-1 text-sm font-medium text-gray-600 transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        쪽지함으로
-      </Link>
+    <div className="space-y-6">
+      {listRow}
 
-      <Card>
-        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
-                쪽지
-              </span>
-              <span
-                className={
-                  message.read
-                    ? "rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600"
-                    : "text-primary bg-primary-50 rounded-full px-2 py-0.5 text-[11px] font-medium"
-                }
-              >
-                {message.read ? "읽음" : "읽지 않음"}
-              </span>
-            </div>
-            <p className="mt-2 text-sm text-gray-500">
-              보낸 사람:{" "}
-              <span className="font-medium text-gray-900">
-                {message.senderNickname}
-              </span>
-            </p>
-            <p className="text-sm text-gray-500">
-              받는 사람:{" "}
-              <span className="font-medium text-gray-900">
-                {message.receiverNickname}
-              </span>
-            </p>
-            <p className="mt-1 text-xs text-gray-400">
-              {formatDateTime(message.createdAt)}
-            </p>
+      <div className="rounded-xl bg-white p-6 shadow-sm">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <time className="text-xs text-gray-500" dateTime={message.createdAt}>
+            {formatDateTimeFull(message.createdAt)}
+          </time>
+          {!message.read ? (
+            <Badge
+              variant="accent"
+              className="min-h-7 justify-center leading-none uppercase"
+            >
+              NEW
+            </Badge>
+          ) : (
+            <Badge
+              variant="accent"
+              className="min-h-7 justify-center border-0 bg-zinc-50 leading-none text-gray-900"
+            >
+              읽음
+            </Badge>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <span className="text-sm text-gray-500">보낸 사람</span>
+            <span className="text-sm font-semibold text-gray-950">
+              {message.senderNickname}
+            </span>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleDelete}
-            disabled={deleting}
-            className="mt-1 w-full shrink-0 sm:mt-0 sm:w-auto"
-          >
-            {deleting ? "삭제 중…" : "삭제"}
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <div className="rounded-xl border border-gray-100 bg-gray-50/60 p-4 sm:p-5">
-            <div className="min-h-32 text-sm whitespace-pre-wrap text-gray-800 sm:text-base">
-              {message.content}
-            </div>
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <span className="text-sm text-gray-500">받는 사람</span>
+            <span className="text-sm font-semibold text-gray-950">
+              {message.receiverNickname}
+            </span>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+
+        <div className="mt-5 rounded-lg bg-zinc-50 p-5">
+          <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-800">
+            {message.content}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
