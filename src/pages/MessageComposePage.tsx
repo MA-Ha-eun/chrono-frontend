@@ -114,9 +114,9 @@ export function MessageComposePage() {
     keyword.trim().length > 0 && searchResults.length > 0 && !selectedUser;
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
+    <div className="flex min-h-[calc(100vh-8rem)] items-start justify-center py-4 sm:items-center sm:py-0">
       <div className="w-full max-w-3xl">
-        <Card className="border-0 p-6 shadow-sm sm:p-8">
+        <Card className="border-0 p-4 shadow-sm sm:p-6 md:p-8">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
               쪽지 보내기
@@ -124,7 +124,7 @@ export function MessageComposePage() {
           </div>
           <div className="space-y-4">
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
                 <label className="block text-sm font-medium text-gray-700">
                   받는 사람
                   <span className="text-primary ml-1">*</span>
@@ -172,7 +172,7 @@ export function MessageComposePage() {
                 )}
 
                 {showResultsDropdown && (
-                  <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+                  <div className="absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
                     {searchResults.map((user) => (
                       <button
                         key={user.userId}
@@ -237,7 +237,7 @@ export function MessageComposePage() {
               </p>
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 pt-1 sm:flex-row">
+            <div className="mt-6 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:border-t-0 sm:pt-1">
               <Button
                 type="button"
                 variant="outline"

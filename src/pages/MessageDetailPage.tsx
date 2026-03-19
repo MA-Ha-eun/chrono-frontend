@@ -114,7 +114,7 @@ export function MessageDetailPage() {
       </Link>
 
       <Card>
-        <CardHeader className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm text-gray-500">
               보낸 사람:{" "}
@@ -138,13 +138,13 @@ export function MessageDetailPage() {
             size="sm"
             onClick={handleDelete}
             disabled={deleting}
-            className="mt-2 shrink-0 sm:mt-0"
+            className="mt-1 w-full shrink-0 sm:mt-0 sm:w-auto"
           >
             {deleting ? "삭제 중…" : "삭제"}
           </Button>
         </CardHeader>
         <CardContent>
-          <div className="whitespace-pre-wrap text-gray-800">
+          <div className="min-h-40 text-sm whitespace-pre-wrap text-gray-800 sm:text-base">
             {message.content}
           </div>
         </CardContent>

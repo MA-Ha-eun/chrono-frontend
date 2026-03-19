@@ -136,7 +136,7 @@ export function MessagesPage() {
         <Button
           size="md"
           type="button"
-          className="inline-flex h-10 px-4 text-sm font-medium"
+          className="inline-flex h-10 w-full px-4 text-sm font-medium sm:w-auto"
           onClick={(e) => {
             e.preventDefault();
             window.open(
@@ -151,7 +151,7 @@ export function MessagesPage() {
       </div>
 
       <div
-        className="flex gap-1 rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
+        className="flex gap-1 overflow-x-auto rounded-lg border border-gray-200 bg-white p-1 shadow-sm"
         role="tablist"
       >
         <button
@@ -231,7 +231,7 @@ function MessageRow({ item, tab }: { item: MessageListItem; tab: Tab }) {
           !item.read && tab === "inbox" && "border-primary/20 bg-primary-50/50"
         )}
       >
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <span className="font-medium text-gray-900">{name}</span>
@@ -243,7 +243,7 @@ function MessageRow({ item, tab }: { item: MessageListItem; tab: Tab }) {
             </div>
             <p className="mt-1 truncate text-sm text-gray-600">{preview}</p>
           </div>
-          <span className="shrink-0 text-xs text-gray-500">
+          <span className="shrink-0 text-xs text-gray-500 sm:pt-0.5">
             {formatDate(item.createdAt)}
           </span>
         </div>
