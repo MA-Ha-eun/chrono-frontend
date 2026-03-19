@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/common/Button";
@@ -15,20 +15,51 @@ export function Navbar() {
     location.pathname === "/" || location.pathname === "/landing";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+
+  const refreshUnreadCount = useCallback(async () => {
+    try {
+      const res = await getUnreadMessageCount();
+      setUnreadCount(res.count);
+    } catch {
+      setUnreadCount(0);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
       setUnreadCount(0);
       return;
     }
-    let mounted = true;
-    getUnreadMessageCount()
-      .then((res) => mounted && setUnreadCount(res.count))
-      .catch(() => mounted && setUnreadCount(0));
-    return () => {
-      mounted = false;
+    void refreshUnreadCount();
+  }, [isAuthenticated, location.pathname, refreshUnreadCount]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
+    const eventSource = new EventSource(
+      `${API_BASE_URL}/v1/messages/subscribe`,
+      {
+        withCredentials: true,
+      }
+    );
+
+    eventSource.onmessage = () => {
+      void refreshUnreadCount();
     };
-  }, [isAuthenticated, location.pathname]);
+
+    eventSource.onerror = () => {
+      // 연결 실패 시에도 기존 라우트 기반 unread 갱신 유지
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [API_BASE_URL, isAuthenticated, refreshUnreadCount]);
 
   const isActive = (path: string) => {
     return location.pathname.startsWith(path);
