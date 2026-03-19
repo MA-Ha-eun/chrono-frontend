@@ -253,9 +253,7 @@ export const mockApi = {
         throw new Error("쪽지를 찾을 수 없습니다.");
       }
 
-      if (found.receiverId === mockUser.userId && !found.read) {
-        found.read = true;
-      }
+      // 실제 api는 수신자 조회 시 읽음 처리되지만 mock에선 목록/상세에서 NEW 표시 맞추기 위해 변이 안 함 (테스트용)
 
       return {
         messageId: found.messageId,
