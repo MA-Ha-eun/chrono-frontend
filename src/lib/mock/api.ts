@@ -253,6 +253,10 @@ export const mockApi = {
         throw new Error("쪽지를 찾을 수 없습니다.");
       }
 
+      if (found.receiverId === mockUser.userId && !found.read) {
+        found.read = true;
+      }
+
       return {
         messageId: found.messageId,
         senderId: found.senderId ?? mockUser.userId ?? 1,
