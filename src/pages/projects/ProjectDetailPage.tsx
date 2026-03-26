@@ -12,6 +12,8 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronDown,
+  X,
+  Copy,
 } from "lucide-react";
 import {
   getProject,
@@ -23,6 +25,7 @@ import {
   syncCommits,
   getCommitSummary,
   getCommitHistory,
+  getProjectIntro,
 } from "@/lib/api/commit";
 import { isApiError } from "@/lib/api/client";
 import {
@@ -64,6 +67,12 @@ export function ProjectDetailPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
+  const [isGeneratingIntro, setIsGeneratingIntro] = useState(false);
+  const [projectIntro, setProjectIntro] = useState<string>("");
+  const [projectIntroError, setProjectIntroError] = useState<string | null>(
+    null
+  );
 
   const loadProject = useCallback(async () => {
     if (!id) return;
@@ -214,6 +223,29 @@ export function ProjectDetailPage() {
       }
     } finally {
       setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleGenerateProjectIntro = async () => {
+    if (!id || isGeneratingIntro) return;
+
+    setIsIntroModalOpen(true);
+    setIsGeneratingIntro(true);
+    setProjectIntroError(null);
+
+    try {
+      const intro = await getProjectIntro(Number(id));
+      setProjectIntro(intro);
+    } catch (err) {
+      if (isApiError(err)) {
+        setProjectIntroError(
+          err.message || "프로젝트 소개 생성에 실패했습니다."
+        );
+      } else {
+        setProjectIntroError("프로젝트 소개 생성 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsGeneratingIntro(false);
     }
   };
 
@@ -496,6 +528,20 @@ export function ProjectDetailPage() {
               프로젝트를 확인하고 관리하세요.
             </p>
           )}
+          <button
+            type="button"
+            onClick={handleGenerateProjectIntro}
+            disabled={isGeneratingIntro}
+            className="text-primary hover:text-primary-dark mt-2 inline-flex cursor-pointer items-center gap-2 text-sm text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="bg-primary/70 absolute inline-flex h-full w-full animate-ping rounded-full" />
+              <span className="bg-primary relative inline-flex h-2 w-2 rounded-full" />
+            </span>
+            {isGeneratingIntro
+              ? "프로젝트 소개 생성 중..."
+              : "프로젝트 소개 생성하기 (AI)"}
+          </button>
         </div>
       </div>
 
@@ -755,6 +801,71 @@ export function ProjectDetailPage() {
         project={project}
         onSubmit={handleEditSubmit}
       />
+
+      {isIntroModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+          <div className="w-full max-w-2xl rounded-xl bg-white shadow-sm">
+            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                프로젝트 소개
+              </h3>
+              <button
+                type="button"
+                onClick={() => setIsIntroModalOpen(false)}
+                className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
+                aria-label="닫기"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="px-6 py-5">
+              {isGeneratingIntro ? (
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <span className="border-primary inline-block h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
+                  생성 중입니다...
+                </div>
+              ) : projectIntroError ? (
+                <p className="text-accent-dark text-sm">{projectIntroError}</p>
+              ) : (
+                <div className="max-h-[420px] overflow-y-auto rounded-lg bg-zinc-50 p-4">
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-800">
+                    {projectIntro || "생성된 프로젝트 소개가 없습니다."}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex items-center justify-end gap-4 border-t border-gray-100 px-6 py-4">
+              <button
+                type="button"
+                onClick={handleGenerateProjectIntro}
+                disabled={isGeneratingIntro}
+                className="text-primary hover:text-primary-dark cursor-pointer text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                다시 생성
+              </button>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!projectIntro) return;
+                  try {
+                    await navigator.clipboard.writeText(projectIntro);
+                    showToast("프로젝트 소개가 복사되었습니다.", "success");
+                  } catch {
+                    showToast("복사에 실패했습니다.", "error");
+                  }
+                }}
+                disabled={!projectIntro || isGeneratingIntro}
+                className="text-primary hover:text-primary-dark inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Copy className="h-4 w-4" />
+                복사
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
