@@ -118,3 +118,10 @@ export async function getProjectIntro(projectId: number): Promise<string> {
   );
   return response.data;
 }
+
+export async function getAiSummary(projectId: number): Promise<string> {
+  const response = await apiClient.post<string>(
+    `/projects/${projectId}/commits/ai-summary`
+  );
+  return response.data;
+}
