@@ -112,26 +112,41 @@ export function MessageComposePage() {
 
   const showResultsDropdown =
     keyword.trim().length > 0 && searchResults.length > 0 && !selectedUser;
+  const receiverGuideMessage = selectedUser
+    ? null
+    : isSearching
+      ? "사용자를 검색하고 있습니다"
+      : searchError
+        ? searchError
+        : keyword.trim().length > 0 && searchResults.length === 0
+          ? "검색 결과가 없습니다"
+          : null;
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] items-start justify-center py-4 sm:items-center sm:py-0">
+    <div className="flex min-h-[calc(100vh-8rem)] items-center justify-center">
       <div className="w-full max-w-3xl">
-        <Card className="border-0 p-4 shadow-sm sm:p-6 md:p-8">
+        <Card className="border-0 p-6 shadow-sm sm:p-8">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
               쪽지 보내기
             </h1>
           </div>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <div className="space-y-6">
+            <div className="space-y-1.5">
+              <div className="mb-1.5 flex items-center justify-between">
                 <label className="block text-sm font-medium text-gray-700">
                   받는 사람
-                  <span className="text-primary ml-1">*</span>
                 </label>
-                <p className="text-xs text-gray-500">
-                  닉네임, 이메일 또는 GitHub 아이디로 검색할 수 있어요.
-                </p>
+                {receiverGuideMessage && (
+                  <span
+                    className={cn(
+                      "text-xs",
+                      searchError ? "text-accent-dark" : "text-gray-500"
+                    )}
+                  >
+                    {receiverGuideMessage}
+                  </span>
+                )}
               </div>
 
               <div className="relative">
@@ -141,7 +156,7 @@ export function MessageComposePage() {
                     setSelectedUser(null);
                     setKeyword(e.target.value);
                   }}
-                  placeholder="예: 개발자, developer@example.com, github 아이디 등"
+                  placeholder="닉네임, 이메일 또는 GitHub 아이디로 검색할 수 있어요"
                   className="pl-9"
                 />
                 <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -160,15 +175,6 @@ export function MessageComposePage() {
                   >
                     <X className="h-4 w-4" />
                   </button>
-                )}
-
-                {isSearching && !selectedUser && (
-                  <p className="mt-1 text-xs text-gray-500">
-                    사용자를 검색하는 중입니다…
-                  </p>
-                )}
-                {searchError && !selectedUser && (
-                  <p className="text-accent-dark mt-1 text-xs">{searchError}</p>
                 )}
 
                 {showResultsDropdown && (
@@ -203,6 +209,20 @@ export function MessageComposePage() {
                   </div>
                 )}
               </div>
+
+              {selectedUser && (
+                <div className="rounded-lg bg-zinc-50 px-3 py-2 text-sm">
+                  <span className="text-gray-500">to </span>
+                  <span className="font-medium text-gray-900">
+                    {selectedUser.nickname}
+                  </span>
+                  {selectedUser.email && (
+                    <span className="ml-2 text-xs text-gray-500">
+                      ({selectedUser.email})
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="space-y-1.5">
@@ -211,11 +231,11 @@ export function MessageComposePage() {
                 className="block text-sm font-medium text-gray-700"
               >
                 내용
-                <span className="text-primary ml-1">*</span>
               </label>
               <textarea
                 id="message-content"
                 rows={5}
+                maxLength={1000}
                 className={cn(
                   "flex w-full rounded-lg border px-3 py-2 text-sm text-gray-900 transition-all duration-200 placeholder:text-gray-400 focus:ring-1 focus:outline-none",
                   contentTooLong
@@ -223,7 +243,7 @@ export function MessageComposePage() {
                     : "focus:border-primary focus:ring-primary border-gray-300 bg-white",
                   "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
                 )}
-                placeholder="보낼 내용을 입력해주세요."
+                placeholder="보낼 내용을 입력해주세요"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
@@ -237,7 +257,7 @@ export function MessageComposePage() {
               </p>
             </div>
 
-            <div className="mt-6 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:border-t-0 sm:pt-1">
+            <div className="mt-6 flex flex-col gap-3 pt-1 sm:flex-row">
               <Button
                 type="button"
                 variant="outline"
