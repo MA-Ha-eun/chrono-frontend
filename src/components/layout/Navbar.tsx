@@ -47,12 +47,12 @@ export function Navbar() {
       }
     );
 
-    eventSource.onmessage = () => {
+    eventSource.addEventListener("새로운 메시지", () => {
       void refreshUnreadCount();
-    };
+    });
 
     eventSource.onerror = () => {
-      // 연결 실패 시에도 기존 라우트 기반 unread 갱신 유지
+      // 연결 실패(인증 포함) 시 조용히 닫고 라우트 기반 갱신으로 fallback
       eventSource.close();
     };
 
