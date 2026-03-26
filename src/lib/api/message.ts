@@ -28,7 +28,7 @@ export async function sendMessage(data: SendMessageRequest): Promise<void> {
     const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
-        `쪽지 보내기 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
+        `메시지 보내기 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
         error
       );
     }
@@ -58,7 +58,7 @@ export async function getInboxMessages(
     const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
-        `받은 쪽지 목록 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
+        `받은 메시지 목록 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
         error
       );
     }
@@ -88,7 +88,7 @@ export async function getSentMessages(
     const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
-        `보낸 쪽지 목록 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
+        `보낸 메시지 목록 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
         error
       );
     }
@@ -114,7 +114,7 @@ export async function getMessageDetail(
     const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
-        `쪽지 상세 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
+        `메시지 상세 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
         error
       );
     }
@@ -138,7 +138,7 @@ export async function deleteMessage(messageId: number): Promise<void> {
     const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
-        `쪽지 삭제 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
+        `메시지 삭제 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
         error
       );
     }
@@ -169,7 +169,7 @@ export async function searchMessageUsers(
     const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
-        `쪽지 사용자 검색 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
+        `메시지 사용자 검색 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
         error
       );
     }
@@ -195,7 +195,7 @@ export async function getUnreadMessageCount(): Promise<UnreadMessageCountRespons
     const errorInfo = getErrorInfo(error);
     if (import.meta.env.DEV) {
       console.warn(
-        `안 읽은 쪽지 개수 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
+        `안 읽은 메시지 개수 API 호출 실패, mock 데이터 사용: ${errorInfo}`,
         error
       );
     }

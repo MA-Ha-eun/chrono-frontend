@@ -71,8 +71,8 @@ export function MessagesPage() {
       setInboxData(data);
     } catch (err) {
       if (isApiError(err))
-        setError(err.message ?? "받은 쪽지를 불러오는 데 실패했습니다.");
-      else setError("받은 쪽지를 불러오는 데 실패했습니다.");
+        setError(err.message ?? "받은 메시지를 불러오는 데 실패했습니다.");
+      else setError("받은 메시지를 불러오는 데 실패했습니다.");
     }
   }, []);
 
@@ -82,8 +82,8 @@ export function MessagesPage() {
       setSentData(data);
     } catch (err) {
       if (isApiError(err))
-        setError(err.message ?? "보낸 쪽지를 불러오는 데 실패했습니다.");
-      else setError("보낸 쪽지를 불러오는 데 실패했습니다.");
+        setError(err.message ?? "보낸 메시지를 불러오는 데 실패했습니다.");
+      else setError("보낸 메시지를 불러오는 데 실패했습니다.");
     }
   }, []);
 
@@ -144,10 +144,10 @@ export function MessagesPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-              쪽지
+              메시지
             </h1>
             <p className="mt-1 text-sm text-gray-500">
-              chrono. 사용자들과 쪽지를 주고받을 수 있어요.
+              chrono. 사용자들과 메시지를 주고받을 수 있어요.
             </p>
           </div>
           <Button
@@ -159,7 +159,7 @@ export function MessagesPage() {
               openCompose();
             }}
           >
-            쪽지 보내기
+            메시지 보내기
           </Button>
         </div>
         <ErrorState
@@ -183,9 +183,9 @@ export function MessagesPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">쪽지</h1>
+          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">메시지</h1>
           <p className="mt-1 text-sm text-gray-500">
-            chrono. 사용자들과 쪽지를 주고받을 수 있어요.
+            chrono. 사용자들과 메시지를 주고받을 수 있어요.
           </p>
         </div>
         <Button
@@ -197,7 +197,7 @@ export function MessagesPage() {
             openCompose();
           }}
         >
-          쪽지 보내기
+          메시지 보내기
         </Button>
       </div>
 
@@ -232,7 +232,7 @@ export function MessagesPage() {
             )}
             onClick={() => setTab("inbox")}
           >
-            받은 쪽지
+            받은 메시지
           </button>
           <button
             type="button"
@@ -246,7 +246,7 @@ export function MessagesPage() {
             )}
             onClick={() => setTab("sent")}
           >
-            보낸 쪽지
+            보낸 메시지
           </button>
         </div>
 
@@ -264,19 +264,19 @@ export function MessagesPage() {
             icon={Mail}
             title={
               tab === "all"
-                ? "쪽지가 없습니다"
+                ? "메시지가 없습니다"
                 : tab === "inbox"
-                  ? "받은 쪽지가 없습니다"
-                  : "보낸 쪽지가 없습니다"
+                  ? "받은 메시지가 없습니다"
+                  : "보낸 메시지가 없습니다"
             }
             description={
               tab === "all"
-                ? "새로운 쪽지가 도착하거나 보내면 이곳에 표시됩니다."
+                ? "새로운 메시지가 도착하거나 보내면 이곳에 표시됩니다."
                 : tab === "inbox"
-                  ? "새로운 쪽지가 도착하면 여기에서 확인할 수 있어요."
+                  ? "새로운 메시지가 도착하면 여기에서 확인할 수 있어요."
                   : "필요한 내용을 팀원에게 먼저 보내보세요."
             }
-            actionLabel="쪽지 보내기"
+            actionLabel="메시지 보내기"
             onAction={() => navigate("/messages/new")}
             className="py-16"
           />

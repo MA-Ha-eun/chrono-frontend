@@ -30,7 +30,7 @@ export function MessageDetailPage() {
 
   useEffect(() => {
     if (!id || Number.isNaN(messageId)) {
-      setError("잘못된 쪽지입니다.");
+      setError("잘못된 메시지입니다.");
       setLoading(false);
       return;
     }
@@ -43,8 +43,8 @@ export function MessageDetailPage() {
       .catch((err) => {
         if (!mounted) return;
         if (isApiError(err))
-          setError(err.message ?? "쪽지를 불러오는 데 실패했습니다.");
-        else setError("쪽지를 불러오는 데 실패했습니다.");
+          setError(err.message ?? "메시지를 불러오는 데 실패했습니다.");
+        else setError("메시지를 불러오는 데 실패했습니다.");
       })
       .finally(() => mounted && setLoading(false));
 
@@ -55,7 +55,7 @@ export function MessageDetailPage() {
 
   const handleDelete = async () => {
     if (Number.isNaN(messageId) || deleting) return;
-    if (!window.confirm("이 쪽지를 삭제하시겠습니까?")) return;
+    if (!window.confirm("이 메시지를 삭제하시겠습니까?")) return;
 
     setDeleting(true);
     try {
@@ -112,8 +112,8 @@ export function MessageDetailPage() {
       <div className="space-y-6">
         {listRow}
         <ErrorState
-          title={error ?? "쪽지를 찾을 수 없습니다."}
-          description="쪽지가 삭제되었거나 접근 권한이 없습니다."
+          title={error ?? "메시지를 찾을 수 없습니다."}
+          description="메시지가 삭제되었거나 접근 권한이 없습니다."
           actionLabel="목록으로"
           actionLink="/messages"
         />

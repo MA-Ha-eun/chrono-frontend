@@ -250,7 +250,7 @@ export const mockApi = {
       await delay(200);
       const found = mockMessages.find((m) => m.messageId === id);
       if (!found) {
-        throw new Error("쪽지를 찾을 수 없습니다.");
+        throw new Error("메시지를 찾을 수 없습니다.");
       }
 
       // 실제 api는 수신자 조회 시 읽음 처리되지만 mock에선 목록/상세에서 NEW 표시 맞추기 위해 변이 안 함 (테스트용)
