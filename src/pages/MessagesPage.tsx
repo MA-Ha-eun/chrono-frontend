@@ -51,6 +51,20 @@ export function MessagesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const openCompose = useCallback(() => {
+    // 모바일에선 팝업 말고 라우팅으로 이동
+    if (window.matchMedia("(max-width: 640px)").matches) {
+      navigate("/messages/new");
+      return;
+    }
+
+    window.open(
+      "/messages/new",
+      "message-compose",
+      "width=560,height=640,noopener,noreferrer"
+    );
+  }, [navigate]);
+
   const loadInbox = useCallback(async () => {
     try {
       const data = await getInboxMessages(0, 20);
@@ -142,11 +156,7 @@ export function MessagesPage() {
             className="bg-primary hover:bg-primary-dark inline-flex h-10 w-full justify-center rounded-lg px-4 text-sm font-medium text-white transition-colors sm:w-auto"
             onClick={(e) => {
               e.preventDefault();
-              window.open(
-                "/messages/new",
-                "message-compose",
-                "width=560,height=640,noopener,noreferrer"
-              );
+              openCompose();
             }}
           >
             쪽지 보내기
@@ -184,11 +194,7 @@ export function MessagesPage() {
           className="bg-primary hover:bg-primary-dark inline-flex h-10 w-full justify-center rounded-lg px-4 text-sm font-medium text-white transition-colors sm:w-auto"
           onClick={(e) => {
             e.preventDefault();
-            window.open(
-              "/messages/new",
-              "message-compose",
-              "width=560,height=640,noopener,noreferrer"
-            );
+            openCompose();
           }}
         >
           쪽지 보내기

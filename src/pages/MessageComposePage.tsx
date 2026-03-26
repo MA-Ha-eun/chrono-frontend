@@ -133,14 +133,14 @@ export function MessageComposePage() {
           </div>
           <div className="space-y-6">
             <div className="space-y-1.5">
-              <div className="mb-1.5 flex items-center justify-between">
+              <div className="mb-1.5 flex items-start justify-between gap-2">
                 <label className="block text-sm font-medium text-gray-700">
                   받는 사람
                 </label>
                 {receiverGuideMessage && (
                   <span
                     className={cn(
-                      "text-xs",
+                      "max-w-[65%] text-right text-xs leading-tight break-words",
                       searchError ? "text-accent-dark" : "text-gray-500"
                     )}
                   >
