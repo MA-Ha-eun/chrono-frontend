@@ -101,20 +101,21 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
+    const isAuthEndpoint =
+      originalRequest?.url?.includes("/auth/login") ||
+      originalRequest?.url?.includes("/auth/signup") ||
+      originalRequest?.url?.includes("/auth/email") ||
+      originalRequest?.url?.includes("/auth/password");
+
     if (
       (error.response?.status === 401 || error.response?.status === 403) &&
       // 401(인증 만료) 또는 403(토큰 만료 시 백엔드가 403 반환하는 경우)
       originalRequest &&
-      !originalRequest._retry
+      !originalRequest._retry &&
+      !isAuthEndpoint
     ) {
       if (originalRequest.url?.includes("/auth/refresh")) {
         useAuthStore.getState().logout();
-        if (
-          window.location.pathname !== "/login" &&
-          window.location.pathname !== "/"
-        ) {
-          window.location.href = "/login";
-        }
         return Promise.reject(
           error.response.data || {
             message: "인증이 만료되었습니다. 다시 로그인해주세요.",
@@ -153,13 +154,6 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         refreshSubscribers = [];
         useAuthStore.getState().logout();
-
-        if (
-          window.location.pathname !== "/login" &&
-          window.location.pathname !== "/"
-        ) {
-          window.location.href = "/login";
-        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
