@@ -97,12 +97,17 @@ export function SignupPage() {
     setIsVerifyingCode(true);
 
     try {
-      await verifyEmailCode({
+      const verified = await verifyEmailCode({
         email: email.trim(),
         code: verificationCode.trim(),
       });
-      setEmailVerified(true);
-      setVerificationCodeMessage("인증이 완료되었습니다.");
+      if (verified) {
+        setEmailVerified(true);
+        setVerificationCodeMessage("인증이 완료되었습니다.");
+      } else {
+        setEmailVerified(false);
+        setVerificationCodeMessage("인증코드가 올바르지 않습니다.");
+      }
     } catch (err) {
       if (isApiError(err)) {
         setVerificationCodeMessage(

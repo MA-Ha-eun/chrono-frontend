@@ -236,3 +236,52 @@ export interface Commit {
   authorEmail: string;
   commitDate: string;
 }
+
+// 쪽지
+export interface MessageListItem {
+  messageId: number;
+  senderId: number | null;
+  senderNickname: string | null;
+  receiverId: number | null;
+  receiverNickname: string | null;
+  content: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface MessageDetail {
+  messageId: number;
+  senderId: number;
+  senderNickname: string;
+  receiverId: number;
+  receiverNickname: string;
+  content: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface SendMessageRequest {
+  receiverId: number;
+  content: string;
+}
+
+export interface UnreadMessageCountResponse {
+  count: number;
+}
+
+export interface MessageUserSearchItem {
+  userId: number;
+  nickname: string;
+  email?: string;
+  githubUsername?: string | null;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+}

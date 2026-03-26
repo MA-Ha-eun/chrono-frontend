@@ -6,6 +6,8 @@ import {
   ProjectListItem,
   ProjectStatus,
   CommitHistoryCount,
+  MessageListItem,
+  MessageUserSearchItem,
 } from "@/types/api";
 
 // 날짜 문자열 생성 (YYYY-MM-DD)
@@ -122,7 +124,8 @@ export const mockProjects: ProjectListItem[] = [
     projectId: 1,
     title: "Chrono - 프로젝트 관리 서비스",
     status: ProjectStatus.IN_PROGRESS,
-    techStack: "React, TypeScript, Tailwind CSS, Zustand, React Router, Axios, Vite",
+    techStack:
+      "React, TypeScript, Tailwind CSS, Zustand, React Router, Axios, Vite",
     lastCommitAt: getDateTimeString(0, 2),
     totalCommits: 247,
     targetDate: getDateString(-6),
@@ -224,10 +227,12 @@ export const mockProjectsDetail: Record<number, Project> = {
   1: {
     projectId: 1,
     title: "Chrono - 프로젝트 관리 서비스",
-    description: "GitHub 커밋을 기반으로 사이드 프로젝트를 관리하는 서비스입니다. 프로젝트 진행 상황을 시각적으로 확인하고, 커밋 통계를 분석하여 생산성을 향상시킬 수 있습니다.",
+    description:
+      "GitHub 커밋을 기반으로 사이드 프로젝트를 관리하는 서비스입니다. 프로젝트 진행 상황을 시각적으로 확인하고, 커밋 통계를 분석하여 생산성을 향상시킬 수 있습니다.",
     startDate: getDateString(55),
     targetDate: getDateString(-6),
-    techStack: "React, TypeScript, Tailwind CSS, Zustand, React Router, Axios, Vite",
+    techStack:
+      "React, TypeScript, Tailwind CSS, Zustand, React Router, Axios, Vite",
     status: ProjectStatus.IN_PROGRESS,
     repoName: "chrono",
     repoOwner: "testuser",
@@ -241,7 +246,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   2: {
     projectId: 2,
     title: "포트폴리오 웹사이트",
-    description: "개인 포트폴리오를 소개하는 웹사이트입니다. Next.js의 SSR과 SSG를 활용하여 빠른 로딩 속도를 구현했으며, 반응형 디자인으로 모든 디바이스에서 최적의 경험을 제공합니다.",
+    description:
+      "개인 포트폴리오를 소개하는 웹사이트입니다. Next.js의 SSR과 SSG를 활용하여 빠른 로딩 속도를 구현했으며, 반응형 디자인으로 모든 디바이스에서 최적의 경험을 제공합니다.",
     startDate: getDateString(40),
     targetDate: getDateString(10),
     techStack: "Next.js, TypeScript, Tailwind CSS, Vercel",
@@ -258,7 +264,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   3: {
     projectId: 3,
     title: "기술 블로그",
-    description: "개발 경험과 학습 내용을 공유하는 기술 블로그입니다. Gatsby의 플러그인 생태계를 활용하여 MDX로 작성된 마크다운을 효율적으로 렌더링하고, GraphQL을 통해 데이터를 관리합니다.",
+    description:
+      "개발 경험과 학습 내용을 공유하는 기술 블로그입니다. Gatsby의 플러그인 생태계를 활용하여 MDX로 작성된 마크다운을 효율적으로 렌더링하고, GraphQL을 통해 데이터를 관리합니다.",
     startDate: getDateString(24),
     targetDate: getDateString(15),
     techStack: "Gatsby, MDX, GraphQL, Netlify",
@@ -275,7 +282,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   4: {
     projectId: 4,
     title: "AI 챗봇 프로젝트",
-    description: "OpenAI API를 활용한 지능형 챗봇 서비스입니다. FastAPI로 RESTful API를 구현하고, PostgreSQL로 대화 히스토리를 저장하며, Docker를 통해 컨테이너화하여 배포합니다.",
+    description:
+      "OpenAI API를 활용한 지능형 챗봇 서비스입니다. FastAPI로 RESTful API를 구현하고, PostgreSQL로 대화 히스토리를 저장하며, Docker를 통해 컨테이너화하여 배포합니다.",
     startDate: getDateString(66),
     targetDate: getDateString(21),
     techStack: "Python, FastAPI, OpenAI, PostgreSQL, Docker",
@@ -292,7 +300,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   5: {
     projectId: 5,
     title: "모바일 앱",
-    description: "React Native로 개발한 크로스 플랫폼 모바일 애플리케이션입니다. Expo를 활용하여 빠른 개발과 배포를 지원하며, Firebase를 통한 실시간 데이터 동기화와 푸시 알림 기능을 제공합니다.",
+    description:
+      "React Native로 개발한 크로스 플랫폼 모바일 애플리케이션입니다. Expo를 활용하여 빠른 개발과 배포를 지원하며, Firebase를 통한 실시간 데이터 동기화와 푸시 알림 기능을 제공합니다.",
     startDate: getDateString(45),
     targetDate: getDateString(-5),
     techStack: "React Native, Expo, TypeScript, Firebase",
@@ -309,7 +318,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   6: {
     projectId: 6,
     title: "E-commerce 플랫폼",
-    description: "풀스택 이커머스 플랫폼입니다. Vue.js로 프론트엔드를 구현하고, Node.js로 백엔드를 구축했습니다. PostgreSQL로 데이터를 관리하며, Redis를 캐싱 레이어로 활용하고, AWS를 통해 인프라를 구성했습니다.",
+    description:
+      "풀스택 이커머스 플랫폼입니다. Vue.js로 프론트엔드를 구현하고, Node.js로 백엔드를 구축했습니다. PostgreSQL로 데이터를 관리하며, Redis를 캐싱 레이어로 활용하고, AWS를 통해 인프라를 구성했습니다.",
     startDate: getDateString(116),
     targetDate: getDateString(30),
     techStack: "Vue.js, Node.js, PostgreSQL, Redis, AWS",
@@ -326,7 +336,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   7: {
     projectId: 7,
     title: "데이터 대시보드",
-    description: "복잡한 데이터를 시각화하는 대시보드 애플리케이션입니다. D3.js로 커스텀 차트를 구현하고, React와 TypeScript로 컴포넌트를 구성하며, GraphQL을 통해 효율적인 데이터 페칭을 수행합니다. Material-UI로 일관된 디자인을 제공합니다.",
+    description:
+      "복잡한 데이터를 시각화하는 대시보드 애플리케이션입니다. D3.js로 커스텀 차트를 구현하고, React와 TypeScript로 컴포넌트를 구성하며, GraphQL을 통해 효율적인 데이터 페칭을 수행합니다. Material-UI로 일관된 디자인을 제공합니다.",
     startDate: getDateString(20),
     targetDate: getDateString(-1),
     techStack: "D3.js, React, GraphQL, TypeScript, Material-UI",
@@ -343,7 +354,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   8: {
     projectId: 8,
     title: "API 게이트웨이",
-    description: "마이크로서비스 아키텍처를 위한 API 게이트웨이입니다. Go 언어로 고성능 게이트웨이를 구현하고, Docker로 컨테이너화하며, Kubernetes로 오케스트레이션합니다. gRPC를 통한 서비스 간 통신을 지원합니다.",
+    description:
+      "마이크로서비스 아키텍처를 위한 API 게이트웨이입니다. Go 언어로 고성능 게이트웨이를 구현하고, Docker로 컨테이너화하며, Kubernetes로 오케스트레이션합니다. gRPC를 통한 서비스 간 통신을 지원합니다.",
     startDate: getDateString(86),
     targetDate: getDateString(30),
     techStack: "Go, Docker, Kubernetes, gRPC",
@@ -360,7 +372,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   9: {
     projectId: 9,
     title: "웹 게임 프로젝트",
-    description: "Phaser 게임 엔진을 활용한 멀티플레이어 웹 게임입니다. TypeScript로 타입 안정성을 확보하고, WebSocket을 통한 실시간 통신을 구현하며, Node.js로 게임 서버를 구축했습니다.",
+    description:
+      "Phaser 게임 엔진을 활용한 멀티플레이어 웹 게임입니다. TypeScript로 타입 안정성을 확보하고, WebSocket을 통한 실시간 통신을 구현하며, Node.js로 게임 서버를 구축했습니다.",
     startDate: getDateString(40),
     targetDate: getDateString(-1),
     techStack: "Phaser, TypeScript, WebSocket, Node.js",
@@ -377,7 +390,8 @@ export const mockProjectsDetail: Record<number, Project> = {
   10: {
     projectId: 10,
     title: "데이터 분석 도구",
-    description: "데이터 과학자를 위한 분석 도구입니다. Python과 Pandas로 데이터 처리를 수행하고, Jupyter Notebook으로 인터랙티브한 분석 환경을 제공합니다. Matplotlib으로 시각화하고, Streamlit으로 웹 인터페이스를 구현했습니다.",
+    description:
+      "데이터 과학자를 위한 분석 도구입니다. Python과 Pandas로 데이터 처리를 수행하고, Jupyter Notebook으로 인터랙티브한 분석 환경을 제공합니다. Matplotlib으로 시각화하고, Streamlit으로 웹 인터페이스를 구현했습니다.",
     startDate: getDateString(76),
     targetDate: getDateString(4),
     techStack: "Python, Pandas, Jupyter, Matplotlib, Streamlit",
@@ -413,24 +427,27 @@ export const mockCommitSummary = {
   mostActiveDay: "금요일",
 };
 
-export const mockCommitHistory: CommitHistoryCount[] = Array.from({ length: 30 }, (_, i) => {
-  const date = new Date();
-  date.setDate(date.getDate() - (29 - i));
-  const dayOfWeek = date.getDay();
-  
-  // 주말은 적게, 주중은 많게
-  let count = 0;
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
-    count = Math.floor(Math.random() * 3) + 1;
-  } else {
-    count = Math.floor(Math.random() * 8) + 3;
+export const mockCommitHistory: CommitHistoryCount[] = Array.from(
+  { length: 30 },
+  (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (29 - i));
+    const dayOfWeek = date.getDay();
+
+    // 주말 적게 주중 많게
+    let count = 0;
+    if (dayOfWeek === 0 || dayOfWeek === 6) {
+      count = Math.floor(Math.random() * 3) + 1;
+    } else {
+      count = Math.floor(Math.random() * 8) + 3;
+    }
+
+    return {
+      date: date.toISOString().split("T")[0],
+      count,
+    };
   }
-  
-  return {
-    date: date.toISOString().split("T")[0],
-    count,
-  };
-});
+);
 
 export const mockDashboard: DashboardResponse = {
   summary: {
@@ -478,3 +495,108 @@ export const mockRecent7DaysCommits = Array.from({ length: 7 }, (_, i) => {
     count,
   };
 });
+
+// 쪽지 mock
+export const mockMessageUsers: MessageUserSearchItem[] = [
+  {
+    userId: 2,
+    nickname: "백수저",
+    email: "backend@example.com",
+    githubUsername: "backenddev",
+  },
+  {
+    userId: 3,
+    nickname: "프론트22",
+    email: "frontend@example.com",
+    githubUsername: "frontenddev",
+  },
+  {
+    userId: 4,
+    nickname: "하진",
+    email: "hj123@example.com",
+    githubUsername: "hjdevv",
+  },
+];
+
+export const mockMessages: MessageListItem[] = [
+  {
+    messageId: 1,
+    senderId: 2,
+    senderNickname: "백수저",
+    receiverId: mockUser.userId!,
+    receiverNickname: mockUser.nickname,
+    content: "오늘 배포 오후 3시에 합니다. 참고 부탁드립니다.",
+    read: true,
+    createdAt: getDateTimeString(1, 3),
+  },
+  {
+    messageId: 2,
+    senderId: mockUser.userId!,
+    senderNickname: mockUser.nickname,
+    receiverId: 2,
+    receiverNickname: "백수저",
+    content: "넵 확인했습니다!",
+    read: true,
+    createdAt: getDateTimeString(1, 2),
+  },
+  {
+    messageId: 3,
+    senderId: 2,
+    senderNickname: "백수저",
+    receiverId: mockUser.userId!,
+    receiverNickname: mockUser.nickname,
+    content: "참고 문서 링크 공유할게요.",
+    read: false,
+    createdAt: getDateTimeString(0, 2),
+  },
+  {
+    messageId: 4,
+    senderId: mockUser.userId!,
+    senderNickname: mockUser.nickname,
+    receiverId: 3,
+    receiverNickname: "프론트22",
+    content: "상세 페이지 반응형 이슈 내일 같이 볼 수 있을까요?",
+    read: true,
+    createdAt: getDateTimeString(2, 5),
+  },
+  {
+    messageId: 5,
+    senderId: 3,
+    senderNickname: "프론트22",
+    receiverId: mockUser.userId!,
+    receiverNickname: mockUser.nickname,
+    content: "내일 오후 2시 전이면 가능해요.",
+    read: true,
+    createdAt: getDateTimeString(1, 4),
+  },
+  {
+    messageId: 6,
+    senderId: mockUser.userId!,
+    senderNickname: mockUser.nickname,
+    receiverId: 3,
+    receiverNickname: "프론트22",
+    content: "그럼 1시에 확인할까요?",
+    read: true,
+    createdAt: getDateTimeString(1, 2),
+  },
+  {
+    messageId: 7,
+    senderId: 4,
+    senderNickname: "하진",
+    receiverId: mockUser.userId!,
+    receiverNickname: mockUser.nickname,
+    content: "크로노 프로젝트는 계속 작업 중이신 건가요?",
+    read: false,
+    createdAt: getDateTimeString(0, 1),
+  },
+  {
+    messageId: 8,
+    senderId: mockUser.userId!,
+    senderNickname: mockUser.nickname,
+    receiverId: 4,
+    receiverNickname: "하진",
+    content: "네네 랭킹 기능 추가해서 계속 버전 업데이트 하려고요",
+    read: true,
+    createdAt: getDateTimeString(0, 0),
+  },
+];
