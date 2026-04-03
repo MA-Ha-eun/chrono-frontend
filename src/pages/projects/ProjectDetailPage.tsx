@@ -12,8 +12,6 @@ import {
   RefreshCw,
   ChevronLeft,
   ChevronDown,
-  X,
-  Copy,
 } from "lucide-react";
 import {
   getProject,
@@ -38,6 +36,7 @@ import {
 import { Badge } from "@/components/common/Badge";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
 import { ProjectEditModal } from "@/components/projects/ProjectEditModal";
+import { GeneratedTextModal } from "@/components/projects/GeneratedTextModal";
 import { useToastStore } from "@/stores/toastStore";
 import {
   SkeletonCard,
@@ -567,7 +566,7 @@ export function ProjectDetailPage() {
               </span>
               {isGeneratingIntro
                 ? "프로젝트 소개 생성 중..."
-                : "프로젝트 소개 생성하기"}
+                : "프로젝트 소개 생성하기 (AI)"}
             </button>
 
             <button
@@ -582,7 +581,7 @@ export function ProjectDetailPage() {
               </span>
               {isGeneratingSummary
                 ? "커밋 활동 요약 생성 중..."
-                : "커밋 활동 요약"}
+                : "커밋 활동 요약 (AI)"}
             </button>
           </div>
         </div>
@@ -845,135 +844,47 @@ export function ProjectDetailPage() {
         onSubmit={handleEditSubmit}
       />
 
-      {isIntroModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-2xl rounded-xl bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                프로젝트 소개
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsIntroModalOpen(false)}
-                className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
-                aria-label="닫기"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
+      <GeneratedTextModal
+        isOpen={isIntroModalOpen}
+        title="프로젝트 소개"
+        text={projectIntro}
+        emptyText="생성된 프로젝트 소개가 없습니다."
+        isLoading={isGeneratingIntro}
+        error={projectIntroError}
+        loadingBorderClassName="border-primary"
+        onClose={() => setIsIntroModalOpen(false)}
+        onRegenerate={handleGenerateProjectIntro}
+        onCopy={async () => {
+          if (!projectIntro) return;
+          try {
+            await navigator.clipboard.writeText(projectIntro);
+            showToast("프로젝트 소개가 복사되었습니다.", "success");
+          } catch {
+            showToast("복사에 실패했습니다.", "error");
+          }
+        }}
+      />
 
-            <div className="px-6 py-5">
-              {isGeneratingIntro ? (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <span className="border-primary inline-block h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
-                  생성 중입니다...
-                </div>
-              ) : projectIntroError ? (
-                <p className="text-accent-dark text-sm">{projectIntroError}</p>
-              ) : (
-                <div className="max-h-[420px] overflow-y-auto rounded-lg bg-zinc-50 p-4">
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-800">
-                    {projectIntro || "생성된 프로젝트 소개가 없습니다."}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end gap-4 border-t border-gray-100 px-6 py-4">
-              <button
-                type="button"
-                onClick={handleGenerateProjectIntro}
-                disabled={isGeneratingIntro}
-                className="text-primary hover:text-primary-dark cursor-pointer text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                다시 생성
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!projectIntro) return;
-                  try {
-                    await navigator.clipboard.writeText(projectIntro);
-                    showToast("프로젝트 소개가 복사되었습니다.", "success");
-                  } catch {
-                    showToast("복사에 실패했습니다.", "error");
-                  }
-                }}
-                disabled={!projectIntro || isGeneratingIntro}
-                className="hover:text-primary inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Copy className="h-4 w-4" />
-                복사
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isSummaryModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
-          <div className="w-full max-w-2xl rounded-xl bg-white shadow-sm">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                커밋 활동 요약
-              </h3>
-              <button
-                type="button"
-                onClick={() => setIsSummaryModalOpen(false)}
-                className="cursor-pointer text-gray-400 transition-colors hover:text-gray-600"
-                aria-label="닫기"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="px-6 py-5">
-              {isGeneratingSummary ? (
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <span className="border-accent inline-block h-4 w-4 animate-spin rounded-full border-2 border-t-transparent" />
-                  생성 중입니다...
-                </div>
-              ) : aiSummaryError ? (
-                <p className="text-accent-dark text-sm">{aiSummaryError}</p>
-              ) : (
-                <div className="max-h-[420px] overflow-y-auto rounded-lg bg-zinc-50 p-4">
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap text-gray-800">
-                    {aiSummary || "생성된 요약이 없습니다."}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center justify-end gap-4 border-t border-gray-100 px-6 py-4">
-              <button
-                type="button"
-                onClick={handleGenerateAiSummary}
-                disabled={isGeneratingSummary}
-                className="text-primary hover:text-primary-dark cursor-pointer text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                다시 생성
-              </button>
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!aiSummary) return;
-                  try {
-                    await navigator.clipboard.writeText(aiSummary);
-                    showToast("커밋 활동 요약이 복사되었습니다.", "success");
-                  } catch {
-                    showToast("복사에 실패했습니다.", "error");
-                  }
-                }}
-                disabled={!aiSummary || isGeneratingSummary}
-                className="hover:text-primary inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Copy className="h-4 w-4" />
-                복사
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <GeneratedTextModal
+        isOpen={isSummaryModalOpen}
+        title="커밋 활동 요약"
+        text={aiSummary}
+        emptyText="생성된 커밋 활동 요약이 없습니다."
+        isLoading={isGeneratingSummary}
+        error={aiSummaryError}
+        loadingBorderClassName="border-accent"
+        onClose={() => setIsSummaryModalOpen(false)}
+        onRegenerate={handleGenerateAiSummary}
+        onCopy={async () => {
+          if (!aiSummary) return;
+          try {
+            await navigator.clipboard.writeText(aiSummary);
+            showToast("커밋 활동 요약이 복사되었습니다.", "success");
+          } catch {
+            showToast("복사에 실패했습니다.", "error");
+          }
+        }}
+      />
     </div>
   );
 }
