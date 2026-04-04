@@ -496,7 +496,7 @@ export const mockRecent7DaysCommits = Array.from({ length: 7 }, (_, i) => {
   };
 });
 
-// 쪽지 mock
+// 메시지 mock
 export const mockMessageUsers: MessageUserSearchItem[] = [
   {
     userId: 2,

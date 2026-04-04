@@ -237,7 +237,7 @@ export interface Commit {
   commitDate: string;
 }
 
-// 쪽지
+// 메시지
 export interface MessageListItem {
   messageId: number;
   senderId: number | null;

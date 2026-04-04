@@ -111,3 +111,17 @@ export async function getCommitHistory(
     return mockApi.commit.getCommitHistory(projectId);
   }
 }
+
+export async function getProjectIntro(projectId: number): Promise<string> {
+  const response = await apiClient.post<string>(
+    `/projects/${projectId}/commits/project-intro`
+  );
+  return response.data;
+}
+
+export async function getAiSummary(projectId: number): Promise<string> {
+  const response = await apiClient.post<string>(
+    `/projects/${projectId}/commits/ai-summary`
+  );
+  return response.data;
+}

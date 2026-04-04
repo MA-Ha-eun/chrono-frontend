@@ -23,6 +23,8 @@ import {
   syncCommits,
   getCommitSummary,
   getCommitHistory,
+  getProjectIntro,
+  getAiSummary,
 } from "@/lib/api/commit";
 import { isApiError } from "@/lib/api/client";
 import {
@@ -34,6 +36,7 @@ import {
 import { Badge } from "@/components/common/Badge";
 import { ConfirmModal } from "@/components/common/ConfirmModal";
 import { ProjectEditModal } from "@/components/projects/ProjectEditModal";
+import { GeneratedTextModal } from "@/components/projects/GeneratedTextModal";
 import { useToastStore } from "@/stores/toastStore";
 import {
   SkeletonCard,
@@ -64,6 +67,16 @@ export function ProjectDetailPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [isIntroModalOpen, setIsIntroModalOpen] = useState(false);
+  const [isGeneratingIntro, setIsGeneratingIntro] = useState(false);
+  const [projectIntro, setProjectIntro] = useState<string>("");
+  const [projectIntroError, setProjectIntroError] = useState<string | null>(
+    null
+  );
+  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string>("");
+  const [aiSummaryError, setAiSummaryError] = useState<string | null>(null);
 
   const loadProject = useCallback(async () => {
     if (!id) return;
@@ -214,6 +227,50 @@ export function ProjectDetailPage() {
       }
     } finally {
       setIsDeleteModalOpen(false);
+    }
+  };
+
+  const handleGenerateProjectIntro = async () => {
+    if (!id || isGeneratingIntro) return;
+
+    setIsIntroModalOpen(true);
+    setIsGeneratingIntro(true);
+    setProjectIntroError(null);
+
+    try {
+      const intro = await getProjectIntro(Number(id));
+      setProjectIntro(intro);
+    } catch (err) {
+      if (isApiError(err)) {
+        setProjectIntroError(
+          err.message || "프로젝트 소개 생성에 실패했습니다."
+        );
+      } else {
+        setProjectIntroError("프로젝트 소개 생성 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsGeneratingIntro(false);
+    }
+  };
+
+  const handleGenerateAiSummary = async () => {
+    if (!id || isGeneratingSummary) return;
+
+    setIsSummaryModalOpen(true);
+    setIsGeneratingSummary(true);
+    setAiSummaryError(null);
+
+    try {
+      const summary = await getAiSummary(Number(id));
+      setAiSummary(summary);
+    } catch (err) {
+      if (isApiError(err)) {
+        setAiSummaryError(err.message || "커밋 활동 요약 생성에 실패했습니다.");
+      } else {
+        setAiSummaryError("커밋 활동 요약 생성 중 오류가 발생했습니다.");
+      }
+    } finally {
+      setIsGeneratingSummary(false);
     }
   };
 
@@ -496,6 +553,37 @@ export function ProjectDetailPage() {
               프로젝트를 확인하고 관리하세요.
             </p>
           )}
+          <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-2">
+            <button
+              type="button"
+              onClick={handleGenerateProjectIntro}
+              disabled={isGeneratingIntro}
+              className="text-primary hover:text-primary-dark inline-flex cursor-pointer items-center gap-2 text-sm text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="bg-primary/70 absolute inline-flex h-full w-full animate-ping rounded-full" />
+                <span className="bg-primary relative inline-flex h-2 w-2 rounded-full" />
+              </span>
+              {isGeneratingIntro
+                ? "프로젝트 소개 생성 중..."
+                : "프로젝트 소개 생성하기 (AI)"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleGenerateAiSummary}
+              disabled={isGeneratingSummary}
+              className="text-accent hover:text-accent-dark inline-flex cursor-pointer items-center gap-2 text-sm text-gray-500 transition-colors disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <span className="relative flex h-2 w-2">
+                <span className="bg-accent/70 absolute inline-flex h-full w-full animate-ping rounded-full" />
+                <span className="bg-accent relative inline-flex h-2 w-2 rounded-full" />
+              </span>
+              {isGeneratingSummary
+                ? "커밋 활동 요약 생성 중..."
+                : "커밋 활동 요약 (AI)"}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -754,6 +842,48 @@ export function ProjectDetailPage() {
         onClose={() => setIsEditModalOpen(false)}
         project={project}
         onSubmit={handleEditSubmit}
+      />
+
+      <GeneratedTextModal
+        isOpen={isIntroModalOpen}
+        title="프로젝트 소개"
+        text={projectIntro}
+        emptyText="생성된 프로젝트 소개가 없습니다."
+        isLoading={isGeneratingIntro}
+        error={projectIntroError}
+        loadingBorderClassName="border-primary"
+        onClose={() => setIsIntroModalOpen(false)}
+        onRegenerate={handleGenerateProjectIntro}
+        onCopy={async () => {
+          if (!projectIntro) return;
+          try {
+            await navigator.clipboard.writeText(projectIntro);
+            showToast("프로젝트 소개가 복사되었습니다.", "success");
+          } catch {
+            showToast("복사에 실패했습니다.", "error");
+          }
+        }}
+      />
+
+      <GeneratedTextModal
+        isOpen={isSummaryModalOpen}
+        title="커밋 활동 요약"
+        text={aiSummary}
+        emptyText="생성된 커밋 활동 요약이 없습니다."
+        isLoading={isGeneratingSummary}
+        error={aiSummaryError}
+        loadingBorderClassName="border-accent"
+        onClose={() => setIsSummaryModalOpen(false)}
+        onRegenerate={handleGenerateAiSummary}
+        onCopy={async () => {
+          if (!aiSummary) return;
+          try {
+            await navigator.clipboard.writeText(aiSummary);
+            showToast("커밋 활동 요약이 복사되었습니다.", "success");
+          } catch {
+            showToast("복사에 실패했습니다.", "error");
+          }
+        }}
       />
     </div>
   );

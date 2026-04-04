@@ -1,7 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, MessagesSquare, UserCog } from "lucide-react";
 import { Button } from "@/components/common/Button";
 import { useAuthStore } from "@/stores/authStore";
 import { getUnreadMessageCount } from "@/lib/api/message";
@@ -135,34 +135,35 @@ export function Navbar() {
               })}
             </div>
 
-            <div className="hidden items-center justify-end gap-1 md:flex">
+            <div className="hidden items-center justify-end gap-1.5 md:flex">
               <Link
                 to="/messages"
+                aria-label="메시지"
                 className={cn(
-                  "hover:text-primary relative rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors",
-                  isActive("/messages") && "text-primary font-semibold",
-                  unreadCount > 0 && "pr-5"
+                  "hover:text-primary relative flex h-9 w-9 items-center justify-center rounded-lg text-gray-700 transition-colors",
+                  isActive("/messages") && "text-primary"
                 )}
               >
-                쪽지
+                <MessagesSquare className="h-5 w-5" />
                 {unreadCount > 0 && (
-                  <span className="bg-accent absolute -top-0.5 right-0 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-medium text-white">
+                  <span className="bg-accent absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-medium text-white">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}
               </Link>
               <Link
                 to="/settings"
+                aria-label="계정"
                 className={cn(
-                  "hover:text-primary rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors",
-                  isActive("/settings") && "text-primary font-semibold"
+                  "hover:text-primary flex h-9 w-9 items-center justify-center rounded-lg text-gray-700 transition-colors",
+                  isActive("/settings") && "text-primary"
                 )}
               >
-                계정
+                <UserCog className="h-5 w-5" />
               </Link>
               <button
                 onClick={handleLogout}
-                className="hover:text-accent cursor-pointer rounded-lg py-2 pr-0 pl-3 text-gray-700 transition-colors"
+                className="hover:text-accent flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-gray-700 transition-colors"
                 aria-label="로그아웃"
               >
                 <LogOut className="h-5 w-5" />
@@ -207,32 +208,32 @@ export function Navbar() {
                 </Link>
               );
             })}
+            <Link
+              to="/messages"
+              onClick={closeMobileMenu}
+              className="hover:text-primary flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors"
+            >
+              메시지
+              {unreadCount > 0 && (
+                <span className="bg-accent rounded-full px-2 py-0.5 text-xs font-medium text-white">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Link>
+            <Link
+              to="/settings"
+              onClick={closeMobileMenu}
+              className="hover:text-primary block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors"
+            >
+              계정
+            </Link>
             <div className="mt-2 border-t border-gray-100 pt-2">
-              <Link
-                to="/messages"
-                onClick={closeMobileMenu}
-                className="hover:text-primary flex items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors"
-              >
-                쪽지
-                {unreadCount > 0 && (
-                  <span className="bg-accent rounded-full px-2 py-0.5 text-xs font-medium text-white">
-                    {unreadCount > 99 ? "99+" : unreadCount}
-                  </span>
-                )}
-              </Link>
-              <Link
-                to="/settings"
-                onClick={closeMobileMenu}
-                className="hover:text-primary block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors"
-              >
-                계정
-              </Link>
               <button
                 onClick={handleLogout}
-                className="hover:text-accent flex w-full cursor-pointer items-center rounded-lg px-3 py-2.5 text-gray-700 transition-colors"
+                className="hover:text-accent block w-full cursor-pointer rounded-lg px-3 py-2.5 text-left text-sm font-medium text-gray-700 transition-colors"
                 aria-label="로그아웃"
               >
-                <LogOut className="h-5 w-5" />
+                로그아웃
               </button>
             </div>
           </div>

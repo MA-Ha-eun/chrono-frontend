@@ -97,13 +97,13 @@ export function MessageComposePage() {
     setIsSubmitting(true);
     try {
       await sendMessage(payload);
-      showToast("쪽지를 보냈습니다.", "success");
+      showToast("메시지를 보냈습니다.", "success");
       navigate("/messages");
     } catch (err) {
       if (isApiError(err)) {
-        showToast(err.message || "쪽지 보내기에 실패했습니다.", "error");
+        showToast(err.message || "메시지 보내기에 실패했습니다.", "error");
       } else {
-        showToast("쪽지를 보내는 중 오류가 발생했습니다.", "error");
+        showToast("메시지를 보내는 중 오류가 발생했습니다.", "error");
       }
     } finally {
       setIsSubmitting(false);
@@ -128,19 +128,19 @@ export function MessageComposePage() {
         <Card className="border-0 p-6 shadow-sm sm:p-8">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900 md:text-3xl">
-              쪽지 보내기
+              메시지 보내기
             </h1>
           </div>
           <div className="space-y-6">
             <div className="space-y-1.5">
-              <div className="mb-1.5 flex items-center justify-between">
+              <div className="mb-1.5 flex items-start justify-between gap-2">
                 <label className="block text-sm font-medium text-gray-700">
                   받는 사람
                 </label>
                 {receiverGuideMessage && (
                   <span
                     className={cn(
-                      "text-xs",
+                      "max-w-[65%] text-right text-xs leading-tight break-words",
                       searchError ? "text-accent-dark" : "text-gray-500"
                     )}
                   >
@@ -243,7 +243,7 @@ export function MessageComposePage() {
                     : "focus:border-primary focus:ring-primary border-gray-300 bg-white",
                   "disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500"
                 )}
-                placeholder="보낼 내용을 입력해주세요"
+                placeholder="메시지 내용을 입력해주세요"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
               />
@@ -262,7 +262,7 @@ export function MessageComposePage() {
                 type="button"
                 variant="outline"
                 onClick={() => {
-                  // 팝업으로 열린 경우 창 닫기, 아니면 쪽지함으로 이동
+                  // 팝업으로 열린 경우 창 닫기, 아니면 메시지함으로 이동
                   if (window.name === "message-compose") {
                     window.close();
                   } else {

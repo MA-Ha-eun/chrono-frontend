@@ -5,7 +5,7 @@
 버전: v1.3
 
 작성일: 2025-12-02  
-수정일: 2026-02-11
+수정일: 2026-03-27
 
 기반 문서: PRD.md, FRS.md
 
@@ -649,7 +649,7 @@ Query Parameter: `username` (String)
 
 ---
 
-## 🔹 6.6 PAT 연동 해제
+## 🔹 6.5 PAT 연동 해제
 
 ### `DELETE /api/github/pat`
 
@@ -677,7 +677,7 @@ Query Parameter: `username` (String)
 
 ---
 
-## 🔹 6.5 Repo 커밋 데이터 조회 (내부 호출)
+## 🔹 6.6 Repo 커밋 데이터 조회 (내부 호출)
 
 ### 사용처: 프로젝트 생성 시 자동 호출
 
@@ -1090,6 +1090,60 @@ Query Parameter: `username` (String)
 
 ---
 
+## 🔹 8.7 AI 커밋 요약 생성
+
+### `POST /api/projects/{projectId}/commits/ai-summary`
+
+**인증:** 필요
+
+### Request
+
+본문 없음
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": "이 프로젝트는 최근 2주간 인증/권한 로직을 중심으로 개선되었고..."
+}
+```
+
+**비고:**
+
+- 프로젝트 커밋 내역 기반의 AI 요약 텍스트를 생성
+- 프론트에서는 상세 페이지의 "요약 생성" 액션으로 연동 가능
+
+---
+
+## 🔹 8.8 AI 프로젝트 소개문 생성
+
+### `POST /api/projects/{projectId}/commits/project-intro`
+
+**인증:** 필요
+
+### Request
+
+본문 없음
+
+### Response 200
+
+```json
+{
+  "success": true,
+  "message": "SUCCESS",
+  "data": "Chrono는 GitHub 커밋 데이터를 기반으로 프로젝트 진행 상황을 시각화하는 서비스입니다..."
+}
+```
+
+**비고:**
+
+- 프로젝트 정보 + 커밋 흐름을 바탕으로 소개문을 생성
+- README/포트폴리오용 소개문 초안 생성 기능으로 활용 가능
+
+---
+
 # 9. Dashboard API
 
 ## 🔹 9.1 대시보드 전체 데이터 조회
@@ -1184,9 +1238,9 @@ status ∈ {
 
 ---
 
-# 13. 쪽지(Message) API
+# 13. 메시지(Message) API
 
-## ✔ 13.1 쪽지 전송
+## ✔ 13.1 메시지 전송
 
 - **URL**: `POST /api/v1/messages`
 - **인증**: 필요
@@ -1196,7 +1250,7 @@ status ∈ {
 ```json
 {
   "receiverId": 1,
-  "content": "쪽지 테스트"
+  "content": "메시지 테스트"
 }
 ```
 
@@ -1212,7 +1266,7 @@ status ∈ {
 
 ---
 
-## ✔ 13.2 받은 쪽지 목록 조회
+## ✔ 13.2 받은 메시지 목록 조회
 
 - **URL**: `GET /api/v1/messages/inbox`
 - **인증**: 필요
@@ -1232,7 +1286,7 @@ status ∈ {
         "senderNickname": "상어어어",
         "receiverId": 3,
         "receiverNickname": "고래",
-        "content": "쪽지 테스트",
+        "content": "메시지 테스트",
         "read": true,
         "createdAt": "2026-01-31T14:40:01.278762"
       }
@@ -1245,15 +1299,15 @@ status ∈ {
 
 ---
 
-## ✔ 13.3 보낸 쪽지 목록 조회
+## ✔ 13.3 보낸 메시지 목록 조회
 
 - **URL**: `GET /api/v1/messages/sent`
 - **인증**: 필요
-- **비고**: 응답 구조는 받은 쪽지와 동일 (보낸 사람/받는 사람 필드만 다름)
+- **비고**: 응답 구조는 받은 메시지와 동일 (보낸 사람/받는 사람 필드만 다름)
 
 ---
 
-## ✔ 13.4 쪽지 상세 조회
+## ✔ 13.4 메시지 상세 조회
 
 - **URL**: `GET /api/v1/messages/{messageId}`
 - **인증**: 필요
@@ -1270,7 +1324,7 @@ status ∈ {
     "senderNickname": "상어어어",
     "receiverId": 3,
     "receiverNickname": "고래",
-    "content": "쪽지 테스트",
+    "content": "메시지 테스트",
     "read": true,
     "createdAt": "2026-01-31T14:40:01.278762"
   }
@@ -1279,15 +1333,15 @@ status ∈ {
 
 ---
 
-## ✔ 13.5 쪽지 삭제
+## ✔ 13.5 메시지 삭제
 
 - **URL**: `DELETE /api/v1/messages/{messageId}`
 - **인증**: 필요
-- **비고**: 쪽지를 보낸 사람/받은 사람만 삭제 가능, 이미 삭제한 쪽지는 조회 불가
+- **비고**: 메시지를 보낸 사람/받은 사람만 삭제 가능, 이미 삭제한 메시지는 조회 불가
 
 ---
 
-## ✔ 13.6 사용자 검색 (쪽지 수신 대상)
+## ✔ 13.6 사용자 검색 (메시지 수신 대상)
 
 - **URL**: `GET /api/v1/messages/users/search`
 - **인증**: 필요
@@ -1319,7 +1373,7 @@ status ∈ {
 
 ---
 
-## ✔ 13.7 읽지 않은 쪽지 수 조회
+## ✔ 13.7 읽지 않은 메시지 수 조회
 
 - **URL**: `GET /api/v1/messages/unread-count`
 - **인증**: 필요
@@ -1342,7 +1396,7 @@ status ∈ {
 
 - **URL**: `GET /api/v1/messages/subscribe`
 - **인증**: 필요
-- **설명**: Server-Sent Events(SSE)를 이용해 **새 쪽지 도착 시 실시간 알림**을 받기 위한 연결 엔드포인트
+- **설명**: Server-Sent Events(SSE)를 이용해 **새 메시지 도착 시 실시간 알림**을 받기 위한 연결 엔드포인트
 
 ---
 

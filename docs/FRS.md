@@ -3,7 +3,7 @@
 **버전:** v1.0
 
 **작성일:** 2025-12-02
-**수정일:** 2025-12-25
+**수정일:** 2026-03-27
 
 ---
 
@@ -75,6 +75,10 @@ PRD.md에 정의된 목적·플로우·컨셉을 기반으로 실제 **기능 �
 
 - [U-05] 프로필 수정(닉네임/소개)
 - [P-06] 프로젝트 상세 UI 고도화
+- [P-07] 커밋 기반 AI 요약 생성
+- [P-08] 커밋/프로젝트 정보 기반 소개문 생성
+- [M-01] 메시지 송수신 및 목록/상세 조회
+- [M-02] 읽지 않은 메시지 수/실시간 알림
 - [D-05] 대시보드 캐싱
 - [GH-04] GitHub API Rate Limit UI 대응
 
@@ -211,6 +215,22 @@ PRD.md에 정의된 목적·플로우·컨셉을 기반으로 실제 **기능 �
 
 ---
 
+### [P-07] 커밋 기반 AI 요약 생성
+
+- **설명:** 프로젝트 커밋 내역을 분석해 AI 요약 문장을 생성
+- **API:** `POST /api/projects/{projectId}/commits/ai-summary`
+- **활용:** 프로젝트 상세에서 "요약 생성" 액션으로 표시/복사 가능
+
+---
+
+### [P-08] 커밋/프로젝트 정보 기반 소개문 생성
+
+- **설명:** 프로젝트 정보와 커밋 흐름을 바탕으로 소개문 초안을 생성
+- **API:** `POST /api/projects/{projectId}/commits/project-intro`
+- **활용:** README/포트폴리오용 소개문 작성 보조
+
+---
+
 ## 4.4 대시보드 (Dashboard)
 
 ### [D-01] 요약 카드
@@ -248,13 +268,35 @@ PRD.md에 정의된 목적·플로우·컨셉을 기반으로 실제 **기능 �
 
 ### [C-02] 인증 보호
 
-- `/dashboard`, `/projects/**`, `/settings`는 보호 라우트
+- `/dashboard`, `/projects/**`, `/messages/**`, `/settings`는 보호 라우트
 - 토큰 만료 시 로그인 페이지로 리다이렉트
 
 ### [C-03] 레이아웃
 
 - 상단 네비게이션
 - 페이지 공통 padding/width
+
+---
+
+## 4.6 메시지 (Messages)
+
+### [M-01] 메시지 송수신 및 조회
+
+- **설명:** 사용자 간 메시지 전송, 받은/보낸 목록 조회, 상세 조회, 삭제
+- **API:**
+  - `POST /api/v1/messages`
+  - `GET /api/v1/messages/inbox`
+  - `GET /api/v1/messages/sent`
+  - `GET /api/v1/messages/{messageId}`
+  - `DELETE /api/v1/messages/{messageId}`
+  - `GET /api/v1/messages/users/search`
+
+### [M-02] 읽지 않은 메시지 수 / 실시간 알림
+
+- **설명:** 네비게이션에서 읽지 않은 메시지 수를 표시하고, 실시간 이벤트로 갱신
+- **API:**
+  - `GET /api/v1/messages/unread-count`
+  - `GET /api/v1/messages/subscribe` (SSE)
 
 ---
 
