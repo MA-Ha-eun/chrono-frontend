@@ -9,6 +9,52 @@ import { useAuthStore } from "@/stores/authStore";
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
 
+type ApiMode = "real" | "mock" | "auto";
+
+export function getApiMode(): ApiMode {
+  const raw = String(import.meta.env.VITE_API_MODE ?? "").toLowerCase();
+  if (raw === "real" || raw === "mock" || raw === "auto") {
+    return raw;
+  }
+
+  // 기존 동작 유지. DEV + VITE_USE_MOCK=true면 항상 mock
+  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+    return "mock";
+  }
+
+  return "real";
+}
+
+type BackendAvailability = "unknown" | "available" | "unavailable";
+let backendAvailability: BackendAvailability = "unknown";
+let backendAvailabilityExpiresAt = 0;
+
+function cacheBackendAvailability(value: BackendAvailability, ttlMs: number) {
+  backendAvailability = value;
+  backendAvailabilityExpiresAt = Date.now() + ttlMs;
+}
+
+export function markBackendUnavailable(ttlMs = 30_000) {
+  cacheBackendAvailability("unavailable", ttlMs);
+}
+
+function isBackendUnavailableCached(): boolean {
+  const now = Date.now();
+  return (
+    backendAvailability === "unavailable" && now < backendAvailabilityExpiresAt
+  );
+}
+
+export async function shouldUseMock(): Promise<boolean> {
+  const mode = getApiMode();
+  if (mode === "mock") return true;
+  if (mode === "real") return false;
+
+  // 최근 네트워크 레벨로 서버 죽었다 확인될 때 auto
+  // 다음 호출부터 즉시 mock 전환
+  return isBackendUnavailableCached();
+}
+
 let isRefreshing = false;
 let refreshSubscribers: Array<(token: string) => void> = [];
 
@@ -83,6 +129,10 @@ apiClient.interceptors.request.use(
 );
 apiClient.interceptors.response.use(
   (response) => {
+    // 어떤 형태로든 응답 오면
+    if (getApiMode() === "auto") {
+      cacheBackendAvailability("available", 15_000);
+    }
     if (
       response.data &&
       typeof response.data === "object" &&
@@ -100,6 +150,11 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
+
+    // 네트워크 레벨에서 응답 자체가 없으면 (서버 다운 등) auto 모드에서 빠르게 mock 전환할 수 있게 캐시
+    if (getApiMode() === "auto" && !error.response) {
+      markBackendUnavailable();
+    }
 
     const isAuthEndpoint =
       originalRequest?.url?.includes("/auth/login") ||
@@ -224,7 +279,37 @@ export function isApiError(error: unknown): error is ApiError {
   );
 }
 
+export function isNetworkError(error: unknown): boolean {
+  if (axios.isAxiosError(error)) {
+    // 응답 자체가 없는 경우(서버 다운/연결 실패/CORS 등) 또는 timeout
+    if (!error.response) return true;
+    if (error.code === "ECONNABORTED") return true;
+    if (typeof error.message === "string" && error.message.includes("timeout"))
+      return true;
+    if (
+      typeof error.message === "string" &&
+      error.message.includes("Network Error")
+    )
+      return true;
+  }
+
+  // interceptor에서 AxiosError를 ApiError로 normalize한 경우도 네트워크 성격 인지해야
+  if (isApiError(error)) {
+    if (error.message === "네트워크 연결을 확인해주세요.") return true;
+    if (error.message.startsWith("요청 시간이 초과되었습니다.")) return true;
+  }
+
+  return false;
+}
+
 export function shouldUseMockFallback(error: unknown): boolean {
+  // auto 모드에선 네트워크 에러일 때만 mock fallback
+  if (getApiMode() === "auto") {
+    // 캐시가 이미 unavailable이면 에러 형태와 무관하게 fallback 허용
+    if (isBackendUnavailableCached()) return true;
+    return isNetworkError(error);
+  }
+
   if (!isApiError(error)) {
     return true;
   }

@@ -1,4 +1,4 @@
-import { apiClient, shouldUseMockFallback } from "./client";
+import { apiClient, shouldUseMock, shouldUseMockFallback } from "./client";
 import { getErrorInfo } from "@/lib/utils";
 import {
   MessageDetail,
@@ -13,7 +13,7 @@ import { mockApi } from "@/lib/mock/api";
 const BASE = "/v1/messages";
 
 export async function sendMessage(data: SendMessageRequest): Promise<void> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     await mockApi.message.sendMessage(data);
     return;
   }
@@ -40,7 +40,7 @@ export async function getInboxMessages(
   page = 0,
   size = 20
 ): Promise<PageResponse<MessageListItem>> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.message.getInboxMessages(page, size);
   }
 
@@ -70,7 +70,7 @@ export async function getSentMessages(
   page = 0,
   size = 20
 ): Promise<PageResponse<MessageListItem>> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.message.getSentMessages(page, size);
   }
 
@@ -99,7 +99,7 @@ export async function getSentMessages(
 export async function getMessageDetail(
   messageId: number
 ): Promise<MessageDetail> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.message.getMessageDetail(messageId);
   }
 
@@ -123,7 +123,7 @@ export async function getMessageDetail(
 }
 
 export async function deleteMessage(messageId: number): Promise<void> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     await mockApi.message.deleteMessage(messageId);
     return;
   }
@@ -151,7 +151,7 @@ export async function searchMessageUsers(
   page = 0,
   size = 20
 ): Promise<PageResponse<MessageUserSearchItem>> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.message.searchUsers(keyword, page, size);
   }
 
@@ -178,7 +178,7 @@ export async function searchMessageUsers(
 }
 
 export async function getUnreadMessageCount(): Promise<UnreadMessageCountResponse> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.message.getUnreadMessageCount();
   }
 
