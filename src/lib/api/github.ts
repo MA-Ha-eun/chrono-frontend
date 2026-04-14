@@ -1,4 +1,4 @@
-import { apiClient, shouldUseMockFallback } from "./client";
+import { apiClient, shouldUseMock, shouldUseMockFallback } from "./client";
 import { getErrorInfo } from "@/lib/utils";
 import {
   GitHubRepo,
@@ -14,6 +14,17 @@ import { mockApi } from "@/lib/mock/api";
 export async function validateGitHubUsername(
   username: string
 ): Promise<GitHubUsernameValidation> {
+  if (await shouldUseMock()) {
+    const normalized = username.trim();
+    return {
+      valid: !!normalized,
+      username: normalized,
+      avatarUrl: null,
+      message: normalized
+        ? "사용 가능한 사용자명입니다."
+        : "사용자명을 입력해주세요.",
+    };
+  }
   const response = await apiClient.get<GitHubUsernameValidation>(
     "/github/validate",
     {
@@ -26,6 +37,14 @@ export async function validateGitHubUsername(
 export async function connectGitHubBasic(
   data: GitHubConnectBasicRequest
 ): Promise<GitHubConnectBasicResponse> {
+  if (await shouldUseMock()) {
+    return {
+      connected: true,
+      type: "BASIC",
+      username: data.username,
+      message: "mock: GitHub 연결(기본) 성공",
+    };
+  }
   const response = await apiClient.post<GitHubConnectBasicResponse>(
     "/github/connect-basic",
     data
@@ -36,6 +55,13 @@ export async function connectGitHubBasic(
 export async function connectGitHubPat(
   data: GitHubConnectPatRequest
 ): Promise<GitHubConnectPatResponse> {
+  if (await shouldUseMock()) {
+    return {
+      connected: true,
+      type: "FULL",
+      message: "mock: GitHub 연결(PAT) 성공",
+    };
+  }
   const response = await apiClient.post<GitHubConnectPatResponse>(
     "/github/connect-pat",
     data
@@ -44,13 +70,20 @@ export async function connectGitHubPat(
 }
 
 export async function disconnectGitHubPat(): Promise<GitHubDisconnectPatResponse> {
+  if (await shouldUseMock()) {
+    return {
+      connected: false,
+      type: "BASIC",
+      message: "mock: GitHub PAT 연결 해제",
+    };
+  }
   const response =
     await apiClient.delete<GitHubDisconnectPatResponse>("/github/pat");
   return response.data;
 }
 
 export async function getRepos(): Promise<GitHubRepo[]> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.github.getRepos();
   }
 

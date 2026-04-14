@@ -1,4 +1,4 @@
-import { apiClient, shouldUseMockFallback } from "./client";
+import { apiClient, shouldUseMock, shouldUseMockFallback } from "./client";
 import { getErrorInfo } from "@/lib/utils";
 import {
   Project,
@@ -13,7 +13,7 @@ export async function createProject(
   data: CreateProjectRequest,
   owner?: string
 ): Promise<{ projectId: number }> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     const mockProject = await mockApi.project.createProject(data);
     return { projectId: mockProject.projectId };
   }
@@ -80,7 +80,7 @@ interface BackendProjectResponse {
 }
 
 export async function getProjects(): Promise<ProjectListItem[]> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.project.getProjects();
   }
 
@@ -131,7 +131,7 @@ interface BackendProjectDetailResponse {
 }
 
 export async function getProject(id: number): Promise<Project> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.project.getProject(id);
   }
 
@@ -174,7 +174,7 @@ export async function updateProject(
   id: number,
   data: UpdateProjectRequest
 ): Promise<Project> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.project.updateProject(id, data);
   }
 
@@ -215,7 +215,7 @@ export async function updateProjectStatus(
   id: number,
   status: ProjectStatus
 ): Promise<void> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     await mockApi.project.updateProject(id, { status });
     return;
   }
@@ -240,7 +240,7 @@ export async function updateProjectStatus(
 }
 
 export async function deleteProject(id: number): Promise<void> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.project.deleteProject();
   }
 

@@ -1,10 +1,10 @@
-import { apiClient, shouldUseMockFallback } from "./client";
+import { apiClient, shouldUseMock, shouldUseMockFallback } from "./client";
 import { getErrorInfo } from "@/lib/utils";
 import { DailyCommitCount, DashboardResponse } from "@/types/api";
 import { mockApi } from "@/lib/mock/api";
 
 export async function getDashboard(): Promise<DashboardResponse> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.dashboard.getDashboard();
   }
 
@@ -28,7 +28,7 @@ export async function getDashboard(): Promise<DashboardResponse> {
 }
 
 export async function getRecent7DaysCommits(): Promise<DailyCommitCount[]> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.dashboard.getRecent7DaysCommits();
   }
 

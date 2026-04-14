@@ -1,4 +1,4 @@
-import { apiClient, shouldUseMockFallback } from "./client";
+import { apiClient, shouldUseMock, shouldUseMockFallback } from "./client";
 import { getErrorInfo } from "@/lib/utils";
 import {
   User,
@@ -11,7 +11,7 @@ import { mockApi } from "@/lib/mock/api";
 import { connectGitHubBasic } from "./github";
 
 export async function getMe(): Promise<User> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.user.getMe();
   }
 
@@ -37,7 +37,7 @@ export async function getMe(): Promise<User> {
 export async function updateGithubUsername(
   data: UpdateGithubUsernameRequest
 ): Promise<UpdateGithubUsernameResponse> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.user.updateGithubUsername(data);
   }
 
@@ -63,7 +63,7 @@ export async function updateGithubUsername(
 }
 
 export async function updateProfile(data: UpdateProfileRequest): Promise<User> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.user.updateProfile(data);
   }
 
@@ -89,7 +89,7 @@ export async function updateProfile(data: UpdateProfileRequest): Promise<User> {
 export async function updatePassword(
   data: UpdatePasswordRequest
 ): Promise<void> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.user.updatePassword(data);
   }
 

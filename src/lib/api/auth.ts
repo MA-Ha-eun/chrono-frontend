@@ -1,4 +1,10 @@
-import { apiClient, refreshClient } from "./client";
+import {
+  apiClient,
+  getApiMode,
+  isNetworkError,
+  refreshClient,
+  shouldUseMock,
+} from "./client";
 import { getErrorInfo } from "@/lib/utils";
 import {
   LoginRequest,
@@ -29,7 +35,7 @@ export async function signup(data: SignupRequest): Promise<void> {
 }
 
 export async function login(data: LoginRequest): Promise<LoginResponse> {
-  if (import.meta.env.DEV && import.meta.env.VITE_USE_MOCK === "true") {
+  if (await shouldUseMock()) {
     return mockApi.auth.login(data);
   }
 
@@ -48,6 +54,10 @@ export async function login(data: LoginRequest): Promise<LoginResponse> {
       },
     };
   } catch (error) {
+    if (getApiMode() === "auto" && !isNetworkError(error)) {
+      throw error;
+    }
+
     const errorInfo = getErrorInfo(error);
 
     if (import.meta.env.DEV) {
@@ -67,10 +77,16 @@ export async function refreshToken(): Promise<string> {
 }
 
 export async function logout(): Promise<void> {
+  if (await shouldUseMock()) {
+    return;
+  }
   await apiClient.post("/auth/logout");
 }
 
 export async function deleteAccount(): Promise<void> {
+  if (await shouldUseMock()) {
+    return;
+  }
   await apiClient.delete("/auth");
 }
 
